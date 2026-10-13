@@ -1,0 +1,12 @@
+{
+ "state_fields": ["text", "channel_topic"],
+ "questions": {
+  "worth_a_video": {"type": "noul", "instructions": "`text` 는 `channel_topic` 채널에서 영상 한 편으로 만들 만한 소재다."},
+  "is_question":   {"type": "noul", "instructions": "`text` 는 시청자가 답을 듣고 싶어 하는 질문이나 요청이다."},
+  "is_complaint":  {"type": "noul", "instructions": "`text` 는 불만이나 문제 제기다."},
+  "is_noise":      {"type": "noul", "instructions": "`text` 는 인사·감탄·광고·도배처럼 내용이 없는 글이다."},
+  "kind": {"type": "choice", "instructions": "`text` 의 종류",
+           "criteria": {"소재 제안": "만들어 달라는 주제·아이디어", "질문": "답을 원하는 물음", "칭찬": "긍정 반응",
+                        "불만": "문제 제기·항의", "잡담·광고": "내용 없는 글이나 홍보", "해당 없음": "위 어느 것도 아니다"}}
+ }
+}

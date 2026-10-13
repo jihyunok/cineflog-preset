@@ -1,0 +1,19 @@
+{
+ "state_fields": ["shot"],
+ "questions": {
+  "place": {"type": "choice", "instructions": "`shot` describes one shot from the film Finch. Where does this shot take place?",
+            "criteria": {"desert": "outdoors in open desert, wasteland, dirt road or sandstorm away from buildings",
+                         "city": "outdoors among city streets, buildings, overpasses, parking lots or bridges",
+                         "vehicle_cab": "inside the cab of a truck or car (not the RV living area)",
+                         "rv": "inside the RV / motorhome (cockpit or living area)",
+                         "shelter": "inside Finch's shelter base: the tech company building, workshop, lab, corridors, decontamination room, shower, bedroom",
+                         "other_building": "inside some other building such as a store, house, hotel, theater or warehouse",
+                         "none": "none of these, or the place cannot be told"}},
+  "finch_look": {"type": "choice", "instructions": "`shot` describes one shot from the film Finch. How does Finch (the man) appear in this shot?",
+                 "criteria": {"suit": "wearing his protective suit and/or helmet",
+                              "shirtless": "shirtless or bare-chested, e.g. washing or showering",
+                              "clothes": "in ordinary clothes such as a t-shirt, shirt, jacket or coat",
+                              "absent": "Finch is not in the shot",
+                              "none": "none of these, or it cannot be told"}}
+ }
+}

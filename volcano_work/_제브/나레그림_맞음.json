@@ -1,0 +1,7 @@
+{
+ "state_fields": ["narration", "shot"],
+ "questions": {
+  "shows_narrated": {"type": "noul", "instructions": "`narration` is a line a film reviewer says while the picture described in `shot` is on screen. The picture shows something the narration line is talking about: the same people, object, place, or action."},
+  "contradicts": {"type": "noul", "instructions": "`narration` is a line a film reviewer says while the picture described in `shot` is on screen. The picture clearly belongs to a different situation than the one the narration describes (for example the narration talks about washing up inside while the picture shows a sandstorm outside)."}
+ }
+}

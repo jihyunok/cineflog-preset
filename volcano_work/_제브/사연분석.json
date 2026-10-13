@@ -1,0 +1,30 @@
+{
+ "_설명": "사연드라마 쇼츠 벤치 다섯 채널(10-13) 편별 상대 관계·결말 갈래·돈/재산 축. state title(제목)·script(받아쓴 대본, 없으면 빈칸). 거르기.py --spec 으로. 숫자 들어간 제목·조회수 배수는 코드로.",
+ "state_fields": ["title", "script"],
+ "questions": {
+  "counterpart": {"type": "choice",
+   "instructions": "This is a Korean first-person life-story short (사연). Who is the main other person the narrator deals with (the one who wrongs, worries or surprises the narrator)? Use `title`, and `script` if it is not empty.",
+   "criteria": {
+    "시댁·처가·사돈": "An in-law: mother-in-law, daughter-in-law, son-in-law, father-in-law, the other set of parents (사돈), sister-in-law",
+    "자식·손주": {"what": "The narrator's own son, daughter or grandchild", "not_for": "a son-in-law or daughter-in-law (that is 시댁·처가·사돈)"},
+    "부모": "The narrator's own father, mother or stepparent",
+    "부부": "The narrator's husband or wife (or ex-spouse)",
+    "형제·친척": "The narrator's brother, sister or other relatives",
+    "이웃·동네": "A neighbor, people in the village or apartment, the person next door",
+    "직장·일터": "A boss, employer, coworker, client at work, a day-labor employer",
+    "가게·손님": "A shop or restaurant owner and a customer, a regular customer, a landlord-tenant in a store",
+    "처음 보는 사람": "A stranger, a public official, a passenger, someone met by chance",
+    "해당 없음": "None of these, or it is not a story"
+   }},
+  "ending": {"type": "choice",
+   "instructions": "How does this story pay off at the end?",
+   "criteria": {
+    "사이다": "Someone who ignored, cheated or bullied the narrator gets what they deserve through proof or a calm counterattack; no hidden kindness is revealed",
+    "반전감동": "A person the narrator suspected, resented or misunderstood turns out to have a hidden good reason or secret kindness; no one is punished",
+    "둘 다": "Both happen in the same story: a wrongdoer is punished AND someone's hidden kindness is revealed",
+    "해당 없음": "Neither, or cannot tell from the text"
+   }},
+  "is_property": {"type": "noul", "instructions": "The story revolves around land, a house, an apartment, an inheritance, a will, or a large sum of family money."},
+  "is_family": {"type": "noul", "instructions": "The main conflict or secret is between family members (parents, children, spouses, in-laws, siblings, grandchildren)."}
+ }
+}

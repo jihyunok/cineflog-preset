@@ -1,0 +1,8 @@
+{
+ "state_fields": ["shot_a", "shot_b"],
+ "questions": {
+  "same_scene": {"type": "noul", "instructions": "`shot_a` and `shot_b` describe two consecutive shots from the film Finch. Both shots belong to the same continuous scene: the same location and the same ongoing situation, without a jump to another place or another time."},
+  "same_place": {"type": "noul", "instructions": "`shot_a` and `shot_b` describe two consecutive shots from the film Finch. Both shots are in the same place (the same room or building, the same vehicle interior, or the same outdoor area)."},
+  "same_daytime": {"type": "noul", "instructions": "`shot_a` and `shot_b` describe two consecutive shots from the film Finch. Both shots have the same time of day and weather (for example both at night, or both in the same sandstorm)."}
+ }
+}

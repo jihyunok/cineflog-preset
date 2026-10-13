@@ -1,0 +1,7 @@
+{
+ "state_fields": ["before", "after"],
+ "questions": {
+  "continues": {"type": "noul", "instructions": "`before` lists descriptions of three consecutive shots from the film Finch, and `after` lists the next three shots. The shots in `after` continue the same sequence as `before`: the same ongoing event at the same time, even if the camera cuts between inside and outside a vehicle or building, or between different characters taking part in it."},
+  "new_sequence": {"type": "noul", "instructions": "`before` lists descriptions of three consecutive shots from the film Finch, and `after` lists the next three shots. The first shot in `after` starts a new sequence: a different place, a later time, or a different event than the one in `before`."}
+ }
+}

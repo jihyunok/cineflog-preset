@@ -1,0 +1,677 @@
+[
+{
+"blk": 3,
+"split": false,
+"s": 1752.62,
+"d": 2.11,
+"ko": "뒤쪽에 낙하산이 있어요!",
+"mirror": false,
+"en": "There are parachutes in the back!"
+},
+{
+"blk": 4,
+"split": false,
+"s": 74.18,
+"d": 3.33,
+"ko": "아이고, 아프겠다.",
+"mirror": true,
+"en": "Ooh, ouch. That was painful."
+},
+{
+"blk": 5,
+"split": true,
+"s": 86.14,
+"d": 1.87,
+"ko": "지금 작전 중인 건 알죠?",
+"mirror": false,
+"en": "You know we're on a mission, right?"
+},
+{
+"blk": 6,
+"split": false,
+"s": 114.86,
+"d": 2.95,
+"ko": "목표물 인상착의와 일치해.",
+"mirror": false,
+"en": "Matching the target's description."
+},
+{
+"blk": 9,
+"split": false,
+"s": 170.22,
+"d": 1.75,
+"ko": "걸음걸이 분석 돌려.",
+"mirror": false,
+"en": "Get me gait analysis."
+},
+{
+"blk": 10,
+"split": false,
+"s": 186.32,
+"d": 1.13,
+"ko": "얼마나 거물인데?",
+"mirror": false,
+"en": "How high?"
+},
+{
+"blk": 11,
+"split": true,
+"s": 336.2,
+"d": 1.53,
+"ko": "움직이지 마.",
+"mirror": false,
+"en": "Don't move."
+},
+{
+"blk": 14,
+"split": false,
+"s": 469.58,
+"d": 1.45,
+"ko": "누가 그랬니, 아들?",
+"mirror": false,
+"en": "Who did it, son?"
+},
+{
+"blk": 15,
+"split": false,
+"s": 486.6,
+"d": 3.85,
+"ko": "이제 백악관에서도 해내겠습니다.",
+"mirror": true,
+"en": "and now we will do it at the Oval Office"
+},
+{
+"blk": 18,
+"split": false,
+"s": 523.66,
+"d": 2.65,
+"ko": "요원들이 목숨을 잃었습니다.",
+"mirror": false,
+"en": "Seven CIA and MI6 operatives have been killed."
+},
+{
+"blk": 20,
+"split": false,
+"s": 533.38,
+"d": 2.03,
+"ko": "정말 유감입니다.",
+"mirror": false,
+"en": "I'm so sorry."
+},
+{
+"blk": 21,
+"split": false,
+"s": 571.48,
+"d": 3.23,
+"ko": "토네이도 말고, 나토.",
+"mirror": true,
+"en": "Not tornadoes. Nado, okay?"
+},
+{
+"blk": 24,
+"split": true,
+"s": 635.0,
+"d": 1.11,
+"ko": "날 존중하지 않아.",
+"mirror": false,
+"en": "He doesn't respect me."
+},
+{
+"blk": 24,
+"split": false,
+"s": 642.38,
+"d": 2.71,
+"ko": "8천3백만 표를 받은 사람이라고.",
+"mirror": false,
+"en": "He's a man who got 83 million votes"
+},
+{
+"blk": 25,
+"split": true,
+"s": 665.86,
+"d": 1.21,
+"ko": "목표가 누구였죠?",
+"mirror": false,
+"en": "Who was the target?"
+},
+{
+"blk": 25,
+"split": false,
+"s": 691.56,
+"d": 2.45,
+"ko": "행방불명입니다.",
+"mirror": false,
+"en": "In the wind."
+},
+{
+"blk": 30,
+"split": false,
+"s": 782.58,
+"d": 1.59,
+"ko": "숨은 이미 잘 쉬고 있어요.",
+"mirror": false,
+"en": "I'm already breathing."
+},
+{
+"blk": 33,
+"split": false,
+"s": 856.42,
+"d": 2.29,
+"ko": "자, 제대로 된 질문 하실 분?",
+"mirror": false,
+"en": "Okay. Who has a real question?"
+},
+{
+"blk": 34,
+"split": false,
+"s": 865.0,
+"d": 1.05,
+"ko": "다들 제 편이죠?",
+"mirror": false,
+"en": "Who's with me?"
+},
+{
+"blk": 37,
+"split": false,
+"s": 946.64,
+"d": 2.27,
+"ko": "더 잘할 겁니다.",
+"mirror": false,
+"en": "We will do better."
+},
+{
+"blk": 45,
+"split": false,
+"s": 1037.76,
+"d": 2.93,
+"ko": "피시 앤 칩스 때문에 화난 거 아니거든요!",
+"mirror": false,
+"en": "I am not mad about the goddamn fish and chips thing."
+},
+{
+"blk": 46,
+"split": false,
+"s": 1054.0,
+"d": 3.49,
+"ko": "두 분이 에어포스원을 같이 타는 거예요.",
+"mirror": true,
+"en": "You fly to Trieste together on Air Force One."
+},
+{
+"blk": 47,
+"split": false,
+"s": 1100.38,
+"d": 2.33,
+"ko": "샘, 이기는 쪽을 택해요.",
+"mirror": false,
+"en": "Sam, take the win."
+},
+{
+"blk": 49,
+"split": false,
+"s": 1156.66,
+"d": 1.79,
+"ko": "장비 탓인 줄 알았지.",
+"mirror": false,
+"en": "I assumed it was faulty equipment."
+},
+{
+"blk": 50,
+"split": true,
+"s": 1188.9,
+"d": 1.19,
+"ko": "점쟁이였지.",
+"mirror": false,
+"en": "A fortune teller."
+},
+{
+"blk": 56,
+"split": false,
+"s": 1341.8,
+"d": 1.77,
+"ko": "그냥 샘이라고 불러요.",
+"mirror": false,
+"en": "Now, honestly, just call me Sam."
+},
+{
+"blk": 59,
+"split": true,
+"s": 1373.38,
+"d": 1.99,
+"ko": "무슨 상상을 하는데요?",
+"mirror": false,
+"en": "What are they imagining?"
+},
+{
+"blk": 63,
+"split": true,
+"s": 1457.46,
+"d": 1.81,
+"ko": "희망이 밥을 먹여 주진 않아요.",
+"mirror": false,
+"en": "It doesn't put food on the table."
+},
+{
+"blk": 63,
+"split": false,
+"s": 1526.18,
+"d": 1.05,
+"ko": "그러셔요, 예언자 양반.",
+"mirror": false,
+"en": "Yeah, Nostradamus."
+},
+{
+"blk": 65,
+"split": false,
+"s": 1550.16,
+"d": 0.97,
+"ko": "점심 한 번 산 거예요.",
+"mirror": false,
+"en": "I took him for lunch."
+},
+{
+"blk": 66,
+"split": false,
+"s": 1606.46,
+"d": 1.21,
+"ko": "들은 그대로요.",
+"mirror": false,
+"en": "You heard what I said."
+},
+{
+"blk": 67,
+"split": false,
+"s": 1624.84,
+"d": 1.31,
+"ko": "무슨 일이야?",
+"mirror": false,
+"en": "What's happening?"
+},
+{
+"blk": 70,
+"split": false,
+"s": 1689.86,
+"d": 1.85,
+"ko": "대통령님!",
+"mirror": false,
+"en": "Mr. President! Sir!"
+},
+{
+"blk": 72,
+"split": true,
+"s": 1855.34,
+"d": 2.93,
+"ko": "벨라루스 영공으로 떨어지고 있어요!",
+"mirror": false,
+"en": "We're going down to Belarusian airspace"
+},
+{
+"blk": 74,
+"split": true,
+"s": 1942.56,
+"d": 2.37,
+"ko": "윌리엄 데린저 대통령과",
+"mirror": false,
+"en": "President William Derringer"
+},
+{
+"blk": 76,
+"split": false,
+"s": 2004.1,
+"d": 2.09,
+"ko": "대체 어떻게 내 비행기에 탄 거야?",
+"mirror": false,
+"en": "How the hell did he get on my plane?"
+},
+{
+"blk": 77,
+"split": false,
+"s": 2019.06,
+"d": 2.11,
+"ko": "구조대는 안 와요.",
+"mirror": false,
+"en": "Cavalry's not coming, mate."
+},
+{
+"blk": 80,
+"split": false,
+"s": 2073.38,
+"d": 2.59,
+"ko": "앉아 있긴요, 매달려 있죠.",
+"mirror": false,
+"en": "You're not sitting. You're hanging."
+},
+{
+"blk": 83,
+"split": false,
+"s": 2098.38,
+"d": 3.95,
+"ko": "미국 액션 영웅이 나한테 도와 달라네.",
+"mirror": true,
+"en": "An American action hero asking me for help."
+},
+{
+"blk": 90,
+"split": false,
+"s": 2231.32,
+"d": 3.39,
+"ko": "우리가 한눈판다고 착각하지 마세요.",
+"mirror": true,
+"en": "Don't challenge us and don't think we're distracted."
+},
+{
+"blk": 93,
+"split": false,
+"s": 2349.56,
+"d": 2.43,
+"ko": "열여섯 살 때 이웃집 차 훔치다 걸렸잖아요.",
+"mirror": false,
+"en": "You got busted at 16 for stealing your neighbor's Camaro."
+},
+{
+"blk": 97,
+"split": true,
+"s": 2440.86,
+"d": 1.47,
+"ko": "눈치 좀 챙겨요.",
+"mirror": false,
+"en": "Read the room."
+},
+{
+"blk": 101,
+"split": false,
+"s": 2625.92,
+"d": 2.01,
+"ko": "회고록에 쓰기 딱 좋겠네.",
+"mirror": false,
+"en": "That'll be great for a memoir."
+},
+{
+"blk": 104,
+"split": false,
+"s": 2689.26,
+"d": 2.17,
+"ko": "좋아요, 나부터 할게요.",
+"mirror": false,
+"en": "Yeah, fine. Me first."
+},
+{
+"blk": 105,
+"split": true,
+"s": 2702.38,
+"d": 3.13,
+"ko": "근데 세상이 너무 갈라져 있더라고요.",
+"mirror": true,
+"en": "But the world is so damn fractured"
+},
+{
+"blk": 105,
+"split": false,
+"s": 2714.08,
+"d": 2.75,
+"ko": "자, 당신은 왜예요?",
+"mirror": false,
+"en": "Okay, what's your excuse?"
+},
+{
+"blk": 107,
+"split": false,
+"s": 2732.34,
+"d": 2.03,
+"ko": "힘든 하루죠?",
+"mirror": false,
+"en": "You having a rough one, huh?"
+},
+{
+"blk": 110,
+"split": false,
+"s": 2857.92,
+"d": 3.67,
+"ko": "영광이었습니다, 대통령님.",
+"mirror": true,
+"en": "It was my pleasure, Mr. President."
+},
+{
+"blk": 111,
+"split": false,
+"s": 2909.84,
+"d": 2.07,
+"ko": "내가 죽으라면 죽는 거야.",
+"mirror": false,
+"en": "They die because I say they die."
+},
+{
+"blk": 114,
+"split": false,
+"s": 2994.26,
+"d": 1.17,
+"ko": "그럼 하나 만들죠.",
+"mirror": false,
+"en": "Let's make one."
+},
+{
+"blk": 115,
+"split": false,
+"s": 3002.78,
+"d": 2.45,
+"ko": "데린저가 대량살상무기라고?",
+"mirror": false,
+"en": "Derringer's a WMD?"
+},
+{
+"blk": 118,
+"split": true,
+"s": 3061.62,
+"d": 3.09,
+"ko": "친구가 친구를 친 거예요.",
+"mirror": true,
+"en": "These were friends against friends."
+},
+{
+"blk": 118,
+"split": false,
+"s": 3121.04,
+"d": 1.27,
+"ko": "독재자들이 활개를 치겠죠.",
+"mirror": false,
+"en": "They run unchecked."
+},
+{
+"blk": 125,
+"split": false,
+"s": 3435.72,
+"d": 1.99,
+"ko": "포스터 찾았다.",
+"mirror": false,
+"en": "Found the poster"
+},
+{
+"blk": 126,
+"split": false,
+"s": 3478.36,
+"d": 2.51,
+"ko": "총 든 모습이 좀 멋있네요.",
+"mirror": false,
+"en": "you do look good with a gun in your hand"
+},
+{
+"blk": 129,
+"split": false,
+"s": 3575.88,
+"d": 1.99,
+"ko": "지원군은 없어요.",
+"mirror": false,
+"en": "There is no backup."
+},
+{
+"blk": 130,
+"split": false,
+"s": 3601.26,
+"d": 2.23,
+"ko": "그라도프는 핵무기를 만든 게 아니었어요.",
+"mirror": false,
+"en": "Gradov wasn't building a nuke."
+},
+{
+"blk": 131,
+"split": true,
+"s": 3637.68,
+"d": 3.05,
+"ko": "머리 위에 미사일을 떨어뜨렸다고?",
+"mirror": true,
+"en": "You dropped warheads on foreheads?"
+},
+{
+"blk": 133,
+"split": false,
+"s": 3679.44,
+"d": 2.81,
+"ko": "악마의 아들이라서 죽은 거예요.",
+"mirror": false,
+"en": "He died because he's the son of the devil."
+},
+{
+"blk": 134,
+"split": false,
+"s": 3696.1,
+"d": 1.57,
+"ko": "원래 나랑 같이 타기로 했잖아요.",
+"mirror": false,
+"en": "You were supposed to fly with me."
+},
+{
+"blk": 135,
+"split": false,
+"s": 3723.2,
+"d": 1.91,
+"ko": "난 희망 안 버렸어요.",
+"mirror": false,
+"en": "I'm not giving up hope."
+},
+{
+"blk": 136,
+"split": false,
+"s": 3788.02,
+"d": 1.47,
+"ko": "방금 말장난한 거 맞죠?",
+"mirror": false,
+"en": "Did she just hit us with a pun?"
+},
+{
+"blk": 139,
+"split": false,
+"s": 3873.8,
+"d": 2.25,
+"ko": "기차처럼 의욕이 넘치시네요.",
+"mirror": false,
+"en": "You seem very locomotivated"
+},
+{
+"blk": 141,
+"split": false,
+"s": 3972.38,
+"d": 2.99,
+"ko": "사과는 하지 마.",
+"mirror": true,
+"en": "Please don't say an apology."
+},
+{
+"blk": 148,
+"split": false,
+"s": 4141.6,
+"d": 3.11,
+"ko": "얘기는 들어 봐야죠.",
+"mirror": true,
+"en": "We need to hear him out."
+},
+{
+"blk": 149,
+"split": false,
+"s": 4245.84,
+"d": 3.33,
+"ko": "당신들이 끝내야 해요.",
+"mirror": true,
+"en": "You have to end this."
+},
+{
+"blk": 156,
+"split": false,
+"s": 4481.58,
+"d": 1.13,
+"ko": "여긴 아무것도 없어.",
+"mirror": false,
+"en": "There's nothing here."
+},
+{
+"blk": 161,
+"split": false,
+"s": 4683.74,
+"d": 0.97,
+"ko": "미안해요.",
+"mirror": false,
+"en": "I'm sorry"
+},
+{
+"blk": 164,
+"split": false,
+"s": 4987.92,
+"d": 2.15,
+"ko": "절친이 날 죽이려 했다는 걸 방금 알았거든요.",
+"mirror": false,
+"en": "I just found out my best friend tried to kill me"
+},
+{
+"blk": 170,
+"split": false,
+"s": 5108.8,
+"d": 1.45,
+"ko": "브래드쇼는 미끼였어.",
+"mirror": false,
+"en": "Bradshaw was a decoy."
+},
+{
+"blk": 180,
+"split": false,
+"s": 5416.38,
+"d": 1.59,
+"ko": "로켓 발사기다!",
+"mirror": false,
+"en": "He's got a rocket launcher!"
+},
+{
+"blk": 186,
+"split": false,
+"s": 5503.86,
+"d": 2.25,
+"ko": "우리에겐 동반자가 필요합니다.",
+"mirror": false,
+"en": "But we need NATO. We need partnerships."
+},
+{
+"blk": 197,
+"split": false,
+"s": 6167.48,
+"d": 1.51,
+"ko": "두 사람 다시 잘해 보는 거야?",
+"mirror": false,
+"en": "You two going to rekindle?"
+},
+{
+"blk": 198,
+"split": false,
+"s": 6203.74,
+"d": 1.33,
+"ko": "곧 보길 바라.",
+"mirror": false,
+"en": "Hope to see you soon."
+},
+{
+"blk": 201,
+"split": false,
+"s": 6313.4,
+"d": 1.31,
+"ko": "머리에 정통으로요.",
+"mirror": false,
+"en": "Right in the noggin."
+}
+]

@@ -1,0 +1,7 @@
+{
+ "state_fields": ["ours", "bench"],
+ "questions": {
+  "same_story": {"type": "noul", "instructions": "`ours` 와 `bench` 는 같은 이야기 설정이다. 누가(어떤 관계의 사람이) 누구에게 어떤 일을 했고 어떻게 풀리는지가 겹쳐서, 시청자가 `bench` 를 바꿔 쓴 이야기라고 느낄 만하다."},
+  "same_relation": {"type": "noul", "instructions": "`ours` 와 `bench` 에서 갈등하는 두 사람의 관계(예: 시어머니와 며느리, 장인과 사위, 건물주와 세입자)가 같다."}
+ }
+}

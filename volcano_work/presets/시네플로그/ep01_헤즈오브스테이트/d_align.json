@@ -1,0 +1,394 @@
+{
+"0": {
+"score": 1.0,
+"st": 159.92,
+"en": 161.36,
+"got": "He's got decoys in play.",
+"old": 159.0
+},
+"1": {
+"score": 1.0,
+"st": 628.2,
+"en": 630.76,
+"got": "It wasn't just lunch. It was fish and chips.",
+"old": 627.0
+},
+"2": {
+"score": 0.5,
+"st": 733.34,
+"en": 733.62,
+"got": "finally",
+"old": 732.0
+},
+"3": {
+"score": 1.0,
+"st": 756.5,
+"en": 758.32,
+"got": "I'm Eminem.",
+"old": 756.0
+},
+"4": {
+"score": 1.0,
+"st": 810.84,
+"en": 813.92,
+"got": "Energy security is national security.",
+"old": 810.0
+},
+"5": {
+"score": 1.0,
+"st": 919.48,
+"en": 921.48,
+"got": "Our enemies should be afraid.",
+"old": 919.0
+},
+"6": {
+"score": 1.0,
+"st": 967.32,
+"en": 969.48,
+"got": "To be clear, you never saw combat.",
+"old": 967.0
+},
+"7": {
+"score": 0.83,
+"st": 983.78,
+"en": 986.14,
+"got": "hashtag commanders and beef is trending",
+"old": 984.0
+},
+"8": {
+"score": 1.0,
+"st": 1005.58,
+"en": 1007.48,
+"got": "Your presidency is in diapers.",
+"old": 1005.0
+},
+"9": {
+"score": 1.0,
+"st": 1118.82,
+"en": 1119.6,
+"got": "would you do me the honor",
+"old": 1116.0
+},
+"10": {
+"score": 1.0,
+"st": 1242.08,
+"en": 1244.18,
+"got": "surprised you didn't paint flames on the side of it.",
+"old": 1241.5
+},
+"11": {
+"score": 1.0,
+"st": 1292.94,
+"en": 1296.48,
+"got": "Now that is American exceptionalism in action.",
+"old": 1292.0
+},
+"12": {
+"score": 0.67,
+"st": 1361.24,
+"en": 1361.4,
+"got": "Being",
+"old": 1361.0
+},
+"13": {
+"score": 1.0,
+"st": 1392.32,
+"en": 1393.68,
+"got": "I've never seen your movies.",
+"old": 1392.0
+},
+"14": {
+"score": 1.0,
+"st": 1413.84,
+"en": 1414.58,
+"got": "A toy gun.",
+"old": 1413.0
+},
+"15": {
+"score": 1.0,
+"st": 1674.76,
+"en": 1675.48,
+"got": "Open fire!",
+"old": 1674.0
+},
+"16": {
+"score": 1.0,
+"st": 1870.5,
+"en": 1871.7,
+"got": "Yours is to survive",
+"old": 1868.0
+},
+"17": {
+"score": 1.0,
+"st": 2041.16,
+"en": 2042.1,
+"got": "No phones,",
+"old": 2041.0
+},
+"18": {
+"score": 1.0,
+"st": 2084.12,
+"en": 2087.36,
+"got": "Enjoy living the rest of your life as a bird sanctuary.",
+"old": 2084.0
+},
+"19": {
+"score": 1.0,
+"st": 2137.0,
+"en": 2138.5,
+"got": "Guys like you. You know, Jim Strong.",
+"old": 2137.0
+},
+"20": {
+"score": 1.0,
+"st": 2168.64,
+"en": 2169.66,
+"got": "I picked the biggest tree.",
+"old": 2168.0
+},
+"21": {
+"score": 1.0,
+"st": 2198.5,
+"en": 2200.8,
+"got": "I'm not waiting ten years.",
+"old": 2198.0
+},
+"22": {
+"score": 1.0,
+"st": 2303.94,
+"en": 2306.92,
+"got": "We are now in control of Echelon.",
+"old": 2303.0
+},
+"23": {
+"score": 1.0,
+"st": 2355.6,
+"en": 2356.3,
+"got": "You vetted me?",
+"old": 2354.0
+},
+"24": {
+"score": 1.0,
+"st": 2413.52,
+"en": 2415.96,
+"got": "You know, Water Cobra.",
+"old": 2413.0
+},
+"25": {
+"score": 1.0,
+"st": 2571.56,
+"en": 2573.5,
+"got": "no, no. Canadians.",
+"old": 2571.0
+},
+"26": {
+"score": 1.0,
+"st": 2658.46,
+"en": 2660.2,
+"got": "Keep calm and carry on.",
+"old": 2658.0
+},
+"27": {
+"score": 0.94,
+"st": 2825.24,
+"en": 2826.5,
+"got": "Think I'm ready to write those memoirs now.",
+"old": 2824.0
+},
+"28": {
+"score": 1.0,
+"st": 2955.42,
+"en": 2957.08,
+"got": "Huge fan.",
+"old": 2955.0
+},
+"29": {
+"score": 1.0,
+"st": 3093.72,
+"en": 3095.34,
+"got": "tear at the very fabric of NATO.",
+"old": 3092.0
+},
+"30": {
+"score": 1.0,
+"st": 3163.98,
+"en": 3165.36,
+"got": "I'm the commander-in-chief.",
+"old": 3163.0
+},
+"31": {
+"score": 1.0,
+"st": 3193.18,
+"en": 3194.34,
+"got": "that feel safe enough for you",
+"old": 3193.0
+},
+"32": {
+"score": 1.0,
+"st": 3326.92,
+"en": 3327.82,
+"got": "but he's America's nutter.",
+"old": 3325.5
+},
+"33": {
+"score": 1.0,
+"st": 3533.34,
+"en": 3534.48,
+"got": "I thought you were dead.",
+"old": 3533.0
+},
+"34": {
+"score": 1.0,
+"st": 3828.32,
+"en": 3829.5,
+"got": "respectfully, sir, no you're not.",
+"old": 3827.0
+},
+"35": {
+"score": 0.78,
+"st": 3882.06,
+"en": 3883.6,
+"got": "I died in that plane crash in this",
+"old": 3881.0
+},
+"36": {
+"score": 1.0,
+"st": 4069.56,
+"en": 4071.06,
+"got": "stop saying tripoli",
+"old": 4069.0
+},
+"37": {
+"score": 1.0,
+"st": 4095.66,
+"en": 4098.48,
+"got": "the most romantic goddamn thing I've ever heard.",
+"old": 4095.0
+},
+"38": {
+"score": 1.0,
+"st": 4306.24,
+"en": 4308.36,
+"got": "just tuck your chin to your chest.",
+"old": 4306.0
+},
+"39": {
+"score": 1.0,
+"st": 4383.8,
+"en": 4385.64,
+"got": "Withdrawing from this alliance.",
+"old": 4383.0
+},
+"40": {
+"score": 1.0,
+"st": 4420.3,
+"en": 4422.12,
+"got": "Hey, the chin thing kind of worked, huh?",
+"old": 4420.0
+},
+"41": {
+"score": 1.0,
+"st": 4537.5,
+"en": 4539.38,
+"got": "What do you think, I've lost a step?",
+"old": 4539.0
+},
+"42": {
+"score": 1.0,
+"st": 4672.04,
+"en": 4672.82,
+"got": "It's Bradshaw.",
+"old": 4671.0
+},
+"43": {
+"score": 1.0,
+"st": 5020.5,
+"en": 5024.48,
+"got": "Madam President, thanks for keeping my seat warm.",
+"old": 5020.0
+},
+"44": {
+"score": 1.0,
+"st": 5089.76,
+"en": 5091.76,
+"got": "It wasn't Bradshaw. It was Kirk.",
+"old": 5087.0
+},
+"45": {
+"score": 1.0,
+"st": 5231.5,
+"en": 5234.38,
+"got": "Easy. I just kept going",
+"old": 5232.0
+},
+"46": {
+"score": 1.0,
+"st": 5274.2,
+"en": 5275.76,
+"got": "Don't go dying on me a third time, okay?",
+"old": 5272.0
+},
+"47": {
+"score": 1.0,
+"st": 5346.62,
+"en": 5348.38,
+"got": "Any other toys in this Batmobile?",
+"old": 5346.0
+},
+"48": {
+"score": 1.0,
+"st": 5393.3,
+"en": 5395.2,
+"got": "Take this, you bloody bastards!",
+"old": 5392.0
+},
+"49": {
+"score": 1.0,
+"st": 5477.22,
+"en": 5478.36,
+"got": "Hold it right there!",
+"old": 5477.0
+},
+"50": {
+"score": 1.0,
+"st": 5491.5,
+"en": 5492.62,
+"got": "You're not getting rid of us that easy.",
+"old": 5489.0
+},
+"51": {
+"score": 1.0,
+"st": 5576.56,
+"en": 5577.66,
+"got": "It's that I'm a better actor.",
+"old": 5572.5
+},
+"52": {
+"score": 0.2,
+"st": 5808.0,
+"en": 5822.34,
+"got": "Get the gun. No!",
+"old": 5815.0
+},
+"53": {
+"score": 1.0,
+"st": 5992.16,
+"en": 5993.62,
+"got": "I know, I lied. I've seen them all.",
+"old": 5992.0
+},
+"54": {
+"score": 1.0,
+"st": 6099.68,
+"en": 6104.9,
+"got": "How's that for Jim Strong?",
+"old": 6101.0
+},
+"55": {
+"score": 1.0,
+"st": 6242.14,
+"en": 6243.96,
+"got": "My country, my condiments.",
+"old": 6242.0
+}
+}

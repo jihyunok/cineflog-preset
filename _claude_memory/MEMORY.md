@@ -1,0 +1,22 @@
+- [둥둥아빠 강의 체크리스트](dungdung-lecture-checklist.md) — 영화·드라마 리뷰 만들 때마다 8줄 확인: 박힌 자막 지우고 우리 자막·확대/반전/색조·3초 컷·나레 33%·음원 15초 (10-12 "너 좀 기억하라고")
+- [시네플로그 자막은 그림 안](cineflog-captions-inside-picture.md) — 10-12 "대본은 영상 안에 넣어", 검은 띠 말고 그림 안 아래(Margi
+- [강의 규칙 꼭 실행 (시네플로그)](apply-lecture-rules-cineflog.md) — 10-12 "왜 학습한걸 실행안하니": 3초 쓰고 3초 건너뛰기, 그 뒤 나레 안 와도 됨, 나레1:영상2, 장면이 설명하면 나레 삭제
+- [시네플로그 다음: 그레이하운드 (10-13 밤)](cineflog-greyhound-next.md) — 핀치 v8 은 CID 통과·올림. 다음 17 그레이하운드 핀치처럼(벤치 I9Jx9Co8kWs 96만) · 받아쓰기 Speechmatics · 먼저 도구 고치기(나레 경계·대사 컷 가장자리·굽기 전 관문) · ★원본 영화 파일 없음 → 사용자에게 받기
+- [시네플로그 이어서 할 곳 (10-13)](cineflog-resume-2026-10-12.md) — 16 핀치 v8 완성·올림·CID 통과(10-13 밤), 완성본·캡컷 16v8 · D:/ci
+- [벤치 그림을 따른다, 내가 고르지 않는다](follow-bench-picture-no-own-picks.md) — 10-13 "왜 자꾸 산으로 가니 / 하나하나 기억하고 적어놔": 원본은 매 순간 벤치 자리에 가장 가깝게(DP), 훅 포함 전 구간, 대사는 벤치가 흘린 것만, 건네기 전 0초~끝 벤치 대조 · ★벤치는 이야기 흐름 길잡이일 뿐 품질 기준 아님 — "벤치도 그렇다"로 결함 넘기지 말 것
+- [나레 토막·화면 멈춤 없게](narration-split-fragments-no-freeze.md) — 10-13 "4분54초에 고 가 따로 / 8분12초 그 곳까지 / 영상이 잠깐씩 멈춰 / 왜자꾸": 나레 경계 
+- [완성본만 건넨다](deliver-only-the-final-video.md) — 중간 파일 목록을 늘어놓지 말 것
+- [사용자 말은 다 박제](log-every-user-instruction.md) — 지시·되물림을 원문 그대로 docs 에 남긴다
+- [한국어로 답한다](answer-in-korean.md) — 사용자에게 하는 말은 전부 한국어, 영어 섞지 말 것
+- [묻지 말고 진행](dont-ask-just-do.md) — 링크만 오면 소재, 대본 승인 절차 없이 바로 만들고 결과를 보고한다
+- [삭제는 자동 모드에서 막힌다](file-deletion-blocked-use-bat.md) — 10-13 스크립트 쓰기까지 막힘 → 첫 줄에 "Shift+Tab 으로 자동 모드 끄고 '다시 해'", ps1 함수명 Kill 금지
+- [끝나면 바로 다 됐다고](say-done-immediately.md) — 굽기 알림 받으면 첫 줄에 「다 됐어요」, 뒤처리는 그다음
+- [완성본만 남긴다 (용량)](no-work-files-only-final.md) — 중간 파일은 임시 폴더에서, volca
+- [벤치는 전부 칼카피](bench-copy-everything.md) — 썸네일·설명란까지 벤치 실물 먼저 보고 복사, 내 판단 금지 (09-28 사용자 화남)
+- [영화리뷰 공부 (무비마스터)](movie-review-study.md) — 선생님 강의 공부 노트는 volca
+- [시네플로그 채널](cineflog-channel.md) — ★10-12 댓글 진단 → 벤치비교 문서 「고칠 것」 · ★제목 이제 넣는다 · 영화리뷰 롱폼, 원본 3초 컷 규칙, ★부르면 presets/시네플로그/README.md 「지금의 시네플로그」부터 · 이식팩 10-09판 영화롱폼_이식팩.zip(make_pack.py 로 다시 묶음)
+- [시네플로그 이어서 할 곳 (10-02)](cineflog-resume-2026-09-30.md) — 01~06 완성, 04~06 끝에 비평, 다음 졸트
+- [되돌릴 수 없는 일은 근거 먼저](irreversible-check-first.md) — ★10-02 대량 삭제 사고. 강의 자료 grep → 근거 → 허락 순서
+- [시네플로그 일본어판](cineflog-japanese-version.md) — 한국판 나레·자막만 일본어(VOICEVOX 青山龍星 ノーマル(id13, 사용자가 샘플 1번 고름)), 벤치 推しシネマ
+- [롱폼 나레는 제미나이 3.8 TTS](longform-tts-gemini.md) — 10-07 유료 TTS 쓰지 말 것, agy 로
+- [제브는 기본으로 쓴다](jev-by-default.md) — 10-13 "기본적 제브는 사용해": 글 여러 건 분류·거르기는 묻지 말고 제브부터, 벤치 글 보내기도 매번 안 물음

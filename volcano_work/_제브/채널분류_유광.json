@@ -1,0 +1,48 @@
+{
+ "_설명": "유광의 이야기(실존 인물 비화 쇼츠) 편별 분류. 10-13. 거르기.py --spec 으로 돌린다. 세기·조회수 계산은 코드로.",
+ "state_fields": ["title", "first", "last", "script"],
+ "questions": {
+  "topic": {"type": "choice",
+   "instructions": "Which group does the main person (or main subject) of this Korean short-video narration belong to? Use `title` and `script`.",
+   "criteria": {
+    "한국재벌가": "Korean chaebol / business-group families: owners, heirs, their spouses and in-laws (e.g. Hanwha, Samsung, a Korean woman marrying into a foreign luxury-brand family)",
+    "한국권력가": "Families of modern Korean presidents or politicians (e.g. a president's daughter-in-law, a first lady)",
+    "한국근대": {"what": "Korea 1890s-1960s: Korean Empire royals after Joseon, the last princess, Japanese-occupation era gisaeng or celebrities", "not_for": "Joseon dynasty before 1897"},
+    "조선실록": {"what": "Joseon dynasty (before 1897): kings, queens, concubines, princesses, gisaeng, handsome scholars recorded in the Annals", "not_for": "Korean Empire or occupation era"},
+    "한국연예": "Korean actors, singers, entertainers of any era",
+    "해외왕실": "Royal families outside Korea (UK, Spain, Monaco, Brunei, Japan imperial family, Middle East royals and their wives)",
+    "일본중화권스타": "Japanese, Chinese, Taiwanese or Hong Kong actors, singers, idols",
+    "서양스타": "Western (US, Europe, Latin America) actors, singers, models, athletes",
+    "기타인물": "Anyone else: influencers, business founders, politicians outside Korea, ordinary people",
+    "해당 없음": "No single person or group is the subject"
+   }},
+  "axis": {"type": "choice",
+   "instructions": "What is the main story angle of this narration? Pick the angle the whole `script` is built around, not a passing detail.",
+   "criteria": {
+    "미모": "The person's extraordinary beauty or looks is the core of the story (how beautiful, how famous for looks)",
+    "사랑결혼": "A romance, courtship or marriage story (how they met, family opposition, wedding)",
+    "불륜스캔들": "Affair, cheating, love triangle, scandal, a notorious or villain-like person",
+    "비극몰락": "Tragedy, downfall, ruined life, death, addiction",
+    "반전미담": "A surprising twist that reveals a good character, admirable deed or unexpected achievement",
+    "근황외모": "What the person looks like or is doing now compared to the past (glow-up or decline)",
+    "일화사건": "A single anecdote or incident that is not mainly about love, looks, tragedy or virtue",
+    "해당 없음": "None of these angles fits"
+   }},
+  "sex": {"type": "choice",
+   "instructions": "What is the sex of the main person this narration is about?",
+   "criteria": {"여자": "female", "남자": "male", "여럿·정할 수 없음": "several people of both sexes, or cannot tell"}},
+  "first_form": {"type": "choice",
+   "instructions": "How does the first sentence `first` open the story?",
+   "criteria": {
+    "수식어+이름": {"what": "A descriptive build-up that ends by naming the person", "examples": ["대한민국 재계에서 역대급 1등 신랑감으로 꼽히던 남자, 한화그룹 장남 김동관.", "미모로 이름 제대로 날렸던 전두환 첫째 며느리 정도경."]},
+    "사건·숫자": {"what": "Opens with a dramatic event, date or striking number before introducing anyone", "examples": ["1989년 7월, 일본 전역이 뒤집힙니다.", "미국이 난리 났습니다."]},
+    "있습니다 소개": {"what": "Introduces an unnamed person by saying such a person existed", "examples": ["1920년대 경성을 뒤집어 놓은 전설의 기생이 있었습니다."]},
+    "질문": {"what": "Opens by asking the viewer a question", "examples": ["여러분, 19살 소녀 한 명이 대형제국 정권을 통째로 날려버렸다면 믿으시겠습니까?"]},
+    "해당 없음": "None of these"
+   }},
+  "asks_viewer": {"type": "noul",
+   "instructions": "The last sentence `last` directly asks the viewers for their own opinion or answer (e.g. '여러분은 어떠신가요?', '여러분이라면 어떻게 하시겠어요?'). A rhetorical exclamation such as '놀랍지 않나요?' or '드라마보다 더 드라마같지 않나요?' does NOT count."},
+  "narrator_opinion": {"type": "noul",
+   "instructions": "Somewhere in `script` the narrator states their own personal opinion in first person (e.g. '제 생각엔', '저는 ~라고 봅니다'), rather than only telling facts and what others said."}
+ }
+}

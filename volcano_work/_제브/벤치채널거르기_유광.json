@@ -1,0 +1,23 @@
+{
+ "_설명": "유광의 이야기와 같은 꼴의 벤치 채널 거르기. 채널 하나 = 요청 하나, state 는 채널 이름 + 쇼츠 제목들(최근 30 + 인기 5). 나레 유무·길이·조회수는 코드·실측으로. 10-13.",
+ "state_fields": ["channel", "titles"],
+ "questions": {
+  "same_kind": {"type": "noul",
+   "instructions": "Most titles in `titles` promise the backstory of one real, specific person's life: a marriage or romance, extraordinary beauty, a scandal, a downfall, a hidden truth or a surprising achievement. Typical subjects are chaebol heirs and their wives, presidents' families, Joseon-era gisaeng and royal concubines, foreign royal families, and Hollywood, Japanese or Chinese stars. Channels of short movie or drama clips, daily celebrity news, rankings, fashion, or fictional stories do not count."},
+  "main_kind": {"type": "choice",
+   "instructions": "What do most of the shorts in `titles` mainly cover?",
+   "criteria": {
+    "실존 인물 일대기·비화": "The life story or hidden backstory of one real person per video (stars, heirs, royals, historical figures)",
+    "왕실 가십·장면": "Mostly royal families (British royals, Diana, Charlotte) as gossip or video moments rather than life stories",
+    "한국 연예 뉴스·가십": "Current Korean celebrity news, rumours, recent events",
+    "역사 사건·지식": "Historical events, facts or trivia rather than one person's life",
+    "영화·드라마 장면": "Clips or recaps of movies and dramas",
+    "순위·모음": "Rankings, top-N lists, compilations of photos",
+    "기타": "Fashion, beauty, fiction stories, politics, sports or anything else",
+    "해당 없음": "Cannot tell from the titles"
+   }},
+  "korean_people": {"type": "score",
+   "instructions": "How much of `titles` is about Korean people (Korean chaebol families, Korean presidents' families, Joseon or Korean Empire figures, Korean entertainers)?",
+   "criteria": ["Almost none of the titles are about Korean people", "Some titles are about Korean people", "About half are about Korean people", "Most titles are about Korean people"]}
+ }
+}

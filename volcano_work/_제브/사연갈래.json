@@ -1,0 +1,12 @@
+{
+ "state_fields": ["text", "channel_topic"],
+ "questions": {
+  "worth_a_video": {"type": "noul", "instructions": "`text` 는 `channel_topic` 채널에서 영상 한 편으로 만들 만한 소재다."},
+  "is_family": {"type": "noul", "instructions": "`text` 는 가족(부모·자식·부부·사위·며느리·시어머니·장모·형제·손주·사돈) 사이에서 벌어진 일이다."},
+  "genre": {"type": "choice", "instructions": "`text` 가 어떤 사연인지 고른다",
+            "criteria": {"반전감동": "의심하거나 오해했던 사람의 숨은 사정·선행이 끝에 드러나 감동을 준다",
+                         "사이다": "무시·배신·갑질한 사람이 증거나 반격으로 대가를 치른다(참교육)",
+                         "가족감동": "가족 사이의 희생과 사랑이 드러나 눈물 나는 이야기(응징 없이)",
+                         "해당 없음": "사연 이야기가 아니거나 위 셋 어디에도 맞지 않는다"}}
+ }
+}
