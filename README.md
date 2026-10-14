@@ -7,12 +7,15 @@
 2. `%USERPROFILE%\.volcano\keys\` 에 열쇠 파일(speechmatics · groq · typesafe). 값은 어디에도 적지 않는다.
 3. `volcano_work` 에서 Claude Code 를 켜고 "시네플로그 불러와".
 
-## 먼저 읽을 곳
-- `volcano_work/presets/시네플로그/README.md` 맨 앞 「★★★다음」 → 「16 핀치 v5」~「v8」(지금 방식, 16 핀치 v8 은 소유권 주장 없이 올라감).
-- 도구: `volcano_work/presets/시네플로그/ep16v5_핀치/` — fp·match·edl(벤치 편집표) → plan_v8 → fix3~fix10 → build_v8 → check_all·subcheck4·narr_frag·narr_check(제브) → capcut_v8.
-- 나레 녹음·자르기: `presets/시네플로그/gemini_tts/` (gem_split → narr_recut → realign).
-- 강의 공부: `volcano_work/docs/영화리뷰_공부/` (원문 PDF 는 뺌). 제브(글 판정): `volcano_work/_제브/CLAUDE.md`.
-- 기억: `_claude_memory/` — ★cineflog-greyhound-next(다음 할 일) · follow-bench-picture-no-own-picks · narration-split-fragments-no-freeze · dungdung-lecture-checklist.
+## 먼저 읽을 곳 (2026-10-14 판)
+- `volcano_work/presets/시네플로그/README.md` 맨 앞 「★★★★가장 기본」(나레 밑엔 그 장면 · ★결말까지 · 20분 정도) → 「★17 그레이하운드 v9」 절 끝까지(v10~v12: 소유권 주장 대응·결말·끝 검은 화면).
+- ★지금 방식 = `presets/시네플로그/v9/`: `plan_v9.py`(대본 줄마다 그 장면 구간에서만 3초 조각 · 대사 창도 처음부터 1.05배·화면 3초 안) → `narr_pic.py`(제브 나레↔그림) → `gate.py pre`(⑫ 원본 3초 넘는 조각 실패 · ⑬ 20분 알림) → `build_v9.py cut` → `build_v9.py`(gate final, 끝 검은 화면 없음) → `capcut_v9.py` → `capfix.py` → `../capcut_style04.py` → `../capcut_to_final.py`. 대본을 고치면 `renum.py`(글 기준 녹음 번호 옮기기).
+- 편 예시: `presets/시네플로그/ep17v2_그레이하운드/script.py`(v12 최종 대본, `at()`·결말 절) · `gate_allow_why.txt`(허용 이유).
+- 썸네일: `presets/시네플로그/thumb_karang.py`(빨간 굵은 비스듬 글자 + 급박한 장면 문장).
+- 나레 녹음: `presets/시네플로그/gemini_tts/`(AI 스튜디오 98 계정 Ludo · page.js · recv.py · gem_split).
+- 강의 공부: `volcano_work/docs/영화리뷰_공부/` · 규칙 모음 `volcano_work/docs/PLAYBOOK.md` 「리뷰 롱폼 소유권 주장(CID)」 절.
+- 기억: `_claude_memory/` — ★cineflog-cid-transform-all-windows(3초 규칙으로 소유권 주장 통과) · cineflog-include-ending · cineflog-min-20min · cineflog-no-black-tail · cineflog-thumbnail-red-urgent · narration-matches-picture-basic · talk-before-making.
 
-## 다음 할 일 (2026-10-13)
-17 그레이하운드를 핀치 v8 방식으로(벤치 https://www.youtube.com/watch?v=I9Jx9Co8kWs). 먼저 도구 세팅: gem_split 경계를 소리 크기로 · 대사 컷 가장자리를 실제 말 끝으로 · 굽기 직전 관문(나레 토막·대사 잘림·멈춤·까만 화면·자막 시각). 받아쓰기는 Speechmatics. 원본 영화 파일은 따로 받아야 한다.
+## 지금 상태 (2026-10-14)
+- 17 그레이하운드 v12 완성(19:50, 결말까지): 원본 조각을 대사 창 포함 모두 화면 3초 안으로 바꿔 **Apple 소유권 주장 안 뜸**(반전·확대·색조만 센 v10 은 걸렸음). 끝 음원 15초 검은 화면은 뺌.
+- 다음 편: 대본 쓸 때부터 대사는 3초 안 줄만 · 결말까지 · 20분 정도(억지로 맞추지 않음) · 썸네일은 같은 영화 인기 썸네일부터 보고 빨간 글자 보기 여러 장.
