@@ -1,0 +1,72 @@
+{
+ "src": "D:/cine_work/ep03v2_아이돈언더스탠드유/src.mp4",
+ "srclen": 5808.832,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 800,
+ "burn": [640, 120, 300, 1320],
+ "burn_color": "yellow",
+ "burn_why": "이탈리아어 대사 구간에만 노란 영어 자막(한 줄 y≈713~750, 두 줄 윗줄 y≈660)이 박혀 있다 → 그 줄만 노랑으로 찾아 확대로 잘라낸다(build_v9 YEL)",
+ "clips": "clips",
+ "bench": "bench/bench.mp4",
+ "bench_y": 140,
+ "title": "아이 돈 언더스탠드 유",
+ "bench_name": "쩔무비 「언어 장벽이 낳은 대참사! 슬프지만 웃긴 호러!」 (NFZZeQ9o2G4, 31:08, 6천) — 한국어 리뷰는 이것 하나뿐(10-17 검색)",
+ "ctx": "영화 「I Don't Understand You」(2025, American dark comedy horror thriller set in rural Italy). Nick Kroll as Cole and Andrew Rannells as Dom, a gay married couple from Los Angeles celebrating their 10th anniversary in Italy while waiting to adopt a baby boy from birth mother Candace (they were scammed in a previous adoption). Dom's father's friend Daniele gives them engraved kitchen knives ('Domenico' and a misspelled 'Cool') and books a dinner at Zia Luciana's remote farmhouse restaurant near Orvieto. Their rental car gets stuck in the mud in the rain; a gruff man in a truck (Massimo) whose driveway they block drives them to the farmhouse, hitting a deer on the way. Luciana, a nearly blind old woman, serves pizza, homemade wine and horse meat (Cole is a vegetarian); her son Giovanni (gay) died last year and her husband is on a ventilator. Power goes out, Luciana falls down the cellar stairs and dies after their clumsy CPR; Massimo returns, finds his mother, shouts in Italian, they stab him in a panic (he was actually congratulating them on becoming fathers), they revive him, Candace calls that her water broke; Massimo's fiancee Francesca flees and is hit by their car; Luciana wakes up; they burn the evidence in the pizza oven and drive to the airport. Police find the bones and the 'Cool' knife, chase them at the airport only to return their passports. They get their baby in Pittsburgh and name him Gio (after Giovanni). Epilogue: second adoption interview video. Italian dialogue in the film has burned-in yellow English subtitles.",
+ "places": [
+  "Los Angeles home",
+  "airplane",
+  "Rome street",
+  "Daniele's apartment",
+  "car on country road",
+  "hotel room",
+  "muddy road in the rain",
+  "truck",
+  "Luciana's farmhouse kitchen",
+  "farmhouse dining room",
+  "cellar stairs",
+  "farmhouse yard at night",
+  "pizza oven",
+  "airport",
+  "police at farmhouse",
+  "Pittsburgh hospital"
+ ],
+ "who": [
+  "Cole",
+  "Dom",
+  "Candace (birth mother, on video call)",
+  "Daniele",
+  "Zia Luciana (old woman)",
+  "Massimo (her son, truck driver)",
+  "Francesca (Massimo's fiancee)",
+  "Luciana's husband (on ventilator)",
+  "Italian police",
+  "baby Gio"
+ ],
+ "quiet": [
+  [794, 842],
+  [1240, 1311],
+  [4829, 4852],
+  [5444, 5808]
+ ],
+ "quiet_why": "노래 구간(차 안 노래·기념일 가는 길 몽타주·공항 가는 길 노래·엔딩 크레딧) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤",
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 다음 편도 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "remake_why": "10-17 사용자 \"저거 다 엉망이야 다시만들어야해 1번올리고 얼마나 욕들어먹었는지 몰라\" — 옛 방식 편(03·05~12·14·15·18·19)을 v9 방식으로 다시. 03 은 09-30 옛 판(30:21)"
+}

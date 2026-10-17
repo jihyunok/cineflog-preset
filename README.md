@@ -22,7 +22,7 @@
 - 기억: `_claude_memory/` — ★narration-matches-picture-basic · cineflog-cid-transform-all-windows · cineflog-include-ending · cineflog-min-20min(25분 이상) · preset-style-means-full-caption-look · thumbnail-options-next-to-final · cineflog-youtube-channel-uploads · talk-before-making.
 
 ## 지금 상태 (2026-10-17)
-- 완성본 20편(01~20, 07 일본어판 포함). 01·02·04 는 10-14~16 에 3초 규칙 방식으로 다시 만듦.
+- 완성본 20편(01~20, 07 일본어판 포함). 01·02·04·03 은 3초 규칙(v9) 방식으로 다시 만듦(03 은 10-17, 25:34). ★옛 방식 편(05~12·14·15·18·19)은 "다 엉망" — 올리지 말고 하나씩 다시 만든다(README 「옛 편 다시 만들기」).
 - 20 패밀리 플랜 2 완성(25:47·-16 LUFS·관문 0·finalcheck 0·글자 거꾸로 40줄 noflip·캡컷 「시네플로그20」). 썸네일 보기 A~E 사용자 고르기 전.
 - 채널(UCX9JkEbYxU-W8OTB2t0-eaA) 공개 5편: 01·04·13·16·17. 안 올린 완성본 15편: 02·03·05~12·14·15·18·19·20. 13 울프스는 옛 방식인데도 소유권 주장 안 걸림(사용자 "이거 안걸렸어") — 옛 편도 일부공개로 먼저 확인하고 올리면 된다.
 - 다음 편: 대본 쓸 때부터 대사는 3초 안 ✓ 줄만 · 결말까지 · **25분 이상** · 지무비식 자막(capstyle jimovie) · 썸네일은 같은 영화 인기 썸네일부터 보고 보기 5장.

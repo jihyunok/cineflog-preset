@@ -39,9 +39,12 @@ def score(a):
 def top(a):
     r = np.where((a > 225).sum(1) > 4)[0]; return int(Y0 + r.min() * 2) if len(r) else 700
 FPS8 = 8
+# ★10-17 03 아이 돈 언더스탠드 유 다시: 이탈리아어 구간에만 노란 영어 자막이 박혀 있다(y≈713~742/800) → ep.json "burn_color": "yellow" 면
+#   (R+G)/2 − 0.6B 로 바꿔 노랑만 밝게(흰색 ≈102·노랑 ≈255) 본 뒤 같은 잣대(>225 글자 · <50 테두리)로 찾는다.
+YEL = "colorchannelmixer=rr=0.5:rg=0.5:rb=-0.6:gr=0.5:gg=0.5:gb=-0.6:br=0.5:bg=0.5:bb=-0.6," if CFG.get("burn_color") == "yellow" else ""
 def frames(s0, L):
     b = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{max(s0, 0):.3f}", "-t", f"{L:.3f}", "-i", SRC,
-                        "-vf", f"fps={FPS8},crop={WWD}:{HH}:{X0}:{Y0},scale={WWD//2}:{HH//2},format=gray", "-f", "rawvideo", "-"], capture_output=True).stdout
+                        "-vf", f"fps={FPS8},crop={WWD}:{HH}:{X0}:{Y0},scale={WWD//2}:{HH//2},{YEL}format=gray", "-f", "rawvideo", "-"], capture_output=True).stdout
     return np.frombuffer(b, np.uint8).reshape(-1, HH // 2, WWD // 2)
 def burn(s0, L):
     a = frames(s0, L); sc = [score(x) for x in a]; out = []; i = 0
