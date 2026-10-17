@@ -114,7 +114,7 @@ def tsec(x):
     h, m, s = x.split(":"); return int(h) * 3600 + int(m) * 60 + float(s)
 for l in open("subs.ass", encoding="utf-8"):
     if not l.startswith("Dialogue"): continue
-    f = l.rstrip("\n").split(",", 9); a, b, sty, txt = tsec(f[1]), tsec(f[2]), f[3], f[9]
+    f = l.rstrip("\n").split(",", 9); a, b, sty, txt = tsec(f[1]), tsec(f[2]), f[3], re.sub(r"\{[^}]*\}", "", f[9])   # ★10-16 지무비식 자막의 ASS 꾸밈 기호는 빼고 글자만(색·글꼴은 ../capcut_font.py 가 다시 칠함)
     if sty == "TOP": add_text(top, txt, 0, d.get("duration", BODY), 0.87, 3.2, (0.71, 0.71, 0.71), -0.86, 4, 0)
     else: add_text(st, txt, int(a * US), int((b - a) * US), -0.875, 5.0)
 

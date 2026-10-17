@@ -91,6 +91,7 @@ W = []
 for it in items:
     if it["kind"] != "D": continue
     w = {"a": it["t"], "b": it["T"], "s": round(it["s"], 3), "kind": "D", "k": it["k"], "ko": it["ko"], "sub1": round(it["sl"], 3), "z": it["zone"]}
+    w.update(it["opt"])                                            # 10-14 대사 창도 {"noflip": True} (뉴스 화면·모니터 글자 — 01 헤즈 오브 스테이트)
     if DSPD != 1: w["rate"] = DSPD                                 # build cut: 영상 setpts + 소리 atempo 같이 · 자막 시각은 원본 기준(build 가 /rate)
     parts = [p.strip() for p in it["ko"].split(" / ")]
     if len(parts) > 1 and len(parts) == len(it["ids"]):

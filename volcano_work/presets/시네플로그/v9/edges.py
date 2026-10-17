@@ -6,7 +6,7 @@
  - 끝: 이 줄 끝 낱말 소리가 실제로 잦아들 때까지 늘린다. 다음 줄 첫 낱말이 바로 붙어 있으면 그 사이 가장 조용한 곳.
 모듈: Env(src).snap(s, e) → (s2, e2, 메모) · Env(src).edge_bad(t, side) → 문제 설명 또는 None
 CLI: python edges.py check windows.json 원본.mp4 낱말.json [--slen-rate 1.05]   (대사 창 가장자리 검사)"""
-import json, os, subprocess, sys
+import re, json, os, subprocess, sys
 import numpy as np
 SR = 16000; HOP = 0.01; N = int(SR * HOP)
 
@@ -15,6 +15,7 @@ def band_env(src, cache=None):
     cache = cache or os.path.splitext(os.path.basename(src))[0] + "_band.npy"
     if os.path.exists(cache): return np.load(cache)
     ch = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=channels", "-of", "csv=p=0", src], capture_output=True, text=True).stdout.strip()
+    ch = re.match(r"\d+", ch).group() if re.match(r"\d+", ch or "") else ""      # ★10-16 04v2 ac3 원본은 "2," 로 나와 int 가 죽었다
     pan = "pan=mono|c0=c2" if ch and int(ch) >= 6 else "pan=mono|c0=0.5*c0+0.5*c1"       # 5.1 이면 가운데(FC) 채널에 대사
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-i", src, "-map", "0:a:0", "-af", f"{pan},highpass=f=300,lowpass=f=3400", "-ar", str(SR), "-f", "f32le", "-"], stdout=subprocess.PIPE)
     out = []

@@ -3,7 +3,7 @@
 하나라도 걸리면 exit 1 — build_v9 는 그때 굽지 않는다. 16 핀치에서 사용자가 하나씩 찾아낸 것들을 굽기 전에 전부 잰다.
  pre  (자르기 전): ① 나레 조각 토막·경계(gem_split v2 잣대) ② 나레 겹침 ③ 화면 시간 끊김 ④ 멈춤(hold)·느리게(rate<0.85) ⑤ 0.5초 깜빡 조각
                    ⑥ 원본 3초 간격(구역별) ⑦ 대사 창 가장자리 말 잘림(v9/edges) ⑧ 까만 화면(black_src.npy, 0.75초+) ⑨ 나레↔그림(제브, 있으면)
-                   ⑫ 원본 3초 넘게 이어 쓴 조각(대사 창 포함, 10-14 소유권 주장) ⑬ 완성 길이 알림(20분 정도 목표, 실패 아님)
+                   ⑫ 원본 3초 넘게 이어 쓴 조각(대사 창 포함, 10-14 소유권 주장) ⑬ 완성 25분 아래면 실패(10-17)
  final(굽기 직전): ⑩ 나레 자막 ↔ 목소리(subcheck4 잣대: 자막 빠름·늦음 0.4초, 목소리에 자막 빔 0.6초) ⑪ 자막 두 줄 겹침
 사용: python gate.py pre  /  python gate.py final subs.ass narr_track.wav
 예외: gate_allow.json ["검사 문구 일부", …] — 눈으로 확인한 가짜만, 이유를 SESSION-LOG 에 남긴다."""
@@ -54,7 +54,8 @@ if MODE == "pre":
     # ⑫ 원본을 3초 넘게 이어 쓴 조각 (10-14 17 그레이하운드 v10 도 Apple IPE 소유권 주장 — 대사 창 최장 5.9초·63% → 사용자 "1" 대사 창 3초 이하)
     # ⑬ 완성 길이 20분 아래 (10-14 사용자 "14분으로 줄이면 뭐가 재밌니" / "너 앞으로 영화리뷰할때 20아래로만들지마") — 몸통 + 끝 1.5초(끝 검은 화면 15초는 10-14 뺌)
     tot = WN[-1]["b"] + CFG.get("tail", 1.5)
-    if tot < CFG.get("min_total", 1140): print(f"  ⑬ 알림: 완성 {mm(tot)} — 20분 정도가 목표(억지로 맞추지 말 것, 10-14 \"20분정도가되면 좋겠다는거지 억지로맞추지마\")")
+    # ★10-17 사용자 "25분이상좀만들어줘 조회수가 너무 안나와짧은거는" → 25분(1500초) 아래면 실패. 늘릴 때는 결말까지·원본 대사(3초 안)·액션 원본 소리·이야기 장면으로(나레 채우기 말고)
+    if tot < CFG.get("min_total", 1500): fail(f"⑬ 완성 {mm(tot)} — 25분 아래(10-17 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"): 대사·액션·이야기 장면으로 늘릴 것")
     for w in WN:
         if w["b"] - w["a"] > 3.0 + 0.01 or slen(w) > 3.0 * SPD + 0.02: fail(f"⑫ {w['kind']} 조각 {mm(w['a'])} 화면 {w['b'] - w['a']:.2f}초·원본 {slen(w):.2f}초 — 3초 넘음(대사는 나레로 바꾸거나 한쪽 말만)")
     for z in sorted({w.get("z", "main") for w in WN}):
@@ -91,7 +92,7 @@ else:
     def ts(s):
         h, m, c = s.split(":"); return int(h) * 3600 + int(m) * 60 + float(c)
     rows = [(ts(l.split(",")[1]), ts(l.split(",")[2]), l.split(",")[3], l.rstrip("\n").split(",", 9)[9]) for l in open(ASS, encoding="utf-8") if l.startswith("Dialogue") and ",TOP," not in l]
-    L = sorted((a, z, t) for a, z, st, t in rows if st == "N")
+    L = sorted((a, z, t) for a, z, st, t in rows if st in ("N", "NP", "NE"))   # ★10-16 지무비식 자막: 나레 꼴 NP(일반)·NE(강조)도 나레
     def fr(t): return min(max(int(t * 100), 0), len(on) - 1)
     for i, (a, z, t) in enumerate(L):
         if not on[fr(a)]:

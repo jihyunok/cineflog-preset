@@ -1,0 +1,92 @@
+{
+ "src": "D:/cine_work/ep20_패밀리플랜2/src.mp4",
+ "srclen": 6369.536,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 802,
+ "clips": "clips",
+ "bench": "bench/bench.mp4",
+ "bench_y": 0,
+ "title": "패밀리 플랜 2",
+ "bench_name": "카랑Karang 「싸움을 너무 잘해서 숨어살아도 자꾸 들키는 레전드 킬러 1위」 (Ws3DA2K4T2k, 21:52, 133만, 2025-12-05)",
+ "ctx": "영화 「The Family Plan 2」(2025, Apple TV+ action comedy, sequel to The Family Plan 2023). Mark Wahlberg as Dan Morgan (real name Sean McCaffrey), a former assassin who now runs a private security firm; Michelle Monaghan as his wife Jessica Morgan (offered a coaching job in Ohio); Zoe Colletti as daughter Nina Morgan, studying in London; Van Crosby as son Kyle Morgan, a gamer and hacker; toddler son Max; Kit Harington as Finn Clarke, Dan's secret half-brother and the villain; Sidse Babett Knudsen as Svetlana Romanova, Dan's former Russian intelligence contact in Paris; Sanjeev Bhaskar as Vikram, the butler of the Paris mansion; Reda Elazouar as Omar, Nina's boyfriend (his father is the Interpol Secretary General). Story: their father, crime syndicate leader McCaffrey, dies in prison. At Christmas the family visits Nina in London; Finn hires Dan for a bank security test and forces him into a heist for a digital key; the Morgans flee as fugitives chased by Finn's men; the key unlocks the late father's servers (money, hired assassins, surveillance network) based in his Paris childhood mansion; Dan and Finn meet at a museum; Finn puts a bounty on Dan; Svetlana drugs Dan, then warns them; car chase; Dan and Omar cross the rooftops into the mansion while Nina's friends stage a protest and Jessica and Kyle upload a virus that wipes the servers; Dan fights Finn; French police arrest them, Omar's father clears them; epilogue in Columbus, Ohio, Dan visits Finn in prison.",
+ "places": [
+  "London bank",
+  "London street",
+  "Nina's London flat",
+  "Christmas market",
+  "double-decker bus",
+  "car",
+  "train",
+  "Paris street",
+  "Svetlana's apartment",
+  "museum",
+  "Paris mansion",
+  "mansion server room",
+  "rooftops",
+  "protest",
+  "police station",
+  "prison",
+  "Ohio home",
+  "airport"
+ ],
+ "who": [
+  "Dan Morgan",
+  "Jessica Morgan",
+  "Nina",
+  "Kyle",
+  "Max (toddler)",
+  "Finn Clarke",
+  "Svetlana",
+  "Vikram",
+  "Omar",
+  "assassins",
+  "French police",
+  "bank staff"
+ ],
+ "quiet": [
+  [
+   251,
+   290
+  ],
+  [
+   690,
+   750
+  ],
+  [
+   960,
+   982
+  ],
+  [
+   1038,
+   1043
+  ],
+  [
+   3214,
+   3262
+  ],
+  [
+   5966,
+   6370
+  ]
+ ],
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 다음 편도 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "quiet_why": "노래 구간(차 안 합창·실버 벨·크리스마스 랩·시장 노래·센강 샹송 Quelqu'un m'a dit·엔딩 곡) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤"
+}
