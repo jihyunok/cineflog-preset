@@ -1,0 +1,436 @@
+{
+"S1": {
+"text": "낯선 마트 주차장, 텅 빈 자리에 홀로 남겨진 열일곱 살 임산부.",
+"en": "An unfamiliar store parking lot, and a pregnant seventeen-year-old left all alone by an empty space.",
+"emph": [
+"홀로 남겨진 열일곱 살 임산부",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S3": {
+"text": "하지만 남자친구는 끝내 오지 않고, 남은 건 단돈 5달러 55센트.",
+"en": "But her boyfriend never comes back, and all she has left is five dollars and fifty-five cents.",
+"emph": [
+"단돈 5달러 55센트",
+"money"
+],
+"tag": null,
+"tag_rel": null
+},
+"S4": {
+"text": "갈 곳 없는 소녀는 그날부터, 아무도 몰래 월마트에 숨어 사는데요.",
+"en": "With nowhere to go, from that day on the girl secretly lives hidden inside the Walmart.",
+"emph": [
+"월마트에 숨어",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S5": {
+"text": "그리고 폭풍우 치던 어느 밤, 아무도 없는 매장 한가운데서 진통이 찾아옵니다.",
+"en": "Then one stormy night, in the middle of the deserted store, labor pains hit.",
+"emph": [
+"진통",
+"climax"
+],
+"tag": null,
+"tag_rel": null
+},
+"S8": {
+"text": "하룻밤 새 꽃다발이 쏟아지는 유명 인사. 과연 이 어린 엄마 앞엔, 어떤 인생이 펼쳐질까요?",
+"en": "Overnight she becomes a celebrity showered with bouquets. What kind of life awaits this young mother?",
+"emph": [
+"어떤 인생이 펼쳐질까요",
+"woodcut"
+],
+"tag": null,
+"tag_rel": null
+},
+"S9": {
+"text": "2000년 작, 웨어 더 하트 이즈. 결말까지 바로 시작합니다.",
+"en": "From 2000, Where the Heart Is. Let's go all the way to the ending, starting now.",
+"emph": [
+"웨어 더 하트 이즈",
+"reveal"
+],
+"tag": null,
+"tag_rel": null
+},
+"S99": {
+"text": "한편 윌리 잭은, 밤길에서 웬 소녀를 발견하는데요.",
+"en": "Meanwhile, Willy Jack spots a girl by the road at night.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S103": {
+"text": "임신한 여자친구는 버리고, 히치하이커 소녀 졸렌은 냉큼 태웁니다.",
+"en": "He dumped his pregnant girlfriend, yet eagerly picks up a hitchhiking girl, Jolene.",
+"emph": [
+"냉큼 태웁니다",
+"twist"
+],
+"tag": "졸렌",
+"tag_rel": null
+},
+"S106": {
+"text": "아기 침대 앞에서 한참을 떠나지 못하는 예비 엄마.",
+"en": "A mother-to-be who can't tear herself away from the baby cribs.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S107": {
+"text": "파라솔 아래 초콜릿 우유, 한밤의 나 홀로 피크닉.",
+"en": "Chocolate milk under a patio umbrella: a midnight picnic for one.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S109": {
+"text": "그 사이 윌리 잭은, 지갑을 털렸다며 기름값 타령인데,",
+"en": "Meanwhile Willy Jack keeps whining about gas money, claiming his wallet was stolen,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S111": {
+"text": "졸렌이 내민 돈에 입이 귀에 걸립니다.",
+"en": "The money Jolene hands him puts a grin from ear to ear on his face.",
+"emph": [
+"입이 귀에 걸립니다",
+"money"
+],
+"tag": null,
+"tag_rel": null
+},
+"S113": {
+"text": "난데없이 들이닥친 경찰이, 소녀의 나이를 묻는데,",
+"en": "Out of nowhere the police show up and ask the girl how old she is,",
+"emph": [
+"소녀의 나이",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S116": {
+"text": "매장 침낭에서 자고, 세면대에서 씻는 나날.",
+"en": "Days of sleeping in a store sleeping bag and washing up at the sink.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S117": {
+"text": "날이 밝으면 창고에 꼭꼭 숨습니다.",
+"en": "When day breaks, she hides away in the storeroom.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S119": {
+"text": "문틈 너머 아슬아슬한 숨바꼭질.",
+"en": "A nail-biting game of hide-and-seek through the crack in the door.",
+"emph": [
+"아슬아슬한 숨바꼭질",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S121": {
+"text": "몰래 빠져나와, 끼니는 공원 벤치에서 때웁니다.",
+"en": "She sneaks out and makes do with meals on a park bench.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S123": {
+"text": "한편 윌리 잭은 철창 신세가 됐는데",
+"en": "Meanwhile, Willy Jack has ended up behind bars, and",
+"emph": [
+"철창 신세",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S125": {
+"text": "새벽 5시 반 기상. 직원들보다 한발 먼저 움직이죠.",
+"en": "Up at 5:30 a.m., she always moves one step ahead of the staff.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S126": {
+"text": "쓴 물건은 꼬박꼬박 공책에. 이름하여 월마트에 갚을 빚.",
+"en": "Everything she uses goes faithfully into a notebook, titled: what I owe Walmart.",
+"emph": [
+"월마트에 갚을 빚",
+"money"
+],
+"tag": null,
+"tag_rel": null
+},
+"S128": {
+"text": "행운의 마로니에가 시들자, 찾아간 곳은 도서관.",
+"en": "When her lucky buckeye tree starts to wither, she heads to the library.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S132": {
+"text": "책벌레 사서 포니입니다.",
+"en": "This is Forney, the bookworm librarian.",
+"emph": [
+"책벌레 사서 포니",
+"reveal"
+],
+"tag": "포니",
+"tag_rel": null
+},
+"S135": {
+"text": "보다 못해 책을 찾아다 펼쳐 줍니다.",
+"en": "Unable to just watch, he fetches the book and opens it for her.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S138": {
+"text": "위층에서 난 소리에, 포니는 허둥지둥 계단을 오르는데요.",
+"en": "At a noise from upstairs, Forney hurries up the stairs.",
+"emph": [
+"위층에서 난 소리",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S143": {
+"text": "식사 기도 중, 시스터는 스프락 씨와 함께 잔 죄를 용서해 달라는데요.",
+"en": "During grace, Sister asks the Lord to forgive her for sleeping with Mr. Sprock.",
+"emph": [
+"함께 잔 죄",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S146": {
+"text": "아직 월마트에 숨어 산다는 건 꽁꽁 비밀인데,",
+"en": "That she is living hidden in Walmart is still a closely kept secret,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S148": {
+"text": "도서관 책대로, 마당 제일 높은 곳에 나무를 심는데,",
+"en": "Following the library book, she plants the tree on the highest spot in the yard,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S153": {
+"text": "하지만 대학은 끝내 못 마쳤다는데요.",
+"en": "But he never managed to finish college.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S155": {
+"text": "월마트로 향하는 뒷모습을 쫓는 포니의 눈길.",
+"en": "Forney's eyes follow her as she walks back toward Walmart.",
+"emph": [
+"포니의 눈길",
+"reveal"
+],
+"tag": null,
+"tag_rel": null
+},
+"S156": {
+"text": "어느덧 몇 주 뒤, 폭우가 쏟아지는 밤.",
+"en": "Weeks later, a night of pouring rain.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S158": {
+"text": "잠에서 깨 짐을 챙기다, 진통에 배를 움켜쥡니다.",
+"en": "Waking up and packing her things, she clutches her belly as labor begins.",
+"emph": [
+"진통",
+"climax"
+],
+"tag": null,
+"tag_rel": null
+},
+"S160": {
+"text": "양수까지 터졌지만, 텅 빈 매장엔 도와줄 사람 하나 없습니다.",
+"en": "Her water has broken, but there is no one in the empty store to help.",
+"emph": [
+"도와줄 사람 하나 없습니다",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S162": {
+"text": "버티고 버티다 결국 바닥에 털썩.",
+"en": "After holding out as long as she can, she finally collapses to the floor.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S163": {
+"text": "그것도 하필 질색하는 5번 통로.",
+"en": "And of all places, aisle five, the number she can't stand.",
+"emph": [
+"5번 통로",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S165": {
+"text": "그때 유리창을 깨고 포니가 뛰어듭니다.",
+"en": "Then Forney crashes in through the window.",
+"emph": [
+"유리창을 깨고",
+"climax"
+],
+"tag": null,
+"tag_rel": null
+},
+"S166": {
+"text": "엄마와 아기는 무사할까요?",
+"en": "Will mother and baby make it?",
+"emph": [
+"무사할까요",
+"woodcut"
+],
+"tag": null,
+"tag_rel": null
+},
+"S167": {
+"text": "다행히 엄마도 딸도 무사합니다. 눈을 뜨니 병원 침대 위.",
+"en": "Thankfully, mother and daughter are both fine. She wakes up in a hospital bed.",
+"emph": [
+"엄마도 딸도 무사합니다",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+},
+"S169": {
+"text": "살가운 간호사 렉시의 손길.",
+"en": "The gentle touch of a warm-hearted nurse, Lexie.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S176": {
+"text": "돈 걱정도 잠시, 처음으로 품에 안아 보는 딸.",
+"en": "Money worries forgotten for a moment: her daughter, in her arms for the first time.",
+"emph": [
+"처음으로 품에 안아 보는 딸",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+},
+"S177": {
+"text": "그날 밤 아기를 받아 준 사람이 누구였는지, 렉시가 들려주는데,",
+"en": "Lexie tells her who it was that delivered the baby that night,",
+"emph": null,
+"tag": "렉시",
+"tag_rel": null
+},
+"S179": {
+"text": "딸 이름은 웬디 대신 아메리쿠스로.",
+"en": "Her daughter's name: not Wendy, but Americus.",
+"emph": [
+"아메리쿠스",
+"reveal"
+],
+"tag": null,
+"tag_rel": null
+},
+"S182": {
+"text": "달달한 간식 이름의 네 남매, 렉시도 열다섯에 엄마가 됐죠.",
+"en": "Four kids named after sweets: Lexie, too, became a mother at fifteen.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S185": {
+"text": "인터뷰가 전파를 타자, 전국에서 편지가 쏟아집니다.",
+"en": "Once the interview airs, letters pour in from all over the country.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S187": {
+"text": "아기는 축복받지 못할 거라는, 미시시피에서 온 저주의 편지.",
+"en": "A cursing letter from Mississippi, saying the baby will never be blessed.",
+"emph": [
+"저주의 편지",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S188": {
+"text": "돈까지 넣은 따뜻한 편지도 있는데",
+"en": "There are also warm letters with money tucked inside,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S190": {
+"text": "그때 불쑥 찾아온 친엄마 마마 릴.",
+"en": "Then, out of the blue, her own mother, Mama Lil, shows up.",
+"emph": [
+"친엄마 마마 릴",
+"reveal"
+],
+"tag": "마마 릴",
+"tag_rel": "노블리의 엄마"
+},
+"S192": {
+"text": "다섯 살 생일에 도망갔던 바로 그 엄마.",
+"en": "The very mother who ran off on her fifth birthday.",
+"emph": [
+"다섯 살 생일에 도망갔던",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S194": {
+"text": "TV를 보고 열 시간을 달려왔다며, 담배부터 무는데요.",
+"en": "Saying she drove ten hours after seeing her on TV, the first thing she does is light a cigarette.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S210": {
+"text": "셋이 살 집을 구하자는 뜻밖의 제안.",
+"en": "An unexpected offer: find a home for the three of them, baby included.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S215": {
+"text": "돈을 합치자며 받아 든 500달러, 이 엄마 믿어도 될까요?",
+"en": "She takes the $500, saying they should pool their money. Can this mother be trusted?",
+"emph": [
+"이 엄마 믿어도 될까요",
+"woodcut"
+],
+"tag": null,
+"tag_rel": null
+}
+}

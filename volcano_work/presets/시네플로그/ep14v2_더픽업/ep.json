@@ -1,0 +1,64 @@
+{
+ "src": "D:/cine_work/ep14v2_더픽업/src.mp4",
+ "srclen": 5776.0,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 960,
+ "burn": [0, 4, 0, 4],
+ "burn_why": "박힌 자막 없음(옛 14 노트·프레임 확인) → 박힌 자막 확대를 끈다(2x2 띠라 점수가 문턱을 못 넘음)",
+ "clips": "clips",
+ "bench": "bench/bench.mp4",
+ "bench_y": 60,
+ "title": "더 픽업",
+ "bench_name": "무비팩토리 「하필 은퇴를 6개월 앞둔 베테랑 경비원을 건드려버린 범죄조직의 최후」 (A80VEfmF_7M, 18:14, 5만)",
+ "ctx": "영화 「The Pickup」(2025, Amazon MGM action comedy, directed by Tim Story). Eddie Murphy as Russell Pierce, a veteran armored-truck guard of the company Guardian six months from retirement, married 25 years to Natalie (Eva Longoria); Pete Davidson as Travis Stolly, his reckless young new partner who wants to be a cop; Keke Palmer as Zoe, a criminal mastermind (her father died locked in a vault in a casino fire) with her crew Banner and Miguel. Story: Travis, a bank guard, once pulled a gun on Zoe who handed him a note, then they dated; boss Clark assigns Russell and Travis a remote route; Zoe's crew ambushes the truck in a dead zone (tear gas, spike strip, dye pack); Zoe takes them hostage — she wants the truck itself to rob the Sorrento casino's weekend take of 60 million dollars; Travis turns out to have been her informant; Natalie joins; they infiltrate the casino (boxing champion distraction); Banner and Miguel betray Zoe, Russell is shot; highway chase, Natalie takes down Banner; truck explosion; Russell gives Natalie a ring and retires. Epilogue six months later: Travis is a police officer, Zoe in Bali, the couple opens a bed and breakfast. Opening credits text appears over the first scenes (0:45~2:40); end credits from 1:29:50 (5390s).",
+ "places": [
+  "bank lobby",
+  "Russell's house",
+  "Guardian armored truck depot",
+  "armored truck cab",
+  "highway",
+  "dead zone road in the woods",
+  "diner",
+  "Zoe's hideout",
+  "Sorrento casino",
+  "casino vault",
+  "boxing event",
+  "highway chase",
+  "bed and breakfast"
+ ],
+ "who": [
+  "Russell (Eddie Murphy)",
+  "Travis (Pete Davidson)",
+  "Zoe (Keke Palmer)",
+  "Natalie (Eva Longoria)",
+  "Banner",
+  "Miguel",
+  "Clark (boss)",
+  "casino staff",
+  "police"
+ ],
+ "quiet": [
+  [5385, 5776]
+ ],
+ "quiet_why": "엔딩 크레딧(노래) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤",
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 다음 편도 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "remake_why": "10-17 사용자 \"저거 다 엉망이야 다시만들어야해 1번올리고 얼마나 욕들어먹었는지 몰라\" + \"다운로드에 새로운 영화원본있어 끝나는 작업계속해줘\" — 옛 14(10-07, 24:05)를 v9 방식으로 다시"
+}

@@ -1,0 +1,66 @@
+{
+ "src": "D:/cine_work/ep06v2_로드하우스/src.mp4",
+ "srclen": 7404.6,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 800,
+ "burn": [0, 4, 0, 4],
+ "burn_why": "박힌 자막 없음(한국어 srt 따로 · 옛 06 노트) → 박힌 자막 확대를 끈다",
+ "clips": "clips",
+ "bench": "bench/bench.mp4",
+ "bench_y": 140,
+ "title": "로드 하우스",
+ "bench_name": "시네마톡 「\"24년 최신작!\" 은퇴 후 시골 술집에서 경비원으로 일하고 있는 《UFC 챔피언》을 잘못 건드린 최강액션 영화!」 (D8wDpJZYaUQ, 17:22, 300만)",
+ "ctx": "영화 「Road House」(2024, Amazon MGM action, directed by Doug Liman, remake of the 1989 film). Jake Gyllenhaal as Elwood Dalton, a former UFC middleweight fighter haunted by having beaten a friend (Shane Lemond) to death in the ring; he now lives in his car and wins underground fights by intimidation. Frankie (Jessica Williams) hires him as the bouncer of her roadhouse bar on Glass Key in the Florida Keys. Charlie (Hannah Lanier) is the bookstore owner's teenage daughter who loves westerns; Ellie (Daniela Melchior) is the ER doctor, daughter of Sheriff Big Dick Moore (Joaquim de Almeida) who works for the Brandt family. Ben Brandt (Billy Magnussen) wants Frankie's land for a resort and sends a biker gang led by Dell (JD Pardo); Dell dies in a boat crash eaten by crocodiles; Ben's jailed father sends the psychopath Knox (Conor McGregor). Staff: bartender Billy (Lukas Gage), Laura, Ozzy... Knox wrecks the bar, Charlie's bookstore is burned, Dalton raids Ben's money drop at Harvest Key, Ellie is kidnapped on Ben's yacht, Knox rams the yacht, Ben crashes a boat into the bar, final fight Dalton vs Knox in the ruined bar (harpoon, knife), Knox kills Ben; the sheriff lets Dalton leave; the bar reopens; Charlie says goodbye. Mid-credits: Knox wakes up in hospital and escapes. End credits from about 1:54:40.",
+ "places": [
+  "underground fight club",
+  "Dalton's car",
+  "Glass Key bookstore",
+  "the roadhouse bar",
+  "hospital ER",
+  "Dalton's houseboat",
+  "Ben Brandt's yacht",
+  "mangrove swamp with crocodiles",
+  "sheriff's car",
+  "Harvest Key money drop",
+  "open sea boats",
+  "ruined bar",
+  "hospital room"
+ ],
+ "who": [
+  "Dalton (Jake Gyllenhaal)",
+  "Frankie (bar owner)",
+  "Charlie (bookstore girl)",
+  "Ellie (ER doctor)",
+  "Ben Brandt",
+  "Knox (Conor McGregor)",
+  "Dell (biker gang leader)",
+  "Sheriff Moore",
+  "Billy (bartender)",
+  "bar staff",
+  "bikers"
+ ],
+ "quiet": [
+  [6880, 7404.6]
+ ],
+ "quiet_why": "엔딩 크레딧(노래) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤",
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 다음 편도 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "remake_why": "10-17 사용자 \"저거 다 엉망이야 다시만들어야해 1번올리고 얼마나 욕들어먹었는지 몰라\" + \"다운로드에 새로운 영화원본있어 끝나는 작업계속해줘\" — 옛 06(10-02)을 v9 방식으로 다시"
+}

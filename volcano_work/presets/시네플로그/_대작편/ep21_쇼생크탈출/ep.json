@@ -1,0 +1,97 @@
+{
+ "src": "C:/cine_work/ep21_쇼생크탈출/src.mp4",
+ "srclen": 8552.377,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 1024,
+ "h_why": "원본 720x384(BRRip) 을 1920x1024 로 키움(lanczos), 박힌 자막·로고 없음 — 한국어 자막은 따로 The.smi → ko.srt",
+ "clips": "clips",
+ "bench": "bench/bench.mp4",
+ "bench_y": 22,
+ "title": "쇼생크 탈출",
+ "bench_name": "사심가득 영화 「아내와 정부 살인 누명… 평점 9.5 명작」 (0SUpmz8YFbQ, 18:39, 18만, 2026-06-15) — 쇼생크 결말포함 한국어 리뷰 중 조회수 1위(10-18 검색)",
+ "ctx": "영화 「The Shawshank Redemption」(1994, Frank Darabont, from Stephen King's novella). Tim Robbins as Andy Dufresne, a young banker convicted in 1947 of murdering his wife and her lover (golf pro Glenn Quentin), sentenced to two life terms at Shawshank State Prison in Maine; Morgan Freeman as Ellis 'Red' Redding, the narrator, a lifer who smuggles goods; Bob Gunton as Warden Samuel Norton, a corrupt Bible-quoting warden; Clancy Brown as Captain Byron Hadley, brutal chief guard; William Sadler as Heywood; James Whitmore as Brooks Hatlen, the old librarian with a pet crow (Jake) who is paroled after 50 years and hangs himself; Mark Rolston as Bogs Diamond, leader of 'the Sisters' who assault Andy; Gil Bellows as Tommy Williams, a young thief who knows the real killer (Elmo Blatch) and is shot by Hadley on Norton's orders. Story: Andy asks Red for a rock hammer and a Rita Hayworth poster; tar roof work, Andy gives Hadley tax advice and wins beer for the crew; Andy does guards' taxes, builds the library by writing letters to the state senate for six years; plays Mozart's Marriage of Figaro over the PA and gets two weeks in the hole; Norton's 'Inside-Out' labor scheme and money laundering via a fake identity 'Randall Stephens'; after Tommy's murder Andy spends a month in solitary; talks with Red about Zihuatanejo and the Pacific; one stormy night Andy escapes through a tunnel dug behind the posters (Raquel Welch now) over 19 years and crawls 500 yards through a sewer pipe; withdraws Norton's money as Randall Stephens and sends the ledger to the newspaper; Hadley is arrested, Norton shoots himself; Red is paroled after 40 years, follows Andy's letter under the oak tree at a hayfield wall in Buxton, crosses the border and reunites with Andy on a beach in Zihuatanejo, Mexico.",
+ "places": [
+  "courtroom",
+  "Andy's car at night",
+  "Andy's house",
+  "prison yard",
+  "prison gate and bus",
+  "cell block",
+  "Andy's cell",
+  "Red's cell",
+  "shower and delousing",
+  "laundry room",
+  "film projection room",
+  "license plate shop",
+  "roof (tar job)",
+  "library",
+  "warden's office",
+  "solitary confinement (the hole)",
+  "prison PA office",
+  "mess hall",
+  "Inside-Out work site",
+  "sewer pipe",
+  "river in the storm",
+  "bank",
+  "newspaper office",
+  "halfway house room",
+  "grocery store",
+  "Buxton hayfield and oak tree",
+  "bus across the border",
+  "Zihuatanejo beach"
+ ],
+ "who": [
+  "Andy Dufresne",
+  "Red",
+  "Warden Norton",
+  "Captain Hadley",
+  "Heywood",
+  "Brooks Hatlen",
+  "Bogs Diamond",
+  "the Sisters",
+  "Tommy Williams",
+  "Fat Ass (new prisoner)",
+  "guards",
+  "inmates",
+  "Andy's wife",
+  "Glenn Quentin",
+  "parole board"
+ ],
+ "quiet": [
+  [
+   0,
+   180
+  ],
+  [
+   4030,
+   4190
+  ],
+  [
+   8262,
+   8553
+  ]
+ ],
+ "quiet_why": "노래 구간(오프닝 Ink Spots 「If I Didn't Care」·피가로의 결혼 「편지 이중창」·엔딩 크레딧) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤. 시각은 ko.srt 로 어림, 받아쓰기 뒤 다시 확인",
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 다음 편도 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "red_vo": "drop",
+ "red_vo_why": "10-18 사용자 \"b\" — 레드(모건 프리먼) 원본 내레이션은 빼고 대사 장면만 살린다. 줄거리는 우리 나레로",
+ "music_why": "10-18 사용자 \"/달빛롱폼/bgm/Despair and Triumph.mp3 다운받아서 해\" → incompetech 에서 받음(Kevin MacLeod, CC BY 4.0 — 업로드 글에 출처 표기)"
+}

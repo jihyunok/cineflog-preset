@@ -17,6 +17,12 @@ SRC = CFG["src"]; FPS = CFG.get("fps", 24000 / 1001); SH = CFG.get("h", 804)    
 W, H = 1920, 1080; BAR = (H - SH) // 2; SPD = 1.05
 EQ = "eq=saturation=1.25:contrast=1.08:brightness=0.015:gamma=1.02,hue=h=6"          # 10-14 한 단계 세게(옛 1.12·1.05·0.01·4)
 ZOOM, ZOOM_NF, SHARP = 1.12, 1.2, 0.85                                                # 10-14 확대 1.05→1.12(반전 못 하는 글자 컷 1.2) · 선명도 0.55→0.85
+FX = CFG.get("fx", False); MOVE, GRAIN = 0.05, 3                                      # ★10-19 사용자 "세 개 다 넣고 견본 보여줘": 조각마다 줌인·줌아웃 번갈아(+5%) · 필름 그레인 → 견본 뒤 "그냥 원래대로 하자" = 기본 끔(ep.json "fx": true 면 켬)
+                                                                                     #   테두리 블러(그림 92% + 둘레 흐리게)는 견본 보고 "테두리 블러는 빼자" · 그레인 6 은 파일 5배(3초 10.3MB) → 3(2.3MB, 없을 때 1.9MB)
+def vf_fx(k, L):
+    if not FX: return f"pad={W}:{H}:0:{BAR}:black,format=yuv420p[vo]"
+    z = f"(1+{MOVE}*t/{L:.3f})" if k % 2 == 0 else f"(1+{MOVE}*(1-t/{L:.3f}))"
+    return f"scale=w='trunc(1920*{z}/2)*2':h='trunc({SH}*{z}/2)*2':eval=frame,crop=1920:{SH},noise=c0s={GRAIN}:c0f=t,pad={W}:{H}:0:{BAR}:black,format=yuv420p[vo]"
 LT = CFG["logo"][3] + 4 if CFG.get("logo") else 0       # ★10-14 01·02 다시 만들기 "로고는 화면키워" — 원본 로고(AYA 등) 아래끝까지 확대로 잘라 냄(ep.json logo=[x0,y0,x1,y1])
 def vf_base(z):
     cw = round(1920 / z / 2) * 2; chh = round(SH / z / 2) * 2; yo = min(SH - chh, max((SH - chh) // 2, LT))
@@ -55,9 +61,9 @@ def burn(s0, L):
             out.append((i / FPS8, j / FPS8, min(top(a[x]) for x in range(i, j)))); i = j
         else: i += 1
     return out
-def key(w): return f"{w['kind']}_{w['s']:.3f}_{w['b'] - w['a']:.3f}_{int(bool(w.get('noflip')))}_{w.get('rate', 0):.4f}_{w.get('pre', 0):.3f}"
+def key(w, k): return f"{w['kind']}_{w['s']:.3f}_{w['b'] - w['a']:.3f}_{int(bool(w.get('noflip')))}_{w.get('rate', 0):.4f}_{w.get('pre', 0):.3f}" + (f"_fx{k % 2}_{MOVE}_{GRAIN}" if FX else "")
 def cut(k):
-    w = WN[k]; p = f"{CLIPS}/{key(w)}.mkv"
+    w = WN[k]; p = f"{CLIPS}/{key(w, k)}.mkv"
     if os.path.exists(p): return p
     f0 = round(w["a"] * FPS); f1 = round(w["b"] * FPS); n = max(1, f1 - f0); L = n / FPS
     act = w["kind"] == "A"; r = w.get("rate", SPD if act else 1.0); sl = L * r; s0 = w["s"] - w.get("pre", 0)
@@ -69,7 +75,7 @@ def cut(k):
         a2, b2 = a / r, b / r
         ch.append(f"[z{i}]crop={ww}:{h}:{(1920 - ww) // 2}:{LT},scale=1920:{SH},{EQ}[zz{i}]")
         ch.append(f"[v{i}][zz{i}]overlay=0:0:enable='between(t,{max(0, a2 - 0.1):.3f},{b2 + 0.1:.3f})'[v{i + 1}]")
-    ch.append(f"[v{len(bs)}]" + ("hflip," if flip else "") + f"pad={W}:{H}:0:{BAR}:black,format=yuv420p[vo]")
+    ch.append(f"[v{len(bs)}]" + ("hflip," if flip else "") + vf_fx(k, L))
     subprocess.run(FF + ["-ss", f"{max(s0, 0):.4f}", "-i", SRC, "-frames:v", str(n), "-filter_complex", ";".join(ch), "-map", "[vo]", "-map", "0:a:0",
                          "-af", (f"atempo={r:.4f}," if not act and r != 1 else "") + f"apad,atrim=0:{L:.5f},afade=t=in:d=0.03,afade=t=out:st={max(0, L - 0.05):.3f}:d=0.05,aresample=48000",
                          "-c:v", "libx264", "-preset", "veryfast", "-crf", "17", "-c:a", "pcm_s16le", "-ac", "2", "-r", "24000/1001", p + ".tmp.mkv"], check=True)
@@ -78,7 +84,7 @@ def cut(k):
 if MODE == "cut":
     gate("pre")
     from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(6) as ex: ps = list(ex.map(cut, range(len(WN))))
+    with ThreadPoolExecutor(int(os.environ.get("CUT_JOBS", 6))) as ex: ps = list(ex.map(cut, range(len(WN))))   # 10-20 메모리 부족(13.9GB PC)으로 멈춤 → CUT_JOBS=3
     open("all.txt", "w", encoding="utf-8").write("".join(f"file '{p}'\n" for p in ps))
     subprocess.run(FF + ["-f", "concat", "-safe", "0", "-i", "all.txt", "-c", "copy", "body.mkv"], check=True)
     print("조각", len(ps), "· 몸통", round(dur("body.mkv"), 2), "초 (계획", round(WN[-1]["b"], 2), ")"); sys.exit()
@@ -254,8 +260,49 @@ for k in range(len(rows) - 1):           # 두 줄 겹침 없게: 앞 줄은 다
         if tsec(g[2]) < tsec(g[1]) + 0.3: g[2] = ts(tsec(g[1]) + 0.3)
         rows[k + 1] = ",".join(g)
 print("겹친 자막 줄 끝 당김", cutn)
-ass += f"Dialogue: 0,{ts(0)},{ts(END)},TOP,,0,0,0,,CINEFLOG\n" + "\n".join(rows) + "\n"
+# ★10-20 무드킹식 인물 이름표 — 사용자 "https://www.youtube.com/watch?v=fK2xpgBdMJM 이영상 봐봐." · "인물소개 잘해놨어"
+#   인물이 처음 나오는 줄(script 옵션 {"tag": "이름"} 또는 {"tag": ["이름", "관계"]})의 첫 조각에, 얼굴 옆(가슴 높이) 노란 굵은 이름(잘난체 2)을 그 조각 동안(최대 3초).
+#   자리는 body.mkv 그 조각 가운데 프레임의 얼굴(OpenCV) — 얼굴이 왼쪽이면 오른쪽에, 오른쪽이면 왼쪽에. 못 찾으면 왼쪽 아래. 손으로 고칠 땐 ep.json "tag_pos": {"이름": [x, y]}.
+TAGF = ["Jalnan 2 TTF", "Jalnan2TTF.ttf"]; TAGS = []
+#   ★시네플로그는 이름표를 넣지 않는다(10-20 사용자 "우리는 인물 이름표는 넣지마") — ep.json "name_tag": true 인 편만(대본에 tag 가 있어도 무시)
+if CFG.get("name_tag") and any(w.get("tag") for w in WN):
+    import cv2, shutil as _sh
+    if not os.path.exists(f"{FONTS}/{TAGF[1]}"): _sh.copy2(os.path.expanduser(f"~/AppData/Local/Microsoft/Windows/Fonts/{TAGF[1]}"), f"{FONTS}/{TAGF[1]}")
+    # 얼굴 찾기 = YuNet(models/yunet.onnx, 다른 프리셋에 있던 것) — OpenCV 5.0 엔 Haar 가 없고, 한글 경로는 못 읽어 바이트로 넣는다
+    _det = cv2.FaceDetectorYN.create("onnx", np.frombuffer(open(os.path.join(HERE, "..", "models", "yunet.onnx"), "rb").read(), np.uint8), np.array([], np.uint8), (960, 540), 0.7)
+    def _face(t):
+        b = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.3f}", "-i", "body.mkv", "-frames:v", "1", "-vf", "scale=960:540", "-f", "rawvideo", "-pix_fmt", "bgr24", "-"], capture_output=True).stdout
+        if len(b) < 960 * 540 * 3: return None
+        _, fs = _det.detect(np.frombuffer(b[:960 * 540 * 3], np.uint8).reshape(540, 960, 3))
+        if fs is None or not len(fs): return None
+        x, y, w_, h_ = max(fs, key=lambda f: f[2] * f[3])[:4]
+        return (x * 2, y * 2, w_ * 2, h_ * 2)
+    TPOS = CFG.get("tag_pos", {})
+    for k in sorted({w["k"] for w in WN if w.get("tag")}):
+        ws = [w for w in WN if w["k"] == k]; w = ws[min(ws[0].get("tag_w", 0), len(ws) - 1)]   # "tag_w" = 그 줄 몇 번째 조각에(이름을 말하는 조각, 기본 첫 조각)
+        tg = w["tag"]; name, rel = (tg, None) if isinstance(tg, str) else (tg[0], tg[1] if len(tg) > 1 else None)
+        a0 = w["a"] + 0.1; b0 = min(w["b"], w["a"] + 3.0); tw = len(name) * 92
+        if name in TPOS: x, y = TPOS[name]
+        else:
+            f = _face((w["a"] + w["b"]) / 2)
+            if f:
+                fx, fy, fw, fh = f
+                x = min(1920 - tw / 2 - 50, fx + fw + 70 + tw / 2) if fx + fw / 2 < 960 else max(tw / 2 + 50, fx - 70 - tw / 2)
+                y = min(760, max(300, fy + fh * 1.05))
+            else: x, y = 60 + tw / 2, 640
+        txt = name + (r"\N{\fs58}(" + rel + ")" if rel else "")
+        TAGS.append(f"Dialogue: 1,{ts(a0)},{ts(b0)},TAG,,0,0,0,,{{\\pos({x:.0f},{y:.0f})\\fad(120,150)\\fscx80\\fscy80\\t(0,120,\\fscx106\\fscy106)\\t(120,200,\\fscx100\\fscy100)}}{txt}")
+    print("인물 이름표", len(TAGS), [t.split("}")[-1] for t in TAGS])
+    ass = ass.replace("\n[Events]", f"Style: TAG,{TAGF[0]},96,&H004ADCFF,&H004ADCFF,&H00000000,&H96000000,0,0,0,0,100,100,0,0,1,5,2,5,0,0,0,1\n\n[Events]", 1)
+# 오른쪽 위 글자 = ep.json "brand"(이 PC 기본 CINEFLOG). ★다른 PC 10-19 사용자 "이채널은 시네플로그라고 하지말고 대작이라고 해줘" → 그 PC 는 「대작」(10-20 이 PC 로 가져올 때 기본은 그대로 둠)
+ass += f"Dialogue: 0,{ts(0)},{ts(END)},TOP,,0,0,0,,{CFG.get('brand', 'CINEFLOG')}\n" +"\n".join(rows + TAGS) + "\n"
 open("subs.ass", "w", encoding="utf-8").write(ass)
+# ★다른 PC 10-20 사용자 "그리고 대작 워터마크 무드킹처럼 만들어" → 워터마크 그림(brand/make_watermark.py)을 오른쪽 위에 얹고, 화면에 굽는 자막(subs_burn.ass)엔 TOP 글자를 뺀다
+#   (TOP 줄은 캡컷용으로 subs.ass 에 남김). 이 PC 는 ep.json "brand_png": "대작_워터마크.png"(brand/ 안 이름 또는 절대 경로)를 적은 편만 — 없으면 옛 글자.
+WM = CFG.get("brand_png") or None
+if WM and not os.path.isabs(WM): WM = os.path.join(HERE, "..", "brand", WM)
+if WM and not os.path.exists(WM): WM = None
+open("subs_burn.ass", "w", encoding="utf-8").write("".join(l for l in ass.splitlines(True) if not (WM and l.startswith("Dialogue") and ",TOP," in l)))
 if MODE == "subs": sys.exit()
 
 import wave
@@ -302,9 +349,10 @@ t_mus = narr[-1][1] - 1.0
 music = os.path.expanduser(CFG.get("music", r"~/volcano_work/달빛롱폼/bgm/Healing.mp3"))
 fc = f"[2:a]aresample=48000,atrim=0:{END - t_mus + 1:.2f},volume=0.12,afade=t=in:d=2,afade=t=out:st={END - t_mus - 2:.2f}:d=2,adelay={int(t_mus*1000)}|{int(t_mus*1000)}[mus];" \
      f"[1:a][mus]amix=inputs=2:normalize=0:duration=first,atrim=0:{END:.2f},alimiter=limit=0.95,loudnorm=I=-16:TP=-1.5:LRA=11[a];" \
-     f"[0:v]unsharp=5:5:{SHARP}:5:5:0,tpad=stop_mode=clone:stop_duration={OUT:.2f},fade=t=out:st={END - 1:.2f}:d=1,subtitles=subs.ass:fontsdir={FONTS}[v]"
+     f"[0:v]unsharp=5:5:{SHARP}:5:5:0,tpad=stop_mode=clone:stop_duration={OUT:.2f},fade=t=out:st={END - 1:.2f}:d=1,subtitles=subs_burn.ass:fontsdir={FONTS}" + \
+     ("[vs];[3:v]format=rgba[wm];[vs][wm]overlay=W-w-72:54[v]" if WM else "[v]")   # 10-20 텔레그램 "아래 왼쪽으로 조금 옮겨" (40:28 → 72:54)
 open("fc.txt", "w", encoding="utf-8").write(fc)
-subprocess.run(FF + ["-i", "body.mkv", "-i", "mix.wav", "-i", music, "-/filter_complex", "fc.txt", "-map", "[v]", "-map", "[a]",
+subprocess.run(FF + ["-i", "body.mkv", "-i", "mix.wav", "-i", music] + (["-i", WM] if WM else []) + ["-/filter_complex", "fc.txt", "-map", "[v]", "-map", "[a]",
                      "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "final.mp4.tmp.mp4"], check=True)
 os.replace("final.mp4.tmp.mp4", "final.mp4")
 def lufs(p):

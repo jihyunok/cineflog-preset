@@ -11,6 +11,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageOps
 W, H = 1280, 720
 JALNAN = os.path.expanduser(r"~/AppData/Local/Microsoft/Windows/Fonts/Jalnan2TTF.ttf")
 BHS = r"C:/Windows/Fonts/BlackHanSans-Regular.ttf"
+BHS = BHS if os.path.exists(BHS) else os.path.expanduser(r"~/AppData/Local/Microsoft/Windows/Fonts/BlackHanSans-Regular.ttf")
+JALNAN = JALNAN if os.path.exists(JALNAN) else BHS   # 10-19 잘난체 없는 PC → 블랙한산스
 BRUSH = os.path.expanduser(r"~/AppData/Local/Microsoft/Windows/Fonts/EastSeaDokdo-Regular.ttf")
 RED, WHITE = (236, 22, 22), (255, 255, 255)
 DD = ImageDraw.Draw(Image.new("L", (8, 8)))

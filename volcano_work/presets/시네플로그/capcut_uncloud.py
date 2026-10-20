@@ -9,7 +9,7 @@ def fix(d):
     for k in CLEAN:
         if k in d: d[k] = CLEAN[k]
 paths = glob.glob("D:/다운로드/CapCut Drafts/시네플로그*/draft_meta_info.json") + \
-        glob.glob(os.path.expanduser("~/volcano_work/시네플로그/완성본/*_캡컷/draft_meta_info.json"))
+        glob.glob(os.path.join(__import__("final_dir").FINAL, "*_캡컷", "draft_meta_info.json"))
 for p in paths:
     m = json.load(open(p, encoding="utf-8")); fix(m)
     json.dump(m, open(p, "w", encoding="utf-8"), ensure_ascii=False); print("meta", p)

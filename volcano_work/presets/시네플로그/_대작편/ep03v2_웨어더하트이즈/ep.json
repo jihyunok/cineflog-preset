@@ -1,0 +1,195 @@
+{
+ "src": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/src.mp4",
+ "srclen": 7198.69,
+ "scenes": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/scenes.txt",
+ "words": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/src_sm.json",
+ "band": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/src_band.npy",
+ "h": 1080,
+ "burn": [
+  860,
+  220,
+  360,
+  1200
+ ],
+ "h_why": "원본 [노블리].mkv 1920x1080 HEVC 꽉 찬 화면(cropdetect 1920:1080), 박힌 자막 없음 — 자막은 트랙(kor·eng) → ko.srt·en.srt. src.mp4 = v:0+a:0 복사",
+ "clips": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/clips",
+ "bench": "C:/Users/Administrator/cine_work/ep03_웨어더하트이즈/bench/bench.mp4",
+ "bench_y": 0,
+ "title": "웨어 더 하트 이즈",
+ "bench_name": "영반 「자신의 아이를 임신한 여자친구를 버리고 도망간 연예인의 끔직한 최후 | 노블리 |」 (gJXlOluHg3s, 10:30, 68만, 2020-05-11, 태그 결말포함) — 같은 영화 한국어 리뷰 조회수 1위(10-19 검색), 1920x1080 꽉 참",
+ "ctx": "영화 「Where the Heart Is」(2000, Matt Williams, from Billie Letts' novel). Natalie Portman as Novalee Nation, a pregnant 17-year-old from Tennessee whose boyfriend Willy Jack Pickens (Dylan Bruno), an aspiring country singer, drives off to California and abandons her at a Wal-Mart in Sequoyah, Oklahoma; she secretly lives inside the Wal-Mart and gives birth there at night, helped by Forney Hull (James Frain), a shy librarian; the baby is named Americus. Ashley Judd as Lexie Coop, a nurse with many children who becomes her best friend; Stockard Channing as Thelma 'Sister' Husband, a kind religious woman who takes her in; Keith David as Moses Whitecotton, a photographer who teaches her photography; Sally Field as Mama Lil, Novalee's mother; Joan Cusack as Ruth Meyers, a music agent who manages Willy Jack; Mr. Sprock is the Wal-Mart manager; Roger is Lexie's boyfriend; Mary Elizabeth is Forney's sister. Willy Jack goes to jail, becomes a country singer, then loses his legs in a train accident. A tornado hits the town. Novalee and Forney end up together and marry in the Wal-Mart.",
+ "places": [
+  "Willy Jack's car on the road",
+  "Wal-Mart parking lot",
+  "inside Wal-Mart",
+  "Wal-Mart restroom",
+  "Wal-Mart at night",
+  "hospital",
+  "Sister Husband's trailer",
+  "Moses Whitecotton's photo studio",
+  "public library",
+  "Forney's house",
+  "Lexie's house",
+  "jail",
+  "country music stage",
+  "bar",
+  "motel room",
+  "street in Sequoyah",
+  "church",
+  "tornado and storm",
+  "train tracks",
+  "Novalee's house",
+  "Maine college town",
+  "Wal-Mart wedding"
+ ],
+ "who": [
+  "Novalee Nation",
+  "Willy Jack Pickens",
+  "Forney Hull",
+  "Lexie Coop",
+  "Sister Husband",
+  "Moses Whitecotton",
+  "Mama Lil",
+  "Ruth Meyers",
+  "Mr. Sprock",
+  "Americus (baby / little girl)",
+  "Lexie's children",
+  "Roger",
+  "Mary Elizabeth",
+  "reporters",
+  "police"
+ ],
+ "quiet": [
+  [
+   176.3,
+   205.4
+  ],
+  [
+   334.9,
+   342.5
+  ],
+  [
+   351.6,
+   357.6
+  ],
+  [
+   824.6,
+   833.3
+  ],
+  [
+   974.0,
+   1001.2
+  ],
+  [
+   1012.6,
+   1020.6
+  ],
+  [
+   1175.4,
+   1183.2
+  ],
+  [
+   1196.6,
+   1214.4
+  ],
+  [
+   2519.3,
+   2551.6
+  ],
+  [
+   2645.1,
+   2684.4
+  ],
+  [
+   3006.8,
+   3013.6
+  ],
+  [
+   3037.9,
+   3045.5
+  ],
+  [
+   3475.1,
+   3544.9
+  ],
+  [
+   3584.8,
+   3605.2
+  ],
+  [
+   3623.6,
+   3674.4
+  ],
+  [
+   4254.8,
+   4290.4
+  ],
+  [
+   4307.4,
+   4334.2
+  ],
+  [
+   5538.8,
+   5579.8
+  ],
+  [
+   6045.2,
+   6052.9
+  ],
+  [
+   6066.2,
+   6082.2
+  ],
+  [
+   6137.4,
+   6178.6
+  ],
+  [
+   6610.1,
+   6689.5
+  ],
+  [
+   6835.7,
+   7035.4
+  ],
+  [
+   7049.1,
+   7172.6
+  ]
+ ],
+ "quiet_why": "en.srt 의 * 노래 줄(208줄)을 12초 안쪽끼리 묶고 앞뒤 2초 — 윌리 잭 공연·라디오·엔딩 크레딧 노래. 그 원본을 쓴 조각은 원본 소리를 더 낮춤",
+ "music": "~/volcano_work/달빛롱폼/bgm/Healing.mp3",
+ "music_why": "프리셋 기본(Kevin MacLeod 「Healing」, CC BY 4.0 — 업로드 글에 출처)",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "capstyle_why": "04v2 지무비식 자막을 사용자가 \"잘만들었어\"(10-17) → 20·21 과 같은 꼴",
+ "min_total": 1500,
+ "min_total_why": "10-17 사용자 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"",
+ "v2_why": "10-20 텔레그램 \"아니~ 전체적으로 수정해서 만들어. 이정도면 된것같아.\" — 나레만 출발 비디오여행식으로 다시(완성본 03 은 그대로, 따로 v2)",
+ "tag_pos": {
+  "노블리": [
+   1300,
+   330
+  ],
+  "포니": [
+   820,
+   330
+  ],
+  "메리 엘리자베스": [
+   430,
+   640
+  ]
+ },
+ "tag_pos_why": "10-20 굽기 전 이름표 11개 프레임 확인(_tags_v2.jpg): 노블리는 윌리 잭 등 위에, 포니는 아래 자막과 겹쳐서, 메리 엘리자베스는 화면 위 가운데라 — 그 인물 옆으로 손으로"
+}

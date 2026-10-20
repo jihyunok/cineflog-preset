@@ -2,11 +2,12 @@
 """캡컷 드래프트를 완성본 폴더로 복사 — 안쪽 경로를 캡컷 표준 자리표시자로 바꿔 어디로 옮겨도 열리게 한다.
 사용: python capcut_to_final.py 시네플로그02 02_패밀리플랜"""
 import os, shutil, sys, glob
-ROOT = "D:/다운로드/CapCut Drafts"
+ROOT = "D:/다운로드/CapCut Drafts" if os.path.isdir("D:/다운로드/CapCut Drafts") else os.path.expanduser("~/AppData/Local/CapCut/User Data/Projects/com.lveditor.draft").replace("\\", "/")  # D 없는 PC(10-19)
 PH = "##_draftpath_placeholder_0E685133-18CE-45ED-8CB8-2904A212EC80_##"
 name, ep = sys.argv[1], sys.argv[2]
 src = f"{ROOT}/{name}"
-dst = os.path.expanduser(f"~/volcano_work/시네플로그/완성본/{ep}_캡컷")
+from final_dir import FINAL
+dst = os.path.join(FINAL, f"{ep}_캡컷")
 if os.path.exists(dst): shutil.rmtree(dst)
 shutil.copytree(src, dst)
 n = 0

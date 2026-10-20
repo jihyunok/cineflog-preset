@@ -21,7 +21,7 @@ def jobs(ep):
     if not os.path.exists(f"{ROOT}/{ep}/batches.json"): return []
     b = json.load(open(f"{ROOT}/{ep}/batches.json", encoding="utf-8"))
     out = []
-    for k, (n0, n1, t) in enumerate(b):
+    for k, (n0, n1, t) in enumerate(x[:3] for x in b):      # 4번째 칸 = 줄 번호 목록(10-19 mkbatch)
         p = f"{ep}/gem/b{k:02d}_{n0:04d}_{n1:04d}.wav"
         if not os.path.exists(f"{ROOT}/{p}"): out.append({"path": p, "text": t})
     return out

@@ -3,7 +3,8 @@
 하나라도 걸리면 exit 1 — build_v9 는 그때 굽지 않는다. 16 핀치에서 사용자가 하나씩 찾아낸 것들을 굽기 전에 전부 잰다.
  pre  (자르기 전): ① 나레 조각 토막·경계(gem_split v2 잣대) ② 나레 겹침 ③ 화면 시간 끊김 ④ 멈춤(hold)·느리게(rate<0.85) ⑤ 0.5초 깜빡 조각
                    ⑥ 원본 3초 간격(구역별) ⑦ 대사 창 가장자리 말 잘림(v9/edges) ⑧ 까만 화면(black_src.npy, 0.75초+) ⑨ 나레↔그림(제브, 있으면)
-                   ⑫ 원본 3초 넘게 이어 쓴 조각(대사 창 포함, 10-14 소유권 주장) ⑬ 완성 25분 아래면 실패(10-17)
+                   ⑫ 원본 3초(ep.json max_piece) 넘게 이어 쓴 조각(대사 창 포함, 10-14 소유권 주장) ⑬ ep.json min_total 아래(10-20부터 기본 없음)
+                   ⑭ 첫 사건({"event": True} 줄)이 완성본 3분 안 ⑮ 앞 5분에 나레 없이 대사만 5줄 넘게(10-20 앞 3분 이탈 50%+)
  final(굽기 직전): ⑩ 나레 자막 ↔ 목소리(subcheck4 잣대: 자막 빠름·늦음 0.4초, 목소리에 자막 빔 0.6초) ⑪ 자막 두 줄 겹침
 사용: python gate.py pre  /  python gate.py final subs.ass narr_track.wav
 예외: gate_allow.json ["검사 문구 일부", …] — 눈으로 확인한 가짜만, 이유를 SESSION-LOG 에 남긴다."""
@@ -54,10 +55,26 @@ if MODE == "pre":
     # ⑫ 원본을 3초 넘게 이어 쓴 조각 (10-14 17 그레이하운드 v10 도 Apple IPE 소유권 주장 — 대사 창 최장 5.9초·63% → 사용자 "1" 대사 창 3초 이하)
     # ⑬ 완성 길이 20분 아래 (10-14 사용자 "14분으로 줄이면 뭐가 재밌니" / "너 앞으로 영화리뷰할때 20아래로만들지마") — 몸통 + 끝 1.5초(끝 검은 화면 15초는 10-14 뺌)
     tot = WN[-1]["b"] + CFG.get("tail", 1.5)
-    # ★10-17 사용자 "25분이상좀만들어줘 조회수가 너무 안나와짧은거는" → 25분(1500초) 아래면 실패. 늘릴 때는 결말까지·원본 대사(3초 안)·액션 원본 소리·이야기 장면으로(나레 채우기 말고)
-    if tot < CFG.get("min_total", 1500): fail(f"⑬ 완성 {mm(tot)} — 25분 아래(10-17 \"25분이상좀만들어줘 조회수가 너무 안나와짧은거는\"): 대사·액션·이야기 장면으로 늘릴 것")
+    # ★10-17 "25분이상좀만들어줘" → ★10-20 폐지: 사용자 "시간은 지킬필요가 없어"(앞 3분 이탈 50%+ — 길이 채우려 넣은 일상 대사 토막이 원인). ep.json min_total 을 적은 편만 잰다
+    if tot < CFG.get("min_total", 0): fail(f"⑬ 완성 {mm(tot)} — ep.json min_total {CFG['min_total']}초 아래")
+    MAXP = CFG.get("max_piece", 3.0)   # ★10-20 애플·아마존 3초 · 그 밖은 ep.json max_piece 6 까지(강의: 원본 소리 6초 이하)
     for w in WN:
-        if w["b"] - w["a"] > 3.0 + 0.01 or slen(w) > 3.0 * SPD + 0.02: fail(f"⑫ {w['kind']} 조각 {mm(w['a'])} 화면 {w['b'] - w['a']:.2f}초·원본 {slen(w):.2f}초 — 3초 넘음(대사는 나레로 바꾸거나 한쪽 말만)")
+        if w["b"] - w["a"] > MAXP + 0.01 or slen(w) > MAXP * SPD + 0.02: fail(f"⑫ {w['kind']} 조각 {mm(w['a'])} 화면 {w['b'] - w['a']:.2f}초·원본 {slen(w):.2f}초 — {MAXP:g}초 넘음(대사는 나레로 바꾸거나 한쪽 말만)")
+    # ⑭ 첫 사건 3분 안 · ⑮ 앞 5분 대사 토막 줄줄이 (10-20 사용자 "3분이내에이탈율이 50프로가 넘고 … 앞 장면이재미있지않다는거지" / "몰입도 있게 영상을 못끌고")
+    #   대본에서 첫 사건(싸움·반전·사고·누명) 줄에 {"event": True} — 훅 뒤 본편에서 완성본 180초 안에 와야 한다
+    #   쇼츠(ep.json "shorts": true — shorts/shorts_setup.py 가 적음)는 한 사건 1:40~2:30 이라 ⑭⑮ 를 안 잰다
+    ev = [w["a"] for w in WN if w.get("event") and w.get("z", "main") != "hook"]
+    if CFG.get("shorts"): pass
+    elif not ev: fail("⑭ 첫 사건 표시 없음 — 대본의 첫 사건 줄에 {\"event\": True}")
+    elif min(ev) > CFG.get("event_by", 180): fail(f"⑭ 첫 사건 {mm(min(ev))} — 3분 넘음(인물 소개·일상은 나레 한두 줄로 넘길 것)")
+    #   ⑮ 나레 없이 대사 창(D 줄)만 5줄 넘게 이어지면 실패 — 사이에 나레가 한 번이라도 시작하면 끊긴 것으로 본다
+    NT = sorted(q["t"] for q in PL)
+    DW = [] if CFG.get("shorts") else sorted({w["k"]: w for w in WN if w["kind"] == "D" and w["a"] < 300}.values(), key=lambda w: w["a"])
+    run = []
+    for w in DW:
+        if run and any(run[-1]["b"] - 0.05 <= t < w["a"] for t in NT): run = []
+        run.append(w)
+        if len(run) == 5: fail(f"⑮ 앞 5분 {mm(run[0]['a'])}~ 나레 없이 대사만 5줄 넘게 — 일상 대사 토막은 나레 한 줄로")
     for z in sorted({w.get("z", "main") for w in WN}):
         sp = sorted((s0(w), s0(w) + slen(w), w["a"]) for w in WN if w.get("z", "main") == z)
         for x, y in zip(sp, sp[1:]):
@@ -91,7 +108,7 @@ else:
         else: k += 1
     def ts(s):
         h, m, c = s.split(":"); return int(h) * 3600 + int(m) * 60 + float(c)
-    rows = [(ts(l.split(",")[1]), ts(l.split(",")[2]), l.split(",")[3], l.rstrip("\n").split(",", 9)[9]) for l in open(ASS, encoding="utf-8") if l.startswith("Dialogue") and ",TOP," not in l]
+    rows = [(ts(l.split(",")[1]), ts(l.split(",")[2]), l.split(",")[3], l.rstrip("\n").split(",", 9)[9]) for l in open(ASS, encoding="utf-8") if l.startswith("Dialogue") and ",TOP," not in l and ",TAG," not in l]   # 10-20 인물 이름표(TAG)는 자막이 아님
     L = sorted((a, z, t) for a, z, st, t in rows if st in ("N", "NP", "NE"))   # ★10-16 지무비식 자막: 나레 꼴 NP(일반)·NE(강조)도 나레
     def fr(t): return min(max(int(t * 100), 0), len(on) - 1)
     for i, (a, z, t) in enumerate(L):

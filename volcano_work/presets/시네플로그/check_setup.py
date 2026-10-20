@@ -26,7 +26,8 @@ fds = [os.path.join(os.environ.get("LOCALAPPDATA", f"{H}/AppData/Local"), "Micro
 for f in ("GyeonggiTitleB.ttf", "Stylish.ttf", "NotoSansKR-Black.ttf", "Pretendard-Black.otf", "Pretendard-Bold.otf"):
     say(any(os.path.exists(f"{d}/{f}") for d in fds), f"글꼴 {f}")
 say(os.path.exists(f"{H}/volcano_work/fonts/DoHyeon-Regular.ttf"), "글꼴 도현체 → volcano_work/fonts (썸네일)")
-say(os.path.exists("D:/다운로드/CapCut Drafts/0826 (2)/draft_content.json"), "캡컷 틀 → D:/다운로드/CapCut Drafts/0826 (2)  (캡컷 프로젝트 위치도 이 폴더로)")
+say(all(os.path.exists(f"D:/다운로드/CapCut Drafts/{t}/draft_content.json") or os.path.exists(f"{H}/영화롱폼_이식팩/캡컷틀/{t}/draft_content.json") for t in ("0826 (2)", "0826 (8)")),
+    "캡컷 틀 0826 (2)·(8) → D:/다운로드/CapCut Drafts 또는 ~/영화롱폼_이식팩/캡컷틀")
 kd = f"{H}/.volcano/keys"; os.makedirs(kd, exist_ok=True)
 say(os.path.exists(os.path.join(kd, "groq")), "Groq API 키 (받아쓰기·나레 자르기) → " + os.path.normpath(os.path.join(kd, "groq")) + "  (확장자 없는 파일에 키 한 줄)")
 print("  [참고] 나레는 크롬 AI 스튜디오(제미나이 TTS, 목소리 Ludo) - 구글 계정 로그인만 있으면 된다. ElevenLabs 키(elevenlabs)는 예비.")

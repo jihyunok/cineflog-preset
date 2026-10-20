@@ -17,6 +17,10 @@ import difflib, json, os, re, subprocess, sys, time, uuid, urllib.request, urlli
 import numpy as np
 SR = 16000; HOP = 0.01; SIL = -40.0; TRIM = -45.0
 
+def batch_ids(n0, n1):
+    """묶음의 줄 번호 — batches.json 4번째 칸(10-19, 떨어진 줄도 한 묶음)이 있으면 그 순서, 없으면 n0~n1"""
+    B = json.load(open("batches.json", encoding="utf-8")) if os.path.exists("batches.json") else []
+    return next((b[3] for b in B if len(b) > 3 and b[0] == n0 and b[1] == n1), None) or list(range(n0, n1 + 1))
 def arg(k, d=None):
     return sys.argv[sys.argv.index(k) + 1] if k in sys.argv else d
 def norm(s): return re.sub(r"[^0-9A-Za-z가-힣]", "", s)
@@ -207,7 +211,7 @@ def frag_ok(p, text, why):
     이웃 문장 토막이면 받아쓴 첫 낱말이 대본 첫 낱말과 다르고 둘째 낱말이 대본 첫 낱말이 된다(16 핀치 「고 로봇은…」)."""
     m = p[:-4] + "_chk.mp3"
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", p, "-ac", "1", "-ar", "16000", "-b:a", "64k", m], check=True)
-    ws = [norm(w["word"]) for w in asr_groq(m)]; os.remove(m); ws = [w for w in ws if w]
+    ws = [norm(w["word"]) for w in (asr_groq(m) if os.path.exists(os.path.expanduser("~/.volcano/keys/groq")) else asr_sm(m))]; os.remove(m)  # Groq 열쇠 없는 PC(10-19) → Speechmatics; ws = [w for w in ws if w]
     t = [norm(x) for x in text.split()]; t = [x for x in t if x]
     if not ws or not t: return why
     keep = []
@@ -224,8 +228,10 @@ def frag_ok(p, text, why):
 if __name__ == "__main__":
     wav, n0, n1 = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
     OUT = arg("--out", "narr"); HOW = arg("--asr", "sm"); ITEMS = arg("--items", "items.json")
+    # 나레 빠르기(atempo, 음높이 그대로 · 글자 시각도 같은 배율). ★10-19 "1.35배" 는 쇼츠 나레 얘기 — "아니. 쇼츠 말하는거야" · "롱은 그대로" → 롱폼 기본 1배
+    SPEED = float(arg("--speed", (json.load(open("ep.json", encoding="utf-8")) if os.path.exists("ep.json") else {}).get("narr_speed", 1.0)))
     items = {q["ni"]: q["text"] for q in json.load(open(ITEMS, encoding="utf-8")) if q["type"] == "N"}
-    texts = [(i, items[i]) for i in range(n0, n1 + 1)]
+    texts = [(i, items[i]) for i in batch_ids(n0, n1)]
     db = env_db(load16(wav)); W = words_of(wav, HOW)
     segs, Wn, log = split(wav, texts, W, db); os.makedirs(OUT, exist_ok=True)
     for ni, c0, c1, rule in log:
@@ -236,8 +242,10 @@ if __name__ == "__main__":
         if abs(c - e) > 0.03 and r != "R3": bad.append((texts[q][0], [f"끝 경계 {e:.2f} 가 소리 토막 옆 ({r} → {c:.2f})"]))
     for (ni, t), (a, b) in zip(texts, segs):
         a2, b2 = trim(db, a, b)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a2:.3f}", "-to", f"{b2:.3f}", "-i", wav, "-af", f"afade=t=in:d=0.012,afade=t=out:st={max(0, b2 - a2 - 0.025):.3f}:d=0.025,loudnorm=I=-16:TP=-1.5:LRA=9,aresample=48000", "-ac", "2", f"{OUT}/n{ni:03d}.wav"], check=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a2:.3f}", "-to", f"{b2:.3f}", "-i", wav, "-af", f"afade=t=in:d=0.012,afade=t=out:st={max(0, b2 - a2 - 0.025):.3f}:d=0.025,"
+                        + (f"atempo={SPEED:.4f}," if SPEED != 1 else "") + "loudnorm=I=-16:TP=-1.5:LRA=9,aresample=48000", "-ac", "2", f"{OUT}/n{ni:03d}.wav"], check=True)
         st, en, cov = char_times(t, a2, Wn)
+        if SPEED != 1: st = [round(x / SPEED, 3) for x in st]; en = [round(x / SPEED, 3) for x in en]
         json.dump({"text": t, "chars": list(t), "st": st, "en": en, "src": [wav, round(a, 3), round(b, 3)], "trim": [round(a2, 3), round(b2, 3)], "asr": HOW, "cover": round(cov, 2)},
                   open(f"{OUT}/n{ni:03d}.json", "w", encoding="utf-8"), ensure_ascii=False)
         why = check_piece(f"{OUT}/n{ni:03d}.wav", t)

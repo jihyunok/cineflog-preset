@@ -3,9 +3,9 @@
 timeline_layout.json 의 실제 번호로 맞추고, 틀에서 딸려 온 파일(draft.extra·template.json·draft_virtual_store.json)은 백업 폴더로 옮긴다.
 캡컷을 끈 뒤에 돌린다. 인자 없으면 시네플로그01~03 + 완성본 _캡컷 폴더 3개."""
 import glob, json, os, sys, shutil, uuid, time
-BAK = os.path.expanduser("~/volcano_work/시네플로그/_capcut_bak")
+BAK = os.path.expanduser("~/volcano_work/영화리뷰/_capcut_bak")
 dirs = sys.argv[1:] or (sorted(glob.glob("D:/다운로드/CapCut Drafts/시네플로그0*")) +
-                        sorted(glob.glob(os.path.expanduser("~/volcano_work/시네플로그/완성본/*_캡컷"))))
+                        sorted(glob.glob(os.path.join(__import__("final_dir").FINAL, "*_캡컷"))))
 for D in dirs:
     tl = json.load(open(f"{D}/timeline_layout.json", encoding="utf-8"))["dockItems"][0]["timelineIds"][0]
     pj = f"{D}/Timelines/project.json"; p = json.load(open(pj, encoding="utf-8"))

@@ -12,14 +12,16 @@ T = os.path.join(HERE, "_이식팩")
 FONTDIRS = [f"{H}/AppData/Local/Microsoft/Windows/Fonts", os.path.join(os.environ.get("WINDIR", "C:/Windows"), "Fonts"),
             f"{V}/fonts", "D:/cine_work/ep19_강릉/fonts"]
 FONTS = ["GyeonggiTitleB.ttf", "Stylish.ttf", "NotoSansKR-Black.ttf", "Pretendard-Black.otf", "Pretendard-Bold.otf",
-         "DoHyeon-Regular.ttf", "Jalnan2TTF.ttf", "Recipekorea 레코체 FONT.ttf"]
+         "DoHyeon-Regular.ttf", "Jalnan2TTF.ttf", "Recipekorea 레코체 FONT.ttf",
+         "GmarketSansTTFBold.ttf", "BlackHanSans-Regular.ttf", "EastSeaDokdo-Regular.ttf"]   # 10-20 워터마크·썸네일(다른 PC 「대작」에서 가져온 도구)
 BGM = ["Despair and Triumph.mp3", "Healing.mp3"]
 MEMORY = ["cineflog-channel", "cineflog-resume-2026-09-30", "cineflog-japanese-version", "movie-review-study",
           "longform-tts-gemini", "drama-binge-preset", "longform-thumbnail-emotion-curiosity", "bench-copy-everything",
           "answer-in-korean", "dont-ask-just-do", "deliver-only-the-final-video", "no-work-files-only-final",
           "say-done-immediately", "log-every-user-instruction", "always-commit-session-record", "irreversible-check-first",
           "file-deletion-blocked-use-bat", "youtube-download-firefox-cookies", "flow-via-claude-in-chrome",
-          "lecture-applied-2026-10-08"]
+          "lecture-applied-2026-10-08",
+          "narration-chulbi-flow", "tts-call-saving", "movie-review-shorts-template", "cineflog-first-3min-rule"]
 MEMDIR = f"{H}/.claude/projects/C--Users-uere/memory"
 SKIP_DIRS = {"__pycache__", "_이식팩", "clips", "blocks", "narr", "gem", "asr", "chk", "fonts"}
 SKIP_EXT = {".mp4", ".mkv", ".wav", ".mp3", ".m4a", ".aac", ".jpg", ".png", ".log"}
@@ -29,7 +31,8 @@ def tree(src, dst):
     for root, dirs, files in os.walk(src):
         dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         for f in files:
-            if os.path.splitext(f)[1].lower() in SKIP_EXT and "썸네일분석" not in root and "원문" not in root: continue
+            if os.path.splitext(f)[1].lower() in SKIP_EXT and "썸네일분석" not in root and "원문" not in root \
+               and os.path.basename(root) not in ("shorts", "brand"): continue          # 10-20 쇼츠 템플릿·워터마크 그림은 도구라 넣는다
             s = os.path.join(root, f)
             if os.path.getsize(s) > 30_000_000: continue
             d = os.path.join(dst, os.path.relpath(s, src)); os.makedirs(os.path.dirname(d), exist_ok=True)
@@ -55,6 +58,8 @@ for f in FONTS:
     s = next((f"{d}/{f}" for d in FONTDIRS if os.path.exists(f"{d}/{f}")), None)
     if s: shutil.copy2(s, f"{OUT}/fonts/")
     else: print("  글꼴 없음:", f)
+for s in glob.glob(f"{V}/fonts/시네플로그_자막/*"):       # 10-20 자막 글꼴 묶음(다른 PC 판에서 가져옴) — install.ps1 이 fonts/ 바로 아래만 읽어서 평평하게
+    if not os.path.exists(f"{OUT}/fonts/{os.path.basename(s)}"): shutil.copy2(s, f"{OUT}/fonts/")
 for b in BGM: shutil.copy2(f"{V}/달빛롱폼/bgm/{b}", f"{OUT}/bgm/")
 # 캡컷 틀: 캡컷 폴더의 원본 틀(설정 파일만) — 없으면 옛 팩 것
 cc = "D:/다운로드/CapCut Drafts"

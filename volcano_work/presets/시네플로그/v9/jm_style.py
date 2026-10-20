@@ -23,7 +23,8 @@ JM_TONE = {
     "kill": ("카리스마", (247, 1, 8), 0), "woodcut": ("방각본", (247, 106, 24), 0), "emotion": ("아침", (254, 231, 0), 0)}
 JM_GRAD = [(253, 140, 50), (250, 70, 70), (254, 200, 40), (60, 220, 250), (120, 230, 60)]
 # 잉크 높이(px, 1080p) — plain = 사장님 b29 카페24당당해 58px(소형 나레) · emph/punch = JIMOVIE_INK nar_emph/punch · dlg = config ink_px.dlg
-JM_INK = {"plain": 52, "emph": 118, "punch": 158, "dlg": 54, "dlg_y": 90}
+# ★10-20 대작 03 v3 사용자 "캐릭터들이 말할때 자막 조금 더 크게 해줘" → dlg 54 → 66(약 1.2배), 노란 대사(dlg_y 90)는 그대로
+JM_INK = {"plain": 52, "emph": 118, "punch": 158, "dlg": 66, "dlg_y": 90}
 JM_W = 1700                       # 한 줄 폭 상한(text_layout.K_WIDTH nar)
 JM_WHITE = (252, 253, 253)
 JM_NAME2FILE = {v[1]: v[0] for v in JM_FONTS.values()}

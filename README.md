@@ -21,6 +21,13 @@
 - 강의 공부: `volcano_work/docs/영화리뷰_공부/` · 규칙 모음 `volcano_work/docs/PLAYBOOK.md` 「리뷰 롱폼 소유권 주장(CID)」 절.
 - 기억: `_claude_memory/` — ★narration-matches-picture-basic · cineflog-cid-transform-all-windows · cineflog-include-ending · cineflog-min-20min(25분 이상) · preset-style-means-full-caption-look · thumbnail-options-next-to-final · cineflog-youtube-channel-uploads · talk-before-making.
 
+## ★지금 상태 (2026-10-20) — 아래 10-17 판보다 이것이 먼저
+- ★앞 3분 규칙(10-20): 3분 안 이탈 50%+ → 훅은 센 장면 하나를 이어서·일상은 나레 한두 줄·첫 사건은 3분 안(관문 ⑭⑮) · **25분 규칙 폐지**("시간은 지킬필요가 없어") · 원본 조각 애플·아마존 3초, 그 밖 ep.json max_piece 6까지. 20 패밀리 플랜 2 를 이 규칙으로 다시(18:46).
+- ★다른 PC 판(「대작」, presets/영화리뷰)에서 시네플로그에 적용(사용자 "우리 시네플로그에 추가로적용해달라는거야 나래이션하는스타일 그리고 우리는 인물 이름표는 넣지마쇼츠템플릿은 그대로 적용하고 그밖도 적용해줘"):
+  나레 = 출발! 비디오 여행식(기억 narration-chulbi-flow · 분석 docs/영화리뷰_공부/출발비디오여행_나레분석_2026-10-20.md) · 녹음 전 `v9/prep/flow_check.py` + `cold_read.py` · 쇼츠 템플릿 `presets/시네플로그/shorts/` · TTS 2,000자 묶음·새 화면 page.js · 대사 자막 66px · 썸네일 보기 숫자 번호.
+  안 하는 것: 인물 이름표 · 「대작」 글자·워터마크(오른쪽 위 CINEFLOG 그대로) · AI 스튜디오 계정 바꾸기 · 「묻지 말고 알아서」. 저쪽 편 대본은 `presets/시네플로그/_대작편/`(본보기).
+- 06 로드 하우스·14 더 픽업도 v9 로 다시(ep06v2_·ep14v2_). 자세한 건 `volcano_work/presets/시네플로그/README.md` 맨 앞부터.
+
 ## 지금 상태 (2026-10-17)
 - 완성본 20편(01~20, 07 일본어판 포함). 01·02·04·03 은 3초 규칙(v9) 방식으로 다시 만듦(03 은 10-17, 25:34). ★옛 방식 편(05~12·14·15·18·19)은 "다 엉망" — 올리지 말고 하나씩 다시 만든다(README 「옛 편 다시 만들기」).
 - 20 패밀리 플랜 2 완성(25:47·-16 LUFS·관문 0·finalcheck 0·글자 거꾸로 40줄 noflip·캡컷 「시네플로그20」) · 03 아이 돈 언더스탠드 유 다시(25:34·나레 40%·캡컷 「시네플로그03v2」). 둘 다 썸네일 보기 A~E 사용자 고르기 전.

@@ -7,6 +7,7 @@
 - 소재 거르기: `py -3.12 C:\Users\uere\volcano_work\_제브\거르기.py --spec C:\Users\uere\volcano_work\_제브\소재거르기.json --in 항목.jsonl --out 결과.jsonl --topic "채널 주제"`
   결과는 {id, answers}. 문턱은 내 자료로 재서 정한다(강의 예시는 0.8 통과·0.5~0.8 애매). 거른 것만 큰 모델(클로드)이 기획한다.
 - 채널 분석(10-13 유광의 이야기): 편 분류는 `채널분류_유광.json`(state title·first·last·script, 소재·이야기 축·성별·첫 문장 꼴 choice + 끝 질문·의견 noul), 벤치 후보 거르기는 `벤치채널거르기_유광.json`(state channel·titles). 새 채널은 이 두 파일을 복사해 보기만 바꾼다. 131편 5.5초·40채널 1.4초, 거부 0. 제목만으로는 나레 유무·길이를 모르니 그건 실측으로.
+- 채널 분석(10-14 인류의서재, 롱폼 교양): `채널분류_인류의서재.json`(state title·opening=대본 첫 1분, 소재·제목 약속 choice + 우리와 잇기·한국·큰 규모 noul). 200건 5.3초·실패 0. ★`big_scale` 이 조회 차이를 가장 잘 가름(앞뒤 15편 대비 x1.98 vs x0.70). 커지는 채널은 조회수 그대로 말고 앞뒤 15편 대비로 비교.
 - 영화 리뷰 원본 배치(10-13 시네플로그 16 핀치, 사용자 "제브사용해"): 제브는 그림을 못 보니 **agy 가 컷 그림을 영어 한 문장으로** 적고(presets/시네플로그/ep16v5_핀치/shot_desc.py) 제브가 판정한다.
   `같은장면_흐름.json`(앞 컷 셋·뒤 컷 셋 → continues·new_sequence, 장면 나누기) · `컷속성_핀치.json`(컷마다 장소·핀치 차림 choice) · `나레그림_맞음.json`(나레 ↔ 그림 설명, shows_narrated·contradicts — 벤치 그림 점수를 기준으로 비교).
   ★`같은장면_컷.json`(이웃 두 컷만)은 차 밖↔차 안 교차 편집마다 끊어서 못 씀. 921건 23~26초, 642건 18초, 거부 0. 문턱: 장면 경계 new_sequence ≥ 0.5 & continues < 0.5, 어긋남 contradicts ≥ 0.5 이고 벤치 < 0.5 인 것만 고침.

@@ -3,9 +3,9 @@
 나레이션 오디오가 깔린 시간에 뜨는 자막 = 나레, 나머지 = 원본 대사.
 사용(캡컷 끈 뒤): python capcut_split_subs.py [드래프트폴더...]  — 인자 없으면 시네플로그01~03 + 완성본 _캡컷 폴더."""
 import copy, glob, json, os, shutil, sys, uuid
-BAK = os.path.expanduser("~/volcano_work/시네플로그/_capcut_bak")
+BAK = os.path.expanduser("~/volcano_work/영화리뷰/_capcut_bak")
 dirs = sys.argv[1:] or (sorted(glob.glob("D:/다운로드/CapCut Drafts/시네플로그0*")) +
-                        sorted(glob.glob(os.path.expanduser("~/volcano_work/시네플로그/완성본/*_캡컷"))))
+                        sorted(glob.glob(os.path.join(__import__("final_dir").FINAL, "*_캡컷"))))
 
 def split(d):
     if any(t.get("name") == "대사 자막" for t in d["tracks"]): return None

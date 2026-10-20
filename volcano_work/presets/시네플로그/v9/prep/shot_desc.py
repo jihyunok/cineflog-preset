@@ -45,7 +45,7 @@ def run(batch):
               " 본 것만 적어(짐작 금지). 못 열었으면 desc 에 'CANNOT OPEN'. file 칸에는 파일 이름 그대로.")
     for k in range(3):
         try:
-            r = subprocess.run([AGY, "-p", prompt, "--print-timeout", "400s", "--output-format", "json", "--disable-slash-commands", "--json-schema", SCH],
+            r = subprocess.run([AGY, "--model", "gemini-3.8-flash-high", "-p", prompt, "--print-timeout", "400s", "--output-format", "json", "--disable-slash-commands", "--json-schema", SCH],
                                cwd=WORK, capture_output=True, timeout=460)
             out = r.stdout.decode("utf-8", "replace"); j = json.loads(out[out.find("{"):])
             resp = j.get("response") or ""; body = json.loads(resp[resp.find("{"):resp.rfind("}") + 1])

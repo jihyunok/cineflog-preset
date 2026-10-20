@@ -1,0 +1,385 @@
+{
+"S220": {
+"text": "약속한 9시가 지나도 엄마는 오지 않습니다.",
+"en": "Nine o'clock, the time she promised, comes and goes, but her mother never shows up.",
+"emph": [
+"오지 않습니다",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S222": {
+"text": "알고 보니 500달러만 챙겨 사라진 것. 또 버림받은 신세.",
+"en": "Turns out she vanished with the 500 dollars. Abandoned all over again.",
+"emph": [
+"500달러만 챙겨",
+"money"
+],
+"tag": null,
+"tag_rel": null
+},
+"S223": {
+"text": "그때 병원 앞에 나타난 반가운 얼굴.",
+"en": "Just then, a welcome face pulls up in front of the hospital.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S229": {
+"text": "화초 핑계로 내민 손길에, 모녀는 시스터의 집으로 향합니다.",
+"en": "Taking the hand Sister offers with the plant as an excuse, mother and daughter head to her home.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S230": {
+"text": "고마움을 전하러 간 날, 포니는 쟁반을 들고 분주한데요.",
+"en": "The day she goes to thank him, Forney is busy carrying a tray.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S236": {
+"text": "조심조심 아기를 안은 포니에게 렌즈를 맞추는데,",
+"en": "As she aims the lens at Forney, carefully holding the baby,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S238": {
+"text": "한편 감옥의 윌리 잭은 여전히 노래 타령. 시끄럽다는 동료와 결국 주먹다짐까지 벌입니다.",
+"en": "Meanwhile, in jail, Willy Jack is still harping on his songs. He even ends up in a fistfight with an inmate who complains about the noise.",
+"emph": [
+"주먹다짐",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S239": {
+"text": "한 달 뒤, 몸매를 되찾은 새내기 엄마. 렉시는 아기를 안고 싱글벙글.",
+"en": "A month later, the new mom has her figure back. Lexie is all smiles holding the baby.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S242": {
+"text": "미시시피에서 왔다는 낯선 부부.",
+"en": "A strange couple who say they're from Mississippi.",
+"emph": [
+"미시시피",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S244": {
+"text": "이 집엔 이미 하느님이 계신다며, 시스터는 단칼에 돌려보내죠.",
+"en": "Saying God already lives in this house, Sister sends them packing on the spot.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S246": {
+"text": "트럭을 맡기러 간 정비소. 잘생긴 정비공과 그만 눈이 맞고 마는데요.",
+"en": "At the garage where she drops off the truck, she ends up falling for a handsome mechanic.",
+"emph": [
+"눈이 맞고",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S247": {
+"text": "얼마 뒤, 렉시에게 임신이 걱정된다고 털어놓는데,",
+"en": "Some time later, she confides to Lexie that she's afraid she might be pregnant,",
+"emph": [
+"임신이 걱정된다고",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S249": {
+"text": "렉시의 비법은 뒤로 아홉 번 뛰기.",
+"en": "Lexie's secret trick: jump backwards nine times.",
+"emph": [
+"뒤로 아홉 번 뛰기",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S255": {
+"text": "포니에게 배워 가며 사진 책과 씨름하는 나날.",
+"en": "Days spent wrestling with photography books, with Forney teaching her.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S259": {
+"text": "천만다행, 임신은 아니었습니다. 시계를 보며 서두르는데,",
+"en": "Thank goodness, she wasn't pregnant. As she checks her watch and hurries off,",
+"emph": [
+"천만다행",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+},
+"S264": {
+"text": "그때 위층에서 쿵 하는 소리.",
+"en": "Just then, a thud from upstairs.",
+"emph": [
+"쿵 하는 소리",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S266": {
+"text": "바닥에 쓰러진 여자를 포니가 익숙하게 돌보는데, 과연 누구일까요?",
+"en": "Forney looks after a woman collapsed on the floor as if he's used to it. Who could she be?",
+"emph": [
+"누구일까요",
+"reveal"
+],
+"tag": null,
+"tag_rel": null
+},
+"S268": {
+"text": "오랫동안 알코올 중독에 시달려 온 메리 엘리자베스.",
+"en": "Mary Elizabeth, who has struggled with alcoholism for years.",
+"emph": [
+"알코올 중독",
+"reveal"
+],
+"tag": "메리 엘리자베스",
+"tag_rel": "포니의 누나"
+},
+"S270": {
+"text": "아버지가 세상을 떠나자, 대학까지 그만두고 돌아온 동생.",
+"en": "When their father died, her younger brother quit college and came home.",
+"emph": [
+"대학까지 그만두고",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+},
+"S274": {
+"text": "사진 스승이 된 모지스 앞에서, 쭈뼛쭈뼛 말을 꺼내는데,",
+"en": "In front of Moses, now her photography mentor, she hesitantly starts to speak,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S278": {
+"text": "한편 출소한 윌리 잭은, 기타 하나 메고 비에 젖은 밤거리를 떠돕니다.",
+"en": "Meanwhile, Willy Jack, out of jail, wanders the rain-soaked streets at night with just a guitar.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S279": {
+"text": "어느덧 크리스마스, 포니와 함께 고른 트리를 낑낑 나르는 밤.",
+"en": "Christmas arrives, a night of lugging the tree she picked out with Forney.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S282": {
+"text": "돈을 딴 데 써 버린 할머니가, 트리 대신 벽에 그려 준 그림.",
+"en": "Her grandmother spent the money elsewhere, so instead of a tree she drew one on the wall.",
+"emph": [
+"벽에 그려 준 그림",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+},
+"S284": {
+"text": "그때 렉시네 식구가 나타납니다.",
+"en": "Just then, Lexie and her kids show up.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S286": {
+"text": "씨 없다던 그 애인은 베개까지 훔쳐 줄행랑.",
+"en": "That supposedly sterile boyfriend ran off, even taking her pillows.",
+"emph": [
+"베개까지 훔쳐",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S289": {
+"text": "돌아오는 길, 포니 옆에서 슬쩍 운전대를 넘겨받습니다.",
+"en": "On the way home, she slips in and takes the wheel from Forney.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S291": {
+"text": "그런데 집 앞에 번쩍이는 경찰차 불빛.",
+"en": "But in front of the house, flashing police lights.",
+"emph": [
+"경찰차 불빛",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S295": {
+"text": "단서라곤 주차 시비뿐, 경찰은 시스터에게도 캐묻죠.",
+"en": "The only lead is a parking spat, so the police question Sister too.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S305": {
+"text": "자책하는 노블리를 포니가 다독이던 그때, 경찰차가 들이닥칩니다.",
+"en": "Just as Forney is comforting her while she blames herself, a police car pulls in.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S306": {
+"text": "길 건너를 비추는 손전등, 설마 아기가 잘못된 걸까요?",
+"en": "A flashlight shining across the street. Could something have happened to the baby?",
+"emph": [
+"설마 아기가 잘못된 걸까요",
+"woodcut"
+],
+"tag": null,
+"tag_rel": null
+},
+"S308": {
+"text": "달려간 교회 앞 구유엔, 아기 예수 대신 아메리쿠스가 잠들어 있었습니다.",
+"en": "In the manger in front of the church, instead of baby Jesus, Americus lies fast asleep.",
+"emph": [
+"아기 예수 대신",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S312": {
+"text": "한편 윌리 잭은 기타를 메고 음반 기획사의 문을 두드리는데요.",
+"en": "Meanwhile, Willy Jack, guitar on his back, knocks on the door of a record company.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S316": {
+"text": "약병부터 여는 심드렁한 매니저 루스 마이어스도, 어느새 귀를 기울입니다.",
+"en": "Even Ruth Meyers, the bored manager who opens her pill bottle first, soon starts to listen.",
+"emph": [
+"루스 마이어스",
+"reveal"
+],
+"tag": "루스 마이어스",
+"tag_rel": null
+},
+"S317": {
+"text": "노래가 끝나 갈 무렵, 난데없이 구두로 책상을 쾅 내리치는데요.",
+"en": "As the song winds down, she suddenly slams her shoe on the desk.",
+"emph": [
+"난데없이",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S318": {
+"text": "알고 보니 합격 신호. 그 자리에서 바로 계약을 맺습니다.",
+"en": "Turns out it means he's in. They sign a contract on the spot.",
+"emph": [
+"바로 계약을 맺습니다",
+"money"
+],
+"tag": null,
+"tag_rel": null
+},
+"S322": {
+"text": "새 이름은 얻었지만, 현실은 싸움판 벌어지는 시골 술집 무대.",
+"en": "He has a new name, but the reality is a country bar stage where brawls break out.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S323": {
+"text": "2년째 라디오 데뷔는 감감무소식.",
+"en": "Two years on, still no sign of a radio debut.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S325": {
+"text": "드디어 라디오를 탄 그 노래. 그 사이 아메리쿠스는 꼬마 숙녀가 됐죠.",
+"en": "Finally, the song makes it onto the radio. Meanwhile, Americus has grown into a little lady.",
+"emph": [
+"드디어 라디오를 탄",
+"climax"
+],
+"tag": null,
+"tag_rel": null
+},
+"S326": {
+"text": "그 가수가 윌리 잭인 줄 꿈에도 모른 채, 왠지 거슬린다는데요.",
+"en": "Never dreaming that singer is Willy Jack, she says something about him gets on her nerves.",
+"emph": [
+"꿈에도 모른 채",
+"twist"
+],
+"tag": null,
+"tag_rel": null
+},
+"S335": {
+"text": "사진을 정리하던 오후, 울리는 전화벨.",
+"en": "One afternoon while she's sorting photos, the phone rings.",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S344": {
+"text": "아픈 이웃을 살피러 시스터가 나간 사이, 마당엔 거센 바람이 몰아칩니다.",
+"en": "While Sister is out checking on a sick neighbor, fierce winds start lashing the yard.",
+"emph": [
+"거센 바람",
+"threat"
+],
+"tag": null,
+"tag_rel": null
+},
+"S347": {
+"text": "이웃들과 함께 서둘러 지하 대피소로 몸을 피하는데,",
+"en": "As she hurries down into the storm cellar with the neighbors,",
+"emph": null,
+"tag": null,
+"tag_rel": null
+},
+"S354": {
+"text": "집채만 한 토네이도가 코앞까지. 무사히 돌아갈 수 있을까요?",
+"en": "A tornado as big as a house, right on top of her. Can she make it back safely?",
+"emph": [
+"집채만 한 토네이도",
+"climax"
+],
+"tag": null,
+"tag_rel": null
+},
+"S359": {
+"text": "가까스로 목숨을 건진 모녀.",
+"en": "Mother and daughter barely escape with their lives.",
+"emph": [
+"가까스로",
+"emotion"
+],
+"tag": null,
+"tag_rel": null
+}
+}

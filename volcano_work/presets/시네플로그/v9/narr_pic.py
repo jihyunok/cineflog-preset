@@ -3,7 +3,7 @@
 10-13 사용자 "나래이션과 나래이션이 말하는 영상이 맞아야해 그건 가장 기본이야". 아웃트로(작품 소개)·제목 줄은 그림을 말하지 않으니 뺀다(narr_en.json 에 없는 줄).
 사용: python narr_pic.py  (작업 폴더: windows.json · narr_place.json · script.py · shots.json · narr_en.json)"""
 import json, os, subprocess, sys
-JEV = r"C:\Users\uere\volcano_work\_제브"
+JEV = os.path.expanduser(r"~/volcano_work/_제브")
 W = json.load(open("windows.json", encoding="utf-8")); S = json.load(open("shots.json", encoding="utf-8"))
 EN = json.load(open("narr_en.json", encoding="utf-8")); ns = {}; exec(open("script.py", encoding="utf-8").read(), ns)
 kn = {}; ni = 0

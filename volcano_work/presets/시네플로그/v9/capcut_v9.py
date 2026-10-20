@@ -5,9 +5,9 @@
 틀: 사용자의 가로 드래프트 'D:/다운로드/CapCut Drafts/0826 (2)'(영상·자막) + '0826 (8)'(오디오)."""
 import copy, json, os, re, shutil, subprocess, time, uuid
 
-ROOT = "D:/다운로드/CapCut Drafts"
+ROOT = "D:/다운로드/CapCut Drafts" if os.path.isdir("D:/다운로드/CapCut Drafts") else os.path.expanduser("~/AppData/Local/CapCut/User Data/Projects/com.lveditor.draft").replace("\\", "/")  # D 없는 PC(10-19) → 캡컷 기본 프로젝트 폴더
 NAME = os.environ.get("CC_NAME", "시네플로그07")
-TPL, TPL_A = (f"{ROOT}/0826 (2)" if os.path.exists(f"{ROOT}/0826 (2)") else os.path.expanduser("~/영화롱폼_이식팩/캡컷틀/0826 (2)")), f"{ROOT}/0826 (8)"  # 0826 (2) 가 캡컷 폴더에서 빠짐(10-04) → 이식팩 사본
+TPL, TPL_A = [f"{ROOT}/{t}" if os.path.exists(f"{ROOT}/{t}") else os.path.expanduser(f"~/영화롱폼_이식팩/캡컷틀/{t}") for t in ("0826 (2)", "0826 (8)")]  # 0826 (2) 가 캡컷 폴더에서 빠짐(10-04) → 이식팩 사본 · 10-19 D 없는 PC 는 이 PC 초안 0706·1014 사본
 OUT = f"{ROOT}/{NAME}"; MED = f"{OUT}/media"
 FONT = os.path.expanduser(r"~/AppData/Local/Microsoft/Windows/Fonts/Pretendard-Bold.otf").replace("\\", "/")
 US = 1_000_000
@@ -109,13 +109,17 @@ for q in json.load(open("narr_place.json")):
     nw = f"narr/n{q['ni']:03d}.wav"; nw2 = f"{MED}/narr_{q['ni']:03d}.wav"; shutil.copy(nw, nw2)
     add_audio(nt, nw2, int(q["t"] * US), int(dur(nw2) * US), 1.0, 2)
 # ── 자막: subs.ass 그대로 (한 줄)
-st = track("text", "자막"); top = track("text", "로고")
+st = track("text", "자막"); top = track("text", "로고"); tagt = None
 def tsec(x):
     h, m, s = x.split(":"); return int(h) * 3600 + int(m) * 60 + float(s)
 for l in open("subs.ass", encoding="utf-8"):
     if not l.startswith("Dialogue"): continue
     f = l.rstrip("\n").split(",", 9); a, b, sty, txt = tsec(f[1]), tsec(f[2]), f[3], re.sub(r"\{[^}]*\}", "", f[9])   # ★10-16 지무비식 자막의 ASS 꾸밈 기호는 빼고 글자만(색·글꼴은 ../capcut_font.py 가 다시 칠함)
     if sty == "TOP": add_text(top, txt, 0, d.get("duration", BODY), 0.87, 3.2, (0.71, 0.71, 0.71), -0.86, 4, 0)
+    elif sty == "TAG":   # 10-20 무드킹식 인물 이름표 — ASS \pos(x,y) 자리 그대로(캔버스 -1~1), 노랑
+        m_ = re.search(r"\\pos\(([\d.]+),([\d.]+)\)", f[9]); px, py = (float(m_[1]), float(m_[2])) if m_ else (420.0, 640.0)
+        if tagt is None: tagt = track("text", "이름표")   # 따로 — capcut_style04 가 「로고」 트랙 꼴(자리)을 덮으므로
+        add_text(tagt, txt.replace("\\N", " "), int(a * US), int((b - a) * US), -(py / 540 - 1), 7.0, (1.0, 0.86, 0.29), px / 960 - 1, 5)
     else: add_text(st, txt, int(a * US), int((b - a) * US), -0.875, 5.0)
 
 # ── 음악: 끝 비평 아래 + 끝까지
