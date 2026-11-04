@@ -235,7 +235,7 @@ if __name__ == "__main__":
     db = env_db(load16(wav)); W = words_of(wav, HOW)
     segs, Wn, log = split(wav, texts, W, db); os.makedirs(OUT, exist_ok=True)
     for ni, c0, c1, rule in log:
-        if rule != "R3": print(f"  경계 n{ni:03d}| {c0:.2f} → {c1:.2f} {rule}")
+        if rule != "R3": print(f"  경계 n{ni:03d}| {c0} → {c1} {rule}")   # 11-01 c0 가 글자일 때가 있어 :.2f 가 죽음(가면의 여왕 b03)
     bad = []; gp = gaps(db)
     for q in range(len(segs) - 1):            # 마지막 경계를 규칙으로 다시 재 봄 — 옮길 데가 남았으면(앞으로만 밀기 등) 실패. 16 핀치 옛 경계 97곳 중 문제 55곳을 이걸로 잡음
         e = segs[q][1]; c, r = refine(e, db, gp, texts[q + 1][1])

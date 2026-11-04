@@ -8,6 +8,9 @@
 3. `volcano_work` 에서 Claude Code 를 켜고 "시네플로그 불러와".
 4. 자막 글꼴: 새 편 작업 폴더(`D:/cine_work/epNN_제목/fonts/`)에 `volcano_work/fonts/시네플로그_자막/` 을 통째로 복사(나레 카페24 당당해 · 대사 광화문=Yeonil_TM · 지무비식 강조 글꼴들).
 
+## 11-04 판
+새 편은 `volcano_work/presets/시네플로그/movie_template/` 을 복사해 시작한다. 규칙은 프리셋 README 맨 앞 「11-04 대본 흐름」(배급사 먼저·줄기·명장면·통독·부드러운 말투·d_fill·금지 회사 차단).
+
 ## 먼저 읽을 곳 (2026-10-17 판)
 - `volcano_work/presets/시네플로그/README.md` 맨 앞부터: 「★★★★가장 기본」(나레 밑엔 그 장면 · 결말까지 · ★25분 이상) → 「★유튜브 채널·올린 편」 → 「둥둥아빠 강의 체크리스트」 → 「★★★새 편 순서」(v9 + prep 도구, 처음부터 한 번에).
 - ★지금 방식 = `presets/시네플로그/v9/` + `v9/prep/`:

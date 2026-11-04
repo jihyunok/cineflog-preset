@@ -66,7 +66,10 @@ def fit(parts, font, maxw, maxh, edge_ratio, shear=0.0):
 
 def make(src, sec, x0, y0, hh, top, white, red, out):
     im = picture(src, sec, x0, y0, hh).convert("RGBA")
-    if top:                                              # 위: 작은 「-…..-」 빨간 붓글씨
+    if top and os.environ.get("THUMB_TOP") == "green":   # ★10-27 구독 대비 조회수 높은 채널 꼴: 위에 작은 초록 굵은 글씨 「(실적·상황 한 줄)」
+        q = fit([(f"({top})", (64, 230, 70))], JALNAN, int(W * 0.62), int(H * 0.11), 0.09)
+        im.alpha_composite(q, (int(W / 2 - q.width / 2), int(H * 0.035)))
+    elif top:                                            # 위: 작은 「-…..-」 빨간 붓글씨
         q = fit([(f"-{top}..-", RED)], BRUSH, int(W * 0.48), int(H * 0.15), 0.1)
         im.alpha_composite(q, (int(W / 2 - q.width / 2), int(H * 0.035)))
     parts = [(white + " ", WHITE), (red, RED)] if white else [(red, RED)]

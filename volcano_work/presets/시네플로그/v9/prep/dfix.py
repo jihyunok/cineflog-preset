@@ -26,6 +26,8 @@ for k, x in enumerate(ns["S"]):
         if c:
             a, b = c[0].split(":"); t = int(a) * 60 + float(b); sp.append((t, t + float(c[1]), k, list(ids)))
 sp.sort(); gapbad = 0
+_E = json.load(open("ep.json", encoding="utf-8")) if __import__("os").path.exists("ep.json") else {}
+TAIL0, TGAP = (_E.get("tail_src") or [1e18])[0], _E.get("tail_gap", 3.0)     # 10-31 plan_v9 와 같게
 for x, y in zip(sp, sp[1:]):
-    if y[0] - x[1] < 3.0 - 0.01: gapbad += 1; print(f"  3초 간격 ✗ 줄{x[2]} {x[3]} → 줄{y[2]} {y[3]} ({y[0] - x[1]:.2f}초)")
+    if y[0] - x[1] < (TGAP if x[0] >= TAIL0 - 1e-6 else 3.0) - 0.01: gapbad += 1; print(f"  3초 간격 ✗ 줄{x[2]} {x[3]} → 줄{y[2]} {y[3]} ({y[0] - x[1]:.2f}초)")
 print("✗ 대사 줄", bad, "· 3초 간격 ✗", gapbad)

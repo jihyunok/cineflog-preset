@@ -1,0 +1,76 @@
+# ⛔ 만들지도 올리지도 않는 회사·작품
+# 11-02 사용자 「이회사꺼 업로드 하지 않게 커밋해」「여기 회사 작품 검색하고 앞으로 만들거나 업로드하지 않게 해」
+#   계기: 다른 PC 채널이 쇼생크 탈출로 워너브라더스 경고를 받음.
+# 11-03 사용자 「같이 막고」 — 둥둥아빠 강의(docs/영화리뷰_공부 1강·2주차_1부 2-4)의 ❌ 전부 추가.
+# 11-03 사용자 「영화 원본 주면 안되는거는 시작도 하지마」
+#   → 새 편을 잡기 전(원본 폴더를 열자마자) 제작사·배급사(미국·한국 모두)를 KOBIS·IMDb 로 확인하고,
+#     아래 [회사]·[플랫폼]·[장르] 하나라도 걸리면 시작하지 않는다(plan_v9.py·title_name.py 가 [작품] 이름으로 자동 멈춤).
+#   [작품]에 없는 새 금지 작품을 찾으면 여기 [작품]에 한 줄 넣고 커밋.
+[회사]
+Warner Bros. / 워너브라더스 / 워너 코리아
+New Line Cinema / 뉴라인
+Castle Rock Entertainment / 캐슬록
+DC Films / DC Studios
+HBO / HBO Max / Max
+Village Roadshow (워너 공동 제작분)
+Legendary (워너 배급분)
+20th Century Fox / 20th Century Studios / Fox Searchlight / Searchlight (폭스 — 「하지 말 것」)
+Sony Pictures / Columbia / TriStar / Screen Gems / Sony Pictures Classics / Stage 6 / Sony Home Entertainment (소니 — 「이번에 빨간색」)
+[플랫폼]
+한국 넷플릭스 오리지널 영화·드라마 — 롱폼 절대 안 됨(쇼츠만 허용)
+넷플릭스 외화는 N 오리지널만 — 그 밖의 넷플 공개작은 원래 배급사로 판단
+쿠팡플레이 / 티빙 / 웨이브 / 왓챠 오리지널
+방송사 JTBC / KBS / MBC / SBS
+[장르]
+음악 영화 / 뮤지컬 / 애니메이션(스톱모션 포함)
+50~70년 넘은 옛 흑백 영화
+[조심 — 하면 수정이 한두 번 걸림, 고를 땐 뒤로]
+디즈니 극장 실사(디즈니 코리아·Touchstone·Buena Vista) — OTT(디즈니+ 오리지널)는 괜찮음
+라이온스게이트 / Summit / 유니버설 / Focus Features / 애플TV / tvN·OCN·MBN·채널A·TV조선
+「○○ 코리아」 국내 지사가 있는 배급사 전부
+[작품]
+쇼생크 탈출 (The Shawshank Redemption, 1994)
+더 리틀 띵스 (The Little Things, 2021)
+아일랜드 (The Island, 2005)
+거짓말의 발명 (The Invention of Lying, 2009)
+노트북 (The Notebook, 2004)
+일라이 (The Book of Eli, 2010)
+블레이드 러너 (Blade Runner, 1982)
+시티 오브 엔젤 (City of Angels, 1998)
+시몬 (S1m0ne, 2002)
+이레이저 (Eraser, 1996)
+반지의 제왕 (The Lord of the Rings)
+블러드 워크 (Blood Work, 2002)
+웨폰 (Weapons, 2025)
+바바리안 (Barbarian, 2022)
+레이싱 인 더 레인 (The Art of Racing in the Rain, 2019)
+웨어 더 하트 이즈 (Where the Heart Is, 2000)
+히든 피겨스 (Hidden Figures, 2016)
+캐스트 어웨이 (Cast Away, 2000)
+마션 (The Martian, 2015)
+에이리언 (Alien, 1979)
+배드 타임즈 엘 로얄에서 생긴 일 (Bad Times at the El Royale, 2018)
+더 마린 3 (The Marine 3 Homefront, 2013)
+히든페이스 (The Hidden Face, 2011)
+디어 존 (Dear John, 2010)
+가타카 (Gattaca, 1997)
+할로우 맨 (Hollow Man, 2000)
+블랙 호크 다운 (Black Hawk Down, 2001)
+다크 타워 (The Dark Tower, 2017)
+오닝 마호니 (Owning Mahowny, 2003)
+미저리 (Misery, 1990)
+내 사랑 (Maudie, 2016)
+매그니피센트 7 (The Magnificent Seven, 2016)
+컨트랙터 (The Contractor, 2007)
+프리스트 (Priest, 2011)
+언차티드 (Uncharted, 2022)
+플랫라이너 (Flatliners, 2017)
+본 콜렉터 (The Bone Collector, 1999)
+테이커스 (Takers, 2010)
+블루 재스민 (Blue Jasmine, 2013)
+좀비랜드 (Zombieland)
+스나이퍼 얼티밋 킬 (Sniper Ultimate Kill, 2017)
+레지던트 이블 (Resident Evil)
+패신저스 (Passengers, 2016)
+터미네이터 2 (Terminator 2, 1991)
+아논 (Anon, 2018)

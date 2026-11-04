@@ -15,14 +15,17 @@ if (!window.__OrigBlob) { window.__OrigBlob = window.Blob; window.Blob = functio
 if (!window.__origHEClick) { window.__origHEClick = HTMLElement.prototype.click; HTMLElement.prototype.click = function () { if (this.tagName === 'A' && (this.hasAttribute('download') || /^(blob:|data:)/.test(this.href || ''))) return; return window.__origHEClick.call(this); }; }
 if (!window.__origDE) { window.__origDE = EventTarget.prototype.dispatchEvent; EventTarget.prototype.dispatchEvent = function (ev) { if (this instanceof HTMLAnchorElement && ev && ev.type === 'click' && (this.hasAttribute('download') || /^(blob:|data:)/.test(this.href || ''))) return true; return window.__origDE.call(this, ev); }; }
 window.__origRDU = window.__origRDU || FileReader.prototype.readAsDataURL;
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const runBtn = () => [...document.querySelectorAll('button')].find(b => /\b(Run|Stop)\b/.test(b.innerText));
+// ★11-03 크롬이 뒤 탭 타이머를 1분 단위로 묶어(intensive throttling) 묶음 사이 리셋이 10분씩 걸림 → 무음 오디오 시계로 잰다(Worker 는 CSP 로 막힘).
+window.__ac = window.__ac || new AudioContext();
+window.__acg = window.__acg || (() => { const g = __ac.createGain(); g.gain.value = 0; g.connect(__ac.destination); return g; })();
+window.sleep = ms => new Promise(r => { if (__ac.state !== 'running') __ac.resume(); const s = __ac.createConstantSource(); s.connect(__acg); s.onended = () => { s.disconnect(); r(); }; s.start(); s.stop(__ac.currentTime + ms / 1000); });
+window.runBtn = () => [...document.querySelectorAll('button')].find(b => /\b(Run|Stop)\b/.test(b.innerText));
 window.cineGen = async (text) => {
   const ta = document.querySelector('textarea'); ta.focus();
   Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, text);
   ta.dispatchEvent(new Event('input', {bubbles: true})); ta.dispatchEvent(new Event('change', {bubbles: true}));
   await sleep(1000);
-  if (runBtn().getAttribute('aria-disabled') === 'true') return {err: 'run disabled — 새로고침 후 다시'};
+  if (runBtn().getAttribute('aria-disabled') === 'true') return {err: 'run disabled'};
   const prev = window.__lastBlob; runBtn().click(); cine.log.push('run ' + new Date().toLocaleTimeString());
   let t0 = Date.now();
   while (!/Stop/.test((runBtn() || {}).innerText || '')) { if (Date.now() - t0 > 60000) return {err: 'no start'}; await sleep(500); }
@@ -49,4 +52,20 @@ window.cineRun = async (ep) => {
   }
   cine.state = 'done ' + ep;
 };
-// 시작: cineRun('epNN_제목')   (recv /next 는 이름순 첫 READY 편을 집으므로 편 이름을 직접 준다)
+// ★11-03 묶음마다 Run 이 꺼지는 문제: 새로고침 대신 화면 안에서 New chat → Create new dialog → Speaker 1 → Ludo (cineReset).
+window.cineB = l => [...document.querySelectorAll('button')].find(b => (b.getAttribute('aria-label') || b.innerText || '').includes(l));
+window.cineReset = async () => { const nc = cineB('New chat'); if (nc) { nc.click(); await sleep(3000); }
+  const c = [...document.querySelectorAll('*')].find(e => e.children.length < 3 && /^Create new dialog$/.test((e.innerText || '').trim())); if (!c) return 'no create';
+  c.click(); await sleep(3000); cineB('Speaker 1').click(); await sleep(2000);
+  const l = [...document.querySelectorAll('*')].find(e => e.children.length <= 1 && (e.innerText || '').trim() === 'Ludo' && e.getBoundingClientRect().y > 200); if (!l) return 'no ludo';
+  l.click(); await sleep(1500);
+  const x = [...document.querySelectorAll('button')].find(b => /close/i.test(b.getAttribute('aria-label') || b.innerText || '') && b.getBoundingClientRect().x > 1000); if (x) x.click(); await sleep(1000);
+  return (cineB('Speaker 1') || {}).innerText; };
+// 자동: recv /next 가 주는 편을 차례로, run disabled 면 cineReset 후 계속. 상태: JSON.stringify([cine.auto, cine.state, cine.log.slice(-4)])
+window.cineAuto = async () => { cine.auto = 'on'; let fails = 0;
+  while (cine.auto === 'on') { const n = await cineAsk({want: 'next'}, d => d && d.next, 30000).then(d => d.next).catch(() => ({ep: ''}));
+    if (!n.ep) { cine.state = 'idle wait ' + new Date().toLocaleTimeString(); await sleep(60000); continue; }
+    await cineRun(n.ep);
+    if (/^stopped: run disabled/.test(cine.state)) { const r = await cineReset(); cine.log.push('reset ' + r); if (!/Ludo/.test(r)) { cine.auto = 'off: reset ' + r; break; } fails = 0; continue; }
+    if (/^stopped/.test(cine.state)) { fails++; cine.log.push('stop#' + fails); if (fails >= 2) { cine.auto = 'off: ' + cine.state; break; } await cineReset(); } else fails = 0; } };
+// 시작: await cineReset(); cineAuto();   또는 한 편만 cineRun('epNN_제목')   (recv /next 는 이름순 첫 READY 편을 집으므로 편 이름을 직접 준다)

@@ -21,9 +21,23 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import edges as EDG
 CFG = json.load(open("ep.json", encoding="utf-8"))
+# ⛔11-03 사용자 「영화 원본 주면 안되는거는 시작도 하지마」 — 금지 회사 작품(../blocked_studios.txt)이면 계획부터 멈춤
+from blocked import stop_if_blocked
+stop_if_blocked(os.path.basename(os.getcwd()), str(CFG.get("src", "")), str(CFG.get("title", "")))
 SRC, SRCLEN = CFG["src"], CFG["srclen"]
 SPD, GAP, MAXC = 1.05, 3.0, 2.9
+# ★10-31 드루와 09 재편집: ep.json "tail_src" = [시작, 끝](사용자 예전 편 화면을 원본 끝에 이어 붙인 구간) 안 조각끼리는 "tail_gap"(기본 GAP) 간격 — 재료가 1,231초뿐이라 3초면 5분밖에 못 씀
+TAIL0, TGAP = (CFG.get("tail_src") or [1e18])[0], CFG.get("tail_gap", GAP)
+def gp(*ts): return TGAP if min(ts) >= TAIL0 - 1e-6 else GAP
 DMAX, DSPD = CFG.get("dmax", 3.0), CFG.get("dspd", 1.05)     # 대사 창 화면 최장(초)·배속 (10-14 CID)
+# ★11-01 드루와 09 사용자 「장면이 끝날때 너무 짧게 뚝 끊겨버려」「그래서 정신이 없어」 → ep.json(기본 0 = 예전 그대로, 드라마는 drama_kit 값):
+#   "d_tail"(화면 초): 대사 말끝 뒤 원본 화면·소리를 더 흘림(표정·반응 여운). 다음 낱말 0.15초 앞·다음 컷 0.05초 앞까지만, 대사 창 합계 DMAX+"d_tail_over"(기본 0 — 관문 ⑫ CID 3초, 10-14 사용자 「1」) 안
+#   "d_fade"(초): 대사 창 끝 소리 줄이기(기본 0.05) — 여운 구간에 걸쳐 줄인다
+#   "scene_pad"(초): 장면이 바뀌는 곳(다음 줄 원본이 "scene_jump" 초(기본 20) 넘게 떨어짐) 앞 줄 그림을 더 둠 — 숨 돌릴 틈
+# ★11-04 시네플로그: 여운 기본값은 새 방식 편(ep.json 에 d_fill 있음, movie_template)만. 옛 편은 다시 계획해도 조각이 그대로다(33편으로 확인).
+NEWSTYLE = "d_fill" in CFG
+DTAIL, DTOVER, DFADE = CFG.get("d_tail", 0.6 if NEWSTYLE else 0.0), CFG.get("d_tail_over", 0.0), CFG.get("d_fade", 0.3 if NEWSTYLE else 0.05)   # 다른 PC 11-02 사용자 「장면 끝나는 시점을 이렇게 하니까 좋아」
+SCPAD, SCJUMP = CFG.get("scene_pad", 0.3 if NEWSTYLE else 0.0), CFG.get("scene_jump", 20.0)
 CPS = 6.5          # 제미나이 Ludo 실측(16 핀치 148조각): 띄어쓰기 뺀 글자 6.51자/초
 DRY = "--dry" in sys.argv
 ns = {}; exec(open("script.py", encoding="utf-8").read(), ns); S = ns["S"]
@@ -76,12 +90,60 @@ for k, x in enumerate(S):
 # 대사 창은 말 끝에서 딱 끊는다(여백을 대사 창에 붙이면 그만큼 원본이 더 흘러 다음 사람 첫 낱말이 들어간다 — 17 관문 ⑦ 12곳).
 # 대사 뒤 나레는 그림을 먼저 깔고 0.15초 뒤에 말을 시작(lead).
 PAD = {("N", "N"): 0.25, ("N", "D"): 0.12, ("N", "A"): 0.1, ("A", "N"): 0.1, ("A", "D"): 0.1, ("A", "A"): 0.0}
+# 11-01 대사 여운(d_tail): 대화가 끝나는 대사(다음 줄이 나레·원본 소리이거나 다른 장면)만 — 주고받는 대사끼리는 그대로 딱 붙인다
+#   다음 낱말·다음 컷·같은 구역 다른 대사의 원본 3초 간격 안에서만
+def _jump0(x, y): return abs((y["s"] if y["kind"] == "D" else y["a"]) - (x["e"] if x["kind"] == "D" else x["b"])) > SCJUMP
+# ★11-03 사용자 「원본 대사가 나올때도 3초가 한장면으로 이어져야하는데 이것도 자른것같던데」(37 우주전쟁: 대사 창 평균 2.1초, 1.5초 미만 49곳)
+#   → "d_fill"(화면 초, 기본 = DMAX 3.0): 대사 창을 말끝 뒤 같은 장면 원본(표정·반응)으로 이 길이까지 채운다. 주고받는 대사 사이도 채움.
+#   멈추는 곳: 다른 사람 말(다음 낱말 0.15초 앞)·같은 구역 다른 대사 3초 간격·원본 컷(컷 뒤가 0.5초 안 되면 컷 0.05초 앞 — 깜빡 금지).
+#   옛 판(말끝 + 0.6초만)으로 돌리려면 ep.json "d_fill": 0.
+DFILL = CFG.get("d_fill", 0.0)   # ★11-03 사용자 「아직 프리셋에 반영하지는 마. 만들어보고 괜찮으면 할거야」 → 기본 꺼짐, 시험 편만 ep.json "d_fill": 3.0
+if DTAIL > 0 or DFILL > 0:
+    for i, it in enumerate(items):
+        if it["kind"] != "D": continue
+        y = items[i + 1] if i + 1 < len(items) else None
+        if DFILL <= 0 and y is not None and y["kind"] == "D" and y["zone"] == it["zone"] and not _jump0(it, y): continue
+        if it["opt"].get("no_tail"): continue                     # 대본 줄 {"no_tail": True} — 옆 나레 줄 원본 자리가 모자랄 때(34 리셋)
+        s2, e2 = it["s"], it["e"]
+        want = max(DTAIL * DSPD, DFILL * DSPD - (e2 - s2))
+        nw = env.ws[env.ws > e2 - 0.03]; nc = cuts[cuts > e2 + 0.02]
+        od = [o["s"] for o in items if o is not it and o["kind"] == "D" and o["zone"] == it["zone"] and o["s"] > e2 - 0.01]
+        # ★11-03 사용자 「그걸 자르면 안돼」 — 3초 안에 바로 이어지는 상대 말(다음 대사 줄)은 멈춰서 끊지 말고 같은 대사 창에 묶어 자막까지(대본 단계).
+        #   묶을 수 있는데 안 묶었으면 문제로 올려 대본을 고치게 한다(묶으면 그 말까지 3초 한 장면).
+        if DFILL > 0 and len(nw) and nw[0] - e2 < DFILL * DSPD - (e2 - s2):
+            nxt = [l for l in L.values() if l["ws"] is not None and abs(l["ws"] - nw[0]) < 0.3 and l["id"] not in it["ids"]]
+            used_ids = {j for o in items if o["kind"] == "D" for j in o["ids"]}
+            for l in nxt[:1]:
+                if l["id"] in used_ids: continue
+                if l["we"] - s2 <= DMAX * DSPD + 1e-6:
+                    problems.append(f"줄{it['k']} 대사 {it['ids']} 바로 뒤 상대 말 [{l['id']}] 「{l['en']}」 이 3초 안에 들어감 — 자르지 말고 묶기: "
+                                    f"('D', {it['ids'] + [l['id']]}, '{it['ko']} / <그 말 자막>') (11-03 「그걸 자르면 안돼」)")
+        lim = min((nw[0] - 0.15 - e2) if len(nw) else 9e9, (DMAX + DTOVER) * DSPD - (e2 - s2),
+                  (min(od) - gp(e2, min(od)) - e2) if od else 9e9, want)
+        if DFILL > 0:   # 컷을 넘어도 원본 그대로 이어지는 것 — 컷 뒤 그림이 0.5초 안 되게 끝나면 깜빡이므로 그 컷 앞에서 멈춤
+            for c in nc:
+                if c - e2 >= lim: break
+                if e2 + lim - c < 0.5: lim = c - 0.05 - e2; break
+        else:
+            lim = min(lim, (nc[0] - 0.05 - e2) if len(nc) else 9e9)
+        room = lim
+        if room >= 0.15: it["tail"] = round(room, 3); it["d"] = (e2 + room - s2) / DSPD
 t = 0.0
+def jump(i):
+    """items[i] 다음 줄이 다른 장면(원본 SCJUMP 초 넘게 떨어짐)인가 — 같은 구역 안만"""
+    if SCPAD <= 0 or i + 1 >= len(items) or items[i + 1]["zone"] != items[i]["zone"]: return False
+    x, y = items[i], items[i + 1]
+    return abs((y["s"] if y["kind"] == "D" else y["a"]) - (x["e"] if x["kind"] == "D" else x["b"])) > SCJUMP
 for i, it in enumerate(items):
     it["t"] = round(t, 3)
     prv = items[i - 1]["kind"] if i else "A"; nxt = items[i + 1]["kind"] if i + 1 < len(items) else "A"
     it["lead"] = 0.15 if (prv == "D" and it["kind"] == "N") else 0.0
-    it["T"] = round(t + it["lead"] + it["d"] + PAD.get((it["kind"], nxt), 0.0), 3)       # 이 줄 그림이 차지하는 화면 끝(다음 줄 시작)
+    pad = PAD.get((it["kind"], nxt), 0.0)
+    # 장면 바뀜 숨은 그 줄 조각 수가 늘지 않을 때만(조각이 하나 늘면 원본 자리가 3초+ 더 필요 — 34 리셋 dry 「자리 없음」 3줄)
+    fits = lambda extra: math.ceil((it["lead"] + it["d"] + pad + extra) / MAXC - 1e-6) == math.ceil((it["lead"] + it["d"] + pad) / MAXC - 1e-6)
+    if it["kind"] == "N" and i and items[i - 1]["kind"] == "D" and jump(i - 1) and fits(SCPAD): it["lead"] += SCPAD   # 대사로 끝난 장면 → 새 장면 그림 먼저 깔고 나레는 늦게
+    if it["kind"] != "D" and jump(i) and fits(SCPAD): pad += SCPAD; it["scene_end"] = True
+    it["T"] = round(t + it["lead"] + it["d"] + pad, 3)       # 이 줄 그림이 차지하는 화면 끝(다음 줄 시작)
     t = it["T"]
 BODY = t
 
@@ -91,6 +153,7 @@ W = []
 for it in items:
     if it["kind"] != "D": continue
     w = {"a": it["t"], "b": it["T"], "s": round(it["s"], 3), "kind": "D", "k": it["k"], "ko": it["ko"], "sub1": round(it["sl"], 3), "z": it["zone"]}
+    if it.get("tail"): w["fo"] = round(max(0.05, min(DFADE, it["tail"] / DSPD)), 3)   # 11-01 여운 구간 안에서만 소리 줄이기(말끝은 그대로)
     w.update(it["opt"])                                            # 10-14 대사 창도 {"noflip": True} (뉴스 화면·모니터 글자 — 01 헤즈 오브 스테이트)
     if DSPD != 1: w["rate"] = DSPD                                 # build cut: 영상 setpts + 소리 atempo 같이 · 자막 시각은 원본 기준(build 가 /rate)
     parts = [p.strip() for p in it["ko"].split(" / ")]
@@ -98,16 +161,26 @@ for it in items:
         st = [max(0.05, L[i]["ws"] - it["s"]) for i in it["ids"]] + [it["sl"]]          # 원본 기준 초(build 가 /rate)
         w["subs"] = [[parts[j], round(st[j] if j else 0.05, 3), round(st[j + 1], 3)] for j in range(len(parts))]
     W.append(w); used[it["zone"]].append((it["s"], it["s"] + (it["T"] - it["t"]) * DSPD))
+# ★11-03 핵심 장면 이어 가기 — 사용자 「원본 6초가 나오면 중간에 짧게 나래이션을 넣는 방식」「중요 핵심 장면이 끈어지지 않게 만들어야할때만 이방법을 쓰고」
+#   대본 ("D", …) → ("N", "짧은 나레", a, b, {"cont": True}) → ("D", …): 나레 밑 그림이 앞 대사 창 원본 바로 뒤를 그대로 이어 가고(반전·확대는 앞 대사와 같게, 원본 소리는 나레 밑에서 작게),
+#   다음 대사까지 한 장면으로 이어진다. 이 사이만 3초 간격 예외. 나레는 조각 하나(2.9초 안) — 짧게.
+LINKS = []                                   # (구역, 앞 끝 원본초, 뒤 시작 원본초) — 3초 간격 검사에서 빼는 이음
+CONT_D = set()                               # 핵심 장면 이음으로 묶인 (앞 대사 k, 뒤 대사 k)
+for i, it in enumerate(items):
+    if it["kind"] == "N" and it["opt"].get("cont") and 0 < i < len(items) - 1 and items[i - 1]["kind"] == "D" and items[i + 1]["kind"] == "D":
+        CONT_D.add((items[i - 1]["s"], items[i + 1]["s"]))
+def _linked(z, x1, y0): return any(lz == z and abs(lx - x1) < 0.05 and abs(ly - y0) < 0.05 for lz, lx, ly in LINKS)
 for z in used:
     sp = sorted(used[z])
     for x, y in zip(sp, sp[1:]):
-        if y[0] - x[1] < GAP - 0.01: problems.append(f"{z} 대사끼리 원본 3초 간격 어김 {mm(x[0])}~{mm(x[1])} / {mm(y[0])}")
+        if any(abs(x[0] - p) < 1e-3 and abs(y[0] - q) < 1e-3 for p, q in CONT_D): continue
+        if y[0] - x[1] < gp(x[0], y[0]) - 0.01: problems.append(f"{z} 대사끼리 원본 3초 간격 어김 {mm(x[0])}~{mm(x[1])} / {mm(y[0])}")
 
 # ── 3. 나레·액션 줄: [a,b] 안에서 순서대로 조각 고르기 (DP, 0.1초 칸)
 ST = 0.1
 def free_mask(z, grid, sl):
     ok = np.ones(len(grid), bool)
-    for x, y in used[z]: ok &= ~((grid < y + GAP) & (grid + sl + GAP > x))
+    for x, y in used[z]: g = gp(x, float(grid[0])); ok &= ~((grid < y + g) & (grid + sl + g > x))
     return ok
 def shot_snap(p, sl, lo, hi):
     """조각 시작이 컷 시작 바로 뒤(0.6초 안)면 그 컷 시작으로 당긴다 — 다음 컷으로 밀면 다른 그림이 된다(10-13 「레이더에 표적이」 밑에 뱃머리)"""
@@ -121,14 +194,33 @@ def place_parts(it, d, z):
     ps = []
     for j, (lo, hi) in enumerate(P):          # 구간 순서가 원본 순서가 아니어도 된다(아웃트로) — 앞서 고른 조각·다른 줄 모두와 3초 간격
         mine = [(q, q + sl) for q in ps]
-        c = [g for g in np.arange(lo, hi - sl + 1e-6, ST) if all(not (g < y + GAP and g + sl + GAP > x) for x, y in used[z] + mine)]
+        c = [g for g in np.arange(lo, hi - sl + 1e-6, ST) if all(not (g < y + gp(x, g) and g + sl + gp(x, g) > x) for x, y in used[z] + mine)]
         if not c: problems.append(f"줄{it['k']} 「{it.get('text', '')[:24]}」 조각{j + 1} [{mm(lo)}~{mm(hi)}] 에 {sl:.1f}초 자리 없음"); return None
         g = min(c, key=lambda g: 2.0 * dark(g, g + sl) + abs(g - lo) * 0.05); ps.append(float(g))
     return ps, n, Lw, sl
-for it in items:
+for ii, it in enumerate(items):
     if it["kind"] == "D": continue
     d = it["T"] - it["t"]; n = max(1, math.ceil(d / MAXC - 1e-6)); Lw = d / n; sl = Lw * SPD
     lo, hi = it["a"], it["b"]; z = it["zone"]
+    if it["opt"].get("cont"):                # ★11-03 핵심 장면 이어 가기(위 설명)
+        pv = items[ii - 1] if ii else None; nx = items[ii + 1] if ii + 1 < len(items) else None
+        if pv is None or pv["kind"] != "D":
+            problems.append(f"줄{it['k']} {{'cont': True}} 는 대사(D) 바로 뒤 나레에만"); continue
+        if d > MAXC + 1e-6:
+            problems.append(f"줄{it['k']} 핵심 장면 이음 나레 「{it.get('text', '')[:24]}」 화면 {d:.1f}초 — {MAXC}초 안으로 짧게(나레 줄이기)"); continue
+        src_end = pv["s"] + (pv["T"] - pv["t"]) * DSPD; sl = d * SPD; st0 = src_end
+        if nx is not None and nx["kind"] == "D" and nx["zone"] == z:
+            if nx["s"] < src_end + 0.2: problems.append(f"줄{it['k']} 핵심 장면 이음: 다음 대사 원본 {mm(nx['s'])} 이 앞 대사 끝 {mm(src_end)} 보다 앞"); continue
+            st0 = max(src_end, nx["s"] - sl)               # 다음 대사 바로 앞에서 끝나게(남는 틈은 앞으로 건너뜀)
+            if st0 + sl > nx["s"] + 0.05: problems.append(f"줄{it['k']} 핵심 장면 이음: 나레 그림({sl:.1f}초)이 다음 대사와 {st0 + sl - nx['s']:.1f}초 겹침 — 나레를 짧게"); continue
+            if st0 - src_end > 3.0 and nx["s"] - (src_end + 3.0 + sl) <= 3.0: st0 = src_end + 3.0   # ★11-03 41: 틈이 3초 넘으면 앞뒤로 나눠 건너뜀(앞 3초·뒤 나머지)
+            LINKS.append((z, st0 + sl, nx["s"]))
+            if st0 - src_end > 3.0: problems.append(f"줄{it['k']} 핵심 장면 이음: 앞 대사 끝과 {st0 - src_end:.1f}초 건너뜀(3초 넘음) — 나레를 늘리거나 다음 대사를 앞으로")
+        LINKS.append((z, src_end, st0))
+        nf = bool(pv["opt"].get("noflip"))          # 앞 대사 창과 같은 반전·확대여야 한 장면으로 보임
+        if nx is not None and nx["kind"] == "D" and bool(nx["opt"].get("noflip")) != nf: problems.append(f"줄{it['k']} 핵심 장면 이음: 앞뒤 대사 noflip 이 달라 화면이 뒤집힘 — 둘 다 같게")
+        W.append(dict(dict({"a": round(it["t"], 3), "b": round(it["T"], 3), "s": round(st0, 3), "kind": "A", "k": it["k"], "z": z, "cont": True}, **it["opt"]), noflip=nf))
+        used[z].append((st0, st0 + sl)); continue
     if it.get("parts"):
         r = place_parts(it, d, z)
         if r is None: continue
@@ -142,7 +234,7 @@ for it in items:
     ok = free_mask(z, grid, sl)
     ideal = [lo + (hi - lo - sl) * (j / (n - 1) if n > 1 else 0.0) for j in range(n)]
     base = np.array([2.0 * dark(g, g + sl) + (1.5 * speech(g, g + sl) if it["kind"] == "A" else 0.0) for g in grid])
-    sh = int(math.ceil((sl + GAP) / ST))
+    sh = int(math.ceil((sl + gp(lo)) / ST))
     INF = 1e9; prev = None; back = []
     for j in range(n):
         c = np.where(ok, np.abs(grid - ideal[j]) / max(3.0, (hi - lo) / n) + base, INF)
@@ -168,8 +260,8 @@ for it in items:
     ps = [float(grid[p]) for p in pos]
     for j in range(n):
         p2 = shot_snap(ps[j], sl, lo, hi)
-        nxt_ok = j == 0 or p2 >= ps[j - 1] + sl + GAP - 1e-6        # 당기면 앞 조각과 3초 간격 확인
-        if nxt_ok and all(not (p2 < y + GAP and p2 + sl + GAP > x) for x, y in used[z]): ps[j] = p2
+        nxt_ok = j == 0 or p2 >= ps[j - 1] + sl + gp(ps[j - 1], p2) - 1e-6        # 당기면 앞 조각과 3초 간격 확인
+        if nxt_ok and all(not (p2 < y + gp(x, p2) and p2 + sl + gp(x, p2) > x) for x, y in used[z]): ps[j] = p2
     for j in range(n):
         a = it["t"] + Lw * j; b = it["t"] + Lw * (j + 1)
         W.append(dict({"a": round(a, 3), "b": round(b, 3), "s": round(ps[j], 3), "kind": "A", "k": it["k"], "z": z}, **it["opt"])); used[z].append((ps[j], ps[j] + sl))
@@ -182,7 +274,8 @@ for i in range(len(W) - 1):
 for z in used:
     sp = sorted(used[z])
     for x, y in zip(sp, sp[1:]):
-        if y[0] - x[1] < GAP - 0.01: problems.append(f"{z} 원본 3초 간격 어김 {mm(x[1])} / {mm(y[0])}")
+        if _linked(z, x[1], y[0]) or any(abs(x[0] - p) < 1e-3 and abs(y[0] - q) < 1e-3 for p, q in CONT_D): continue   # 11-03 핵심 장면 이음
+        if y[0] - x[1] < gp(x[0], y[0]) - 0.01: problems.append(f"{z} 원본 3초 간격 어김 {mm(x[1])} / {mm(y[0])}")
 fl = [w for w in W if w["b"] - w["a"] < 0.5]
 for w in fl: problems.append(f"0.5초 안 되는 깜빡 조각 {mm(w['a'])} ({w['b'] - w['a']:.2f}초)")
 nar = [(it["ni"], it["t"] + it["lead"], it["d"]) for it in items if it["kind"] == "N"]
@@ -190,6 +283,8 @@ NS = sum(d for _, _, d in nar); DS = sum(it["d"] for it in items if it["kind"] =
 srcuse = sum(min(y, SRCLEN) - x for z in used for x, y in used[z])
 rep = [f"화면 {mm(BODY)} ({BODY:.0f}초) · 원본 {SRCLEN / 60:.0f}분의 {100 * BODY / SRCLEN:.0f}% · 나레 {len(nar)}줄 {NS:.0f}초 = {100 * NS / BODY:.0f}% · 대사 창 {sum(1 for it in items if it['kind'] == 'D')}개 {DS:.0f}초 · 조각 {len(W)} · 원본 쓴 양 {srcuse / 60:.1f}분",
        f"가장 긴 조각 {max(w['b'] - w['a'] for w in W):.2f}초 · 대사 창 최장 {max([it['d'] for it in items if it['kind'] == 'D'] or [0]):.2f}초"]
+_tl = [it["tail"] / DSPD for it in items if it.get("tail")]
+if DTAIL > 0 or SCPAD > 0: rep.append(f"대사 여운 {len(_tl)}곳(평균 {sum(_tl) / max(1, len(_tl)):.2f}초) · 장면 바뀜 숨 {sum(1 for it in items if it.get('scene_end'))}곳")
 rep += [f"✗ {p}" for p in problems]
 open("plan_report.txt", "w", encoding="utf-8").write("\n".join(rep) + "\n")
 print("\n".join(rep[:2])); print(f"문제 {len(problems)}")

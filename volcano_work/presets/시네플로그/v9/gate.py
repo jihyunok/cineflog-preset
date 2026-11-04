@@ -22,6 +22,7 @@ def mm(t): return f"{int(t // 60)}:{t % 60:04.1f}"
 if MODE == "pre":
     import edges as EDG, gem_split as GS
     CFG = json.load(open("ep.json", encoding="utf-8")); SPD, GAP = 1.05, 3.0
+    TAIL0, TGAP = (CFG.get("tail_src") or [1e18])[0], CFG.get("tail_gap", GAP)     # 10-31 plan_v9 와 같게(꼬리 구간만 간격 따로)
     WN = json.load(open("windows.json", encoding="utf-8")); PL = json.load(open("narr_place.json"))
     # ① 나레 조각
     srcdb = {}
@@ -76,9 +77,11 @@ if MODE == "pre":
         run.append(w)
         if len(run) == 5: fail(f"⑮ 앞 5분 {mm(run[0]['a'])}~ 나레 없이 대사만 5줄 넘게 — 일상 대사 토막은 나레 한 줄로")
     for z in sorted({w.get("z", "main") for w in WN}):
-        sp = sorted((s0(w), s0(w) + slen(w), w["a"]) for w in WN if w.get("z", "main") == z)
+        sp = sorted((s0(w), s0(w) + slen(w), w["a"], bool(w.get("cont"))) for w in WN if w.get("z", "main") == z)
         for x, y in zip(sp, sp[1:]):
-            if y[0] - x[1] < GAP - 0.01: fail(f"⑥ {z} 원본 3초 간격 {mm(x[2])}/{mm(y[2])} ({y[0] - x[1]:.2f}초)")
+            # ★11-03 핵심 장면 이음({"cont": True} 나레 조각) — 앞 대사 → 이음 나레 → 다음 대사는 한 장면으로 이어 붙이는 것(plan_v9 LINKS), 겹침만 아니면 통과
+            if (x[3] or y[3]) and -0.05 <= y[0] - x[1] <= 3.05: continue
+            if y[0] - x[1] < (TGAP if min(x[0], y[0]) >= TAIL0 - 1e-6 else GAP) - 0.01: fail(f"⑥ {z} 원본 3초 간격 {mm(x[2])}/{mm(y[2])} ({y[0] - x[1]:.2f}초)")
     # ⑦ 대사 가장자리
     env = EDG.Env(CFG["src"], CFG.get("words", "src_words.json"), cache=CFG.get("band", "src_band.npy"))
     for i, t, side, why in EDG.check(WN, env): fail(f"⑦ 대사 {mm(t)} {'시작' if side == 's' else '끝'} 말 잘림: {why}")

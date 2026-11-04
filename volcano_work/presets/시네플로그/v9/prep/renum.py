@@ -4,9 +4,11 @@ import json, os, re, shutil, sys
 ns = {}; exec(open("script.py", encoding="utf-8").read(), ns); S = ns["S"]
 k = 1
 while os.path.exists(f"narr_old_{k}"): k += 1
-os.rename("narr", f"narr_old_{k}")
+# ★10-26 드라마 「끝난 토막부터 녹음」: 합친 뒤 처음엔 narr 가 없음 → python renum.py part1/narr part2/narr … 로 토막 녹음을 글로 찾아 옮김
+HAD = os.path.isdir("narr")
+if HAD: os.rename("narr", f"narr_old_{k}")
 old = {}
-for d in [f"narr_old_{k}"] + sys.argv[1:]:
+for d in ([f"narr_old_{k}"] if HAD else []) + sys.argv[1:]:
     for f in sorted(os.listdir(d)):
         if f.endswith(".json"):
             old.setdefault(json.load(open(f"{d}/{f}", encoding="utf-8"))["text"], f"{d}/{f[:-5]}")

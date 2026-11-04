@@ -1,0 +1,121 @@
+{
+ "src": "D:/cine_work/ep22_하비의마지막로맨스/src.mp4",
+ "srclen": 5563.266,
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 816,
+ "burn": [
+  590,
+  226,
+  360,
+  1200
+ ],
+ "burn_why": "10-27 원본 avi 에 흰 한국어 자막 두 줄이 박혀 있음(src 816 높이에서 y≈630~790) → 그 자리 판정·확대로 가림. 처음 두 장면이 말 없는 순간이라 못 봤음",
+ "clips": "clips",
+ "title": "하비의 마지막 로맨스",
+ "bench_name": "없음 — 10-27 한국어 결말포함 리뷰 없음(43만 wPzMYy9xdFk 는 「비우티풀」이었음). 사용자 「후킹없이 이야기의 흐름데로」 → 영화 순서대로",
+ "ctx": "영화 「Last Chance Harvey」(2008, 한국 개봉 「하비의 마지막 로맨스」, 감독 Joel Hopkins). Dustin Hoffman as Harvey Shine, a divorced New York jingle composer whose career is slipping; he flies to London for his daughter Susan's wedding. Emma Thompson as Kate Walker, a lonely middle-aged London airport survey worker who looks after her anxious mother Maggie (Eileen Atkins) who suspects her Polish neighbour. Liane Balaban as Susan, Harvey's daughter; Kathy Baker as Jean, Harvey's ex-wife; James Brolin as Brian, Jean's husband and Susan's stepfather, whom Susan asks to walk her down the aisle; Richard Schiff as Marvin, Harvey's boss who fires him by phone. Harvey misses his flight back, loses his job, meets Kate in the airport bar, they walk around London, she convinces him to go to the wedding reception where he gives a speech; they spend the next day together; he misses their meeting because of a heart arrhythmia episode; Kate is hurt; he finds her at her writing class and they reconcile.",
+ "places": [
+  "New York studio",
+  "airport",
+  "Heathrow airport",
+  "Kate's office",
+  "hotel",
+  "wedding rehearsal dinner",
+  "Kate's mother's house",
+  "airport bar",
+  "London streets",
+  "church",
+  "wedding reception",
+  "South Bank",
+  "hospital",
+  "writing class",
+  "Kate's flat"
+ ],
+ "who": [
+  "Harvey Shine",
+  "Kate Walker",
+  "Maggie",
+  "Susan",
+  "Jean",
+  "Brian",
+  "Marvin"
+ ],
+ "who_ko": {
+  "Harvey": "하비",
+  "Kate": "케이트",
+  "Maggie": "매기",
+  "Susan": "수전",
+  "Jean": "진",
+  "Brian": "브라이언",
+  "Marvin": "마빈"
+ },
+ "same_place": [
+  [
+   "airport",
+   "Heathrow airport",
+   "airport bar"
+  ],
+  [
+   "hotel",
+   "wedding reception"
+  ]
+ ],
+ "quiet": [
+  [
+   3013,
+   3052
+  ],
+  [
+   3246,
+   3291
+  ],
+  [
+   3664,
+   3830
+  ],
+  [
+   3974,
+   3997
+  ],
+  [
+   5290,
+   5470
+  ]
+ ],
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "max_piece": 3.0,
+ "max_piece_why": "10-27 3초(21편과 같게, 소유권 주장 안전)",
+ "hook": false,
+ "hook_why": "10-27 사용자 「후킹없이 이야기의 흐름데로」",
+ "cold_ok": {
+  "S16 이번 건 꼭 따내, 하": "하비가 돌아오겠다고 버티자 사장이 마지막 경고로 하는 말 — 바로 뒤 「더는 기회 없어」",
+  "S38 에이, 나도 이제 다 ": "바로 앞 나레가 가족은 다 다른 집에 묵는다고 말함 — 괜찮은 척이 그대로 보이는 장면",
+  "S44 펍에서 만난 소개팅 상": "바로 뒤 대사 「컴퓨터 쪽이에요 / 문구 사업이라며?」가 어긋남 그 자체",
+  "S60 한편 펍의 케이트. 동": "나레 밑 그림은 펍 계단의 케이트(962.6~979.7) — 컷 설명 순서 착오",
+  "S86 음, 저기… / 사실 ": "거짓말이 아니라 사실(처음 보는 사이) — 소개팅 상대가 자리를 비운 민망한 상황",
+  "S103 나랑 왜 결혼했어?": "전 부인과 옛 상처를 주고받는 말다툼의 흐름 — 바로 뒤 대답 「어렸으니까」",
+  "S200 추운데 기다리긴 싫으실": "거절이 아니라 마음을 떠보는 말 — 바로 뒤 「그 정도로 춥진 않아요」",
+  "S242 아버님이 고집을 부리셔": "갑자기 끼어든 손님이라 미안해하는 말 — 그대로 들어도 뜻이 통함"
+ },
+ "quiet_why": "거리 공연 노래·드레스 가게 노래(Son of a Gun)·피로연 밴드 노래·춤 장면·끝 노래(Where Do We Go From Here) — 원본 소리 조각(A) 안 씀",
+ "event_by": 200,
+ "flow_ok": {
+  "S201 당신이 만든 곡이에요?": "피아노 방은 피로연장 호텔 안 같은 건물 — 바로 앞 나레 「피아노를 치는 사람은 하비」",
+  "S225 정오요!": "같은 광장(서머싯 하우스) 분수 앞에서 주고받는 말 — 컷 설명 장소 이름만 다름"
+ }
+}

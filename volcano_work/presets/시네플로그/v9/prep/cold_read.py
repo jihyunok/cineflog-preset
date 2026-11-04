@@ -21,7 +21,7 @@ CFG = json.load(open("ep.json", encoding="utf-8"))
 TITLE = sys.argv[sys.argv.index("--title") + 1] if "--title" in sys.argv else CFG.get("title_ko", CFG.get("title", ""))
 ns = {}; exec(open("script.py", encoding="utf-8").read(), ns); S = ns["S"]
 SH = json.load(open("shots.json", encoding="utf-8")); L = {x["id"]: x for x in json.load(open("lines.json", encoding="utf-8"))}
-def desc(t): return next((x["desc"] for x in SH if x["s"] <= t < x["e"]), "")
+def desc(t): return next((x.get("desc", "") for x in SH if x["s"] <= t < x["e"]), "")
 def src0(x):
     if x[0] == "N": return (x[2][0][0] if isinstance(x[2], list) else x[2])
     if x[0] == "D": ids = x[1] if isinstance(x[1], list) else [x[1]]; return L[ids[0]]["ws"]
@@ -61,7 +61,7 @@ while i < len(rows):
     past = "\n".join(re.sub(r"  〔화면:.*", "", r) for r in before)[-2500:]
     prompt = RULE + (("\n앞에서 이미 나온 나레(참고만, 여기선 고르지 마):\n" + past + "\n") if past else "") + "\n이번에 읽을 부분:\n" + "\n".join(r for _, r in rows[i:j])
     prompt = prompt.replace('"', "'")
-    r = subprocess.run([AGY, "-p", prompt, "--model", "gemini-3.8-flash-high", "--print-timeout", "300s", "--output-format", "json", "--disable-slash-commands", "--json-schema", SCH],
+    r = subprocess.run([AGY, "-p", prompt, "--model", os.environ.get("AGY_MODEL", "gemini-3.8-flash-high"), "--print-timeout", "300s", "--output-format", "json", "--disable-slash-commands", "--json-schema", SCH],
                        cwd=W, capture_output=True, timeout=400)
     o = r.stdout.decode("utf-8", "replace")
     try: jj = json.loads(o[o.find("{"):]); resp = jj.get("response") or ""; got = json.loads(resp[resp.find("{"):resp.rfind("}") + 1])["items"]

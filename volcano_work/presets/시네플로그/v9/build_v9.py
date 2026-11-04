@@ -38,12 +38,13 @@ def gate(*a):
 WN = json.load(open("windows.json", encoding="utf-8"))
 os.makedirs(CLIPS, exist_ok=True)
 Y0, HH, X0, WWD = CFG.get("burn", [560, 220, 360, 1200])   # 박힌 자막 자리(burn_detect 와 같은 판정) — 804 높이 영화 기본, 1080 꽉 찬 영화는 ep.json burn
+BHI, BLO = CFG.get("burn_thr", [225, 50])   # ★10-29 32 잭 리처2: TV 녹화본 자막은 흰색 228·테두리 회색이라 225/50 으로 못 잡음 → ep.json "burn_thr": [200, 80]
 def score(a):
-    w = a > 225; d = a < 50; nb = np.zeros_like(w)
+    w = a > BHI; d = a < BLO; nb = np.zeros_like(w)
     for dy, dx in ((1, 0), (2, 0), (0, 1), (0, 2), (-1, 0), (0, -1)): nb |= np.roll(np.roll(d, dy, 0), dx, 1)
     return int((w & nb).sum())
 def top(a):
-    r = np.where((a > 225).sum(1) > 4)[0]; return int(Y0 + r.min() * 2) if len(r) else 700
+    r = np.where((a > BHI).sum(1) > 4)[0]; return int(Y0 + r.min() * 2) if len(r) else 700
 FPS8 = 8
 # ★10-17 03 아이 돈 언더스탠드 유 다시: 이탈리아어 구간에만 노란 영어 자막이 박혀 있다(y≈713~742/800) → ep.json "burn_color": "yellow" 면
 #   (R+G)/2 − 0.6B 로 바꿔 노랑만 밝게(흰색 ≈102·노랑 ≈255) 본 뒤 같은 잣대(>225 글자 · <50 테두리)로 찾는다.
@@ -77,7 +78,7 @@ def cut(k):
         ch.append(f"[v{i}][zz{i}]overlay=0:0:enable='between(t,{max(0, a2 - 0.1):.3f},{b2 + 0.1:.3f})'[v{i + 1}]")
     ch.append(f"[v{len(bs)}]" + ("hflip," if flip else "") + vf_fx(k, L))
     subprocess.run(FF + ["-ss", f"{max(s0, 0):.4f}", "-i", SRC, "-frames:v", str(n), "-filter_complex", ";".join(ch), "-map", "[vo]", "-map", "0:a:0",
-                         "-af", (f"atempo={r:.4f}," if not act and r != 1 else "") + f"apad,atrim=0:{L:.5f},afade=t=in:d=0.03,afade=t=out:st={max(0, L - 0.05):.3f}:d=0.05,aresample=48000",
+                         "-af", (f"atempo={r:.4f}," if not act and r != 1 else "") + f"apad,atrim=0:{L:.5f},afade=t=in:d=0.03,afade=t=out:st={max(0, L - w.get('fo', 0.05)):.3f}:d={w.get('fo', 0.05):.3f},aresample=48000",
                          "-c:v", "libx264", "-preset", "veryfast", "-crf", "17", "-c:a", "pcm_s16le", "-ac", "2", "-r", "24000/1001", p + ".tmp.mkv"], check=True)
     os.replace(p + ".tmp.mkv", p)
     return p

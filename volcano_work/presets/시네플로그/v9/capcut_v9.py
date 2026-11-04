@@ -6,7 +6,8 @@
 import copy, json, os, re, shutil, subprocess, time, uuid
 
 ROOT = "D:/다운로드/CapCut Drafts" if os.path.isdir("D:/다운로드/CapCut Drafts") else os.path.expanduser("~/AppData/Local/CapCut/User Data/Projects/com.lveditor.draft").replace("\\", "/")  # D 없는 PC(10-19) → 캡컷 기본 프로젝트 폴더
-NAME = os.environ.get("CC_NAME", "시네플로그07")
+# ★10-27 22 하비: CC_NAME 없이 돌렸더니 기본값 「시네플로그07」(사용자 07 드래프트)을 rmtree 로 지우다 멈춤 → 기본값 없앰, 꼭 CC_NAME=시네플로그NN
+NAME = os.environ.get("CC_NAME") or exit("CC_NAME=시네플로그NN 을 꼭 주세요 (기본값 없음 — 남의 드래프트를 지우지 않게)")
 TPL, TPL_A = [f"{ROOT}/{t}" if os.path.exists(f"{ROOT}/{t}") else os.path.expanduser(f"~/영화롱폼_이식팩/캡컷틀/{t}") for t in ("0826 (2)", "0826 (8)")]  # 0826 (2) 가 캡컷 폴더에서 빠짐(10-04) → 이식팩 사본 · 10-19 D 없는 PC 는 이 PC 초안 0706·1014 사본
 OUT = f"{ROOT}/{NAME}"; MED = f"{OUT}/media"
 FONT = os.path.expanduser(r"~/AppData/Local/Microsoft/Windows/Fonts/Pretendard-Bold.otf").replace("\\", "/")
@@ -115,7 +116,8 @@ def tsec(x):
 for l in open("subs.ass", encoding="utf-8"):
     if not l.startswith("Dialogue"): continue
     f = l.rstrip("\n").split(",", 9); a, b, sty, txt = tsec(f[1]), tsec(f[2]), f[3], re.sub(r"\{[^}]*\}", "", f[9])   # ★10-16 지무비식 자막의 ASS 꾸밈 기호는 빼고 글자만(색·글꼴은 ../capcut_font.py 가 다시 칠함)
-    if sty == "TOP": add_text(top, txt, 0, d.get("duration", BODY), 0.87, 3.2, (0.71, 0.71, 0.71), -0.86, 4, 0)
+    if sty == "TOP":   # 10-21 ep.json "brand": "" (다른 채널에 올릴 편) 이면 로고 글자 없음
+        if txt.strip(): add_text(top, txt, 0, d.get("duration", BODY), 0.87, 3.2, (0.71, 0.71, 0.71), -0.86, 4, 0)
     elif sty == "TAG":   # 10-20 무드킹식 인물 이름표 — ASS \pos(x,y) 자리 그대로(캔버스 -1~1), 노랑
         m_ = re.search(r"\\pos\(([\d.]+),([\d.]+)\)", f[9]); px, py = (float(m_[1]), float(m_[2])) if m_ else (420.0, 640.0)
         if tagt is None: tagt = track("text", "이름표")   # 따로 — capcut_style04 가 「로고」 트랙 꼴(자리)을 덮으므로

@@ -1,0 +1,100 @@
+{
+ "src": "D:/cine_work/ep26_투모로우워/src.mp4",
+ "scenes": "scenes.txt",
+ "words": "src_sm.json",
+ "band": "src_band.npy",
+ "h": 802,
+ "burn": [
+  608,
+  156,
+  300,
+  1320
+ ],
+ "burn_why": "원본에 박힌 한국어 자막(1432x804 레터박스 → crop 1432:598:0:104 → 1920x802, 자막 y≈629~745) → ko_ocr.py 로 srt.txt",
+ "clips": "clips",
+ "title": "투모로우 워",
+ "ctx": "Film 「The Tomorrow War」(2021, Amazon Prime Video original, director Chris McKay). Chris Pratt as Dan Forester, a former Green Beret turned high-school biology teacher; Yvonne Strahovski as Romeo Command (Muri Forester, Dan's grown-up daughter from 2051); Ryan Kiera Armstrong as young Muri; J. K. Simmons as James Forester, Dan's estranged father; Betty Gilpin as Emmy, Dan's wife; Sam Richardson as Charlie, a nervous scientist draftee; Edwin Hodge as Dorian, a veteran on his third tour; Mary Lynn Rajskub as Norah. Soldiers from 2051 arrive during the 2022 World Cup to say humanity is losing a war against alien 'Whitespikes'; civilians are drafted and jumped 30 years into the future for 7-day tours. Dan finds his daughter, she develops a toxin from a captured female alien, the future base falls, Dan returns to 2022, finds the alien ship buried in Russian ice, and with his father and Charlie destroys the aliens before they wake.",
+ "places": [
+  "World Cup stadium",
+  "Forester house",
+  "high school",
+  "draft center",
+  "Miami 2051",
+  "hotel rooftop",
+  "research base on ocean",
+  "Russia ice glacier",
+  "alien ship"
+ ],
+ "who": [
+  "Dan",
+  "Muri",
+  "Emmy",
+  "James",
+  "Charlie",
+  "Dorian",
+  "Norah",
+  "Hart"
+ ],
+ "who_ko": {
+  "Dan": "댄",
+  "Muri": "뮤리",
+  "Emmy": "에미",
+  "James": "제임스",
+  "Charlie": "찰리",
+  "Dorian": "도리안",
+  "Norah": "노라",
+  "Hart": "하트"
+ },
+ "same_place": [],
+ "music": "~/volcano_work/달빛롱폼/bgm/Despair and Triumph.mp3",
+ "fonts": "fonts",
+ "nfont": [
+  "Cafe24 Dangdanghae",
+  "Cafe24Dangdanghae.ttf",
+  0
+ ],
+ "dfont": [
+  "Yeonil_TM",
+  "Yeonil_TM.ttf",
+  0
+ ],
+ "capstyle": "jimovie",
+ "emph": "emph.json",
+ "max_piece": 3.0,
+ "max_piece_why": "10-28 아마존 영화 3초(시네플로그 기본·소유권 주장 안전)",
+ "quiet": [],
+ "srclen": 8274.013,
+ "flow_ok": {
+  "S26 우린 전쟁을 치르고 있": "경기장 = 거실 TV 중계, 바로 앞 나레가 경기장 등장 설명(10-28)",
+  "S102 여러분이 지금 하는 희": "징병 센터 연설 + 집 앞 에미·뮤리 교차 편집, 앞 나레 「징병 센터에는」(10-28)",
+  "S159 불에 타는 자동차, 스": "같은 마이애미 구조 작전 — 앞 나레 「쌍안경으로 내려다본 도시」(10-28)",
+  "S204 목표 확인 / 2시 방": "같은 마이애미 철수 작전(지휘실 무전) — 컷 설명 장소 이름만 다름(10-28)",
+  "S223 우리가 여기서 하는 일": "앞 나레 「눈을 떠 보니 바다 위 기지」 다음 같은 기지(10-28)",
+  "S270 A3987.0": "같은 암컷 사냥 동굴 — 컷 설명 장소 이름만 다름(10-28)",
+  "S400 A5937.9": "앞 나레 「공항 로비에서 댄을 기다린 건 에미」 다음 집으로 돌아온 장면(10-28)",
+  "S496 내가 죽는다면": "앞 나레 「우주선 깊숙한 곳에서 도리안」(10-28)",
+  "S531 전 언제든지 그렇게 할": "뉴스 화면 이어짐, 다음 나레 「집으로 달려 나온 어린 뮤리」(10-28)",
+  "S113 댄이에요, 안녕하세요 ": "노라는 뒤에 서 있을 뿐, 마이애미에서 나레로 처음 소개(10-28)"
+ },
+ "cold_ok": {
+  "S21 '난 아무도 하려고 하": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S64 그 작자에겐 / 아무것": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S86 뭐야? 안녕 / 당신 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S168 벽에 박힌 가시들. 연": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S264 서로에게 말을 적게 하": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S298 아빠는 살아남아야 해": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S322 실례해요, 포레스터 대": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S327 그럼 전부 죽일 수 있": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S386 날 두고 가": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S387 그런 말을 해서 미안해": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S391 놈들에게 끌려가는 딸의": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S393 2022년의 아스팔트 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S396 미래와의 연결이 끊긴 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S397 병원에서 살아 돌아온 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S416 다 헛수고라고 했잖아 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S441 독소를 최대한 많이 만": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S471 선체를 뚫고 들어간 우": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S489 찰리, 아버지 / 화이": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)",
+  "S502 아뇨, 아버지는 짐만 ": "앞뒤 나레·대사로 이어짐, 고친 나레가 원인을 채움(10-28)"
+ }
+}

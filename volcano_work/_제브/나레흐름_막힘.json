@@ -1,0 +1,7 @@
+{
+ "state_fields": ["before", "line"],
+ "questions": {
+  "unknown_reference": {"type": "noul", "instructions": "`before` is what a viewer of a drama recap video has heard so far (narration and quoted dialogue, oldest first). `line` is the next narration line. The line mentions a person, place, object or event as if the viewer already knows it, but nothing in `before` introduced it and the line itself does not explain who or what it is, so a viewer would be confused."},
+  "missing_cause": {"type": "noul", "instructions": "`before` is what a viewer of a drama recap video has heard so far (narration and quoted dialogue, oldest first). `line` is the next narration line. The line reports a big event (a death, arrest, punishment, betrayal, confession, breakup, sudden change of mind) whose reason is not given in the line or anywhere in `before`, so a viewer would ask why."}
+ }
+}

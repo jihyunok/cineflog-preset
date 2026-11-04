@@ -20,7 +20,7 @@ except Exception: W = []
 STOP = {"at", "in", "inside", "outside", "on", "the", "a", "an", "of", "s", "other", "location", "during", "day", "night", "visible", "nobody"}
 SAME = CFG.get("same_place", [])
 PLACES = [(p, {w for w in re.findall(r"[a-z]+", p.lower()) if w not in STOP}) for p in CFG.get("places", [])]
-def desc(t): return next((x["desc"] for x in SH if x["s"] <= t < x["e"]), "")
+def desc(t): return next((x.get("desc", "") for x in SH if x["s"] <= t < x["e"]), "")
 def place(t):
     d = desc(t); head = re.split(r"[,·]", d)[0].lower(); ws = {w for w in re.findall(r"[a-z]+", head) if w not in STOP}
     best = max(PLACES, key=lambda p: len(p[1] & ws), default=None)

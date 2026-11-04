@@ -1,0 +1,6 @@
+{
+ "state_fields": ["narration", "dialogue"],
+ "questions": {
+  "contradicts": {"type": "noul", "instructions": "`narration` is one line a drama recap narrator says about a scene. `dialogue` is the speech-recognition transcript (names may be misspelled) of the original drama around that scene. The narration states a fact (who did something, who someone is, a relationship, a reason, a number, an outcome) that the dialogue clearly contradicts. Narration that only describes visible action or mood, or adds information the dialogue simply does not mention, is not a contradiction."}
+ }
+}
