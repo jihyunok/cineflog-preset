@@ -5,17 +5,54 @@
                    ⑥ 원본 3초 간격(구역별) ⑦ 대사 창 가장자리 말 잘림(v9/edges) ⑧ 까만 화면(black_src.npy, 0.75초+) ⑨ 나레↔그림(제브, 있으면)
                    ⑫ 원본 3초(ep.json max_piece) 넘게 이어 쓴 조각(대사 창 포함, 10-14 소유권 주장) ⑬ ep.json min_total 아래(10-20부터 기본 없음)
                    ⑭ 첫 사건({"event": True} 줄)이 완성본 3분 안 ⑮ 앞 5분에 나레 없이 대사만 5줄 넘게(10-20 앞 3분 이탈 50%+)
+                   ⑯ 훅 첫 10초 사람 확인(hook_check.json — prep/hookcheck.py 시트를 보고 조각마다 본 것·ok, 나레가 말한 장면 key_scene_shown)
+                   ⑰ 반전 조각 글자 검사(text_scan.json — prep/textflip.py · 검사 안 된 반전 조각 · 글자 구간과 겹치는 반전 조각)
  final(굽기 직전): ⑩ 나레 자막 ↔ 목소리(subcheck4 잣대: 자막 빠름·늦음 0.4초, 목소리에 자막 빔 0.6초) ⑪ 자막 두 줄 겹침
 사용: python gate.py pre  /  python gate.py final subs.ass narr_track.wav
-예외: gate_allow.json ["검사 문구 일부", …] — 눈으로 확인한 가짜만, 이유를 SESSION-LOG 에 남긴다."""
-import json, os, re, subprocess, sys
+예외: gate_allow.json — 눈으로 확인한 가짜만, 이유를 SESSION-LOG 에 남긴다.
+  ["검사 문구 일부", …](옛 꼴) 또는 {"검사 문구 일부": "이유" | {"seen": "그 시각 프레임에 보이는 것", …}}
+  ★11-07 (33 콜래트럴: ⑨ 38조각을 같은 문구 「눈으로 봄」으로 일괄 허용 · 확인 시트는 IndexError 로 실패해 있었음)
+   - ⑧⑨⑰(그림 검사)는 {"seen": 12자+} 만 허용 — 문자열·옛 꼴은 거절 「(허용 거절: 본 것 없음)」
+   - 같은 이유 글이 2건 이상 되풀이되면 그 건 전부 거절
+   - ⑨ 는 _npsheet_ok.json(prep/npsheet.py 가 시트를 다 만든 뒤 씀)의 win_sig 가 지금 windows.json 과 같고 그 조각 id 가 ids 에 있어야 — 아니면 ⑨ 허용 0
+   - ⑯ 과 ⑰ 「없음·검사 안 됨」은 허용 안 됨(도구를 돌리고 사람이 채울 것) — ⑰ 「글자 조각 반전」만 조각마다 seen 으로 허용"""
+import hashlib, json, os, re, subprocess, sys
+from collections import Counter
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, "..", "gemini_tts"))
+import hooksig as HS
 MODE = sys.argv[1]
-ALLOW = json.load(open("gate_allow.json", encoding="utf-8")) if os.path.exists("gate_allow.json") else []
+_RAW = json.load(open("gate_allow.json", encoding="utf-8")) if os.path.exists("gate_allow.json") else []
+ALLOW = {str(a): "" for a in _RAW} if isinstance(_RAW, list) else dict(_RAW)
+def _why(v): return (v.get("seen") or "").strip() if isinstance(v, dict) else str(v or "").strip()
+_NW = Counter(_why(v) for v in ALLOW.values() if _why(v))
+DUPW = {t for t, n in _NW.items() if n >= 2}          # ★11-07 같은 문구 되풀이 = 보지 않고 쓴 것 → 전부 거절
+for t in DUPW: print(f"  허용 거절: 같은 문구 {_NW[t]}건 반복 — 「{t[:60]}」")
+def _sha1(p): return hashlib.sha1(open(p, "rb").read()).hexdigest() if os.path.exists(p) else None
+_NPOK = json.load(open("_npsheet_ok.json", encoding="utf-8")) if os.path.exists("_npsheet_ok.json") else {}
+NP_IDS = set(_NPOK.get("ids") or []) if _NPOK.get("win_sig") and _NPOK["win_sig"] == _sha1("windows.json") else None
+VIS = ("⑧", "⑨", "⑰")
+_said = set()
+def _ok(v, what):
+    t = _why(v)
+    if what.startswith(VIS) and (not isinstance(v, dict) or len(t) < 12): return "본 것 없음"
+    if t in DUPW: return "같은 문구 반복"
+    if what.startswith("⑨"):
+        if NP_IDS is None:
+            if "np" not in _said: _said.add("np"); print("  허용 거절: 확인 시트 없음/낡음 — ⑨ 허용 0")
+            return "확인 시트 없음/낡음"
+        m = re.search(r"n\d{3}_w\d+_-?\d+\.\d", what)
+        if not m or m.group(0) not in NP_IDS: return "확인 시트에 없는 조각"
+    return None
 bad = []
-def fail(what):
-    if any(a in what for a in ALLOW): print("  (허용)", what); return
+def fail(what, allow=True):
+    why = []
+    for a, v in (ALLOW.items() if allow else ()):
+        if not a or a not in what: continue
+        r = _ok(v, what)
+        if r is None: print("  (허용)", what, "—", _why(v)[:60]); return
+        why.append(r)
+    if why: print(f"  (허용 거절: {why[0]})", what)
     bad.append(what)
 def mm(t): return f"{int(t // 60)}:{t % 60:04.1f}"
 
@@ -97,6 +134,33 @@ if MODE == "pre":
             j = json.loads(l); a = j["answers"]
             if a["contradicts"] >= 0.6 and a["shows_narrated"] < 0.3: fail(f"⑨ 나레↔그림 어긋남 {j['id']} (어긋남 {a['contradicts']:.2f}, 맞음 {a['shows_narrated']:.2f})")
     else: print("  ⑨ 나레↔그림 판정 파일 없음(jev_np_out.jsonl) — narr_pic.py 먼저")
+    # ⑯ 훅 첫 10초 사람 확인 (★11-07 33 콜래트럴: 훅 「택시 위로 남자가 떨어집니다」에 택시도 추락도 안 나옴) — 허용 안 됨
+    HW = HS.hook_windows(WN)
+    if CFG.get("shorts") or not (any(w.get("z") == "hook" for w in WN) or any(q["t"] < HS.HOOK_SEC for q in PL)): pass
+    elif not os.path.exists("hook_check.json"): fail("⑯ hook_check.json 없음 — prep/hookcheck.py 로 앞 10초 시트를 만들고 눈으로 보고 채울 것", False)
+    else:
+        HC = json.load(open("hook_check.json", encoding="utf-8")); P16 = HC.get("pieces") or []
+        if HC.get("win_sig") != HS.sig(WN): fail("⑯ hook_check.json 낡음(앞 10초 조각이 바뀜) — prep/hookcheck.py 다시 · 다시 보고 채울 것", False)
+        else:
+            if len(P16) != len(HW): fail(f"⑯ hook_check.json 조각 {len(P16)}개 ≠ 앞 10초 조각 {len(HW)}개 — prep/hookcheck.py 다시", False)
+            for p in P16:
+                sn = (p.get("seen") or "").strip()
+                if len(sn) < 8: fail(f"⑯ 훅 조각 w{p.get('w')} {mm(p.get('a', 0))} 본 것 안 적음(8자+)", False)
+                elif p.get("ok") is not True: fail(f"⑯ 훅 조각 w{p.get('w')} {mm(p.get('a', 0))} ok 아님 「{sn[:30]}」", False)
+            for t, n in Counter((p.get("seen") or "").strip() for p in P16 if (p.get("seen") or "").strip()).items():
+                if n >= 2: fail(f"⑯ 훅 본 것 같은 문구 {n}건 반복 「{t[:30]}」 — 조각마다 그 프레임에 보이는 것을 따로", False)
+            if HC.get("key_scene_shown") is not True: fail(f"⑯ 나레가 말한 장면이 앞 10초에 안 나옴/확인 안 함(key_scene_shown) 「{(HC.get('key_scene') or '')[:30]}」", False)
+    # ⑰ 반전 조각 글자 검사 (★11-07 33 콜래트럴: 택시 지붕 「IXAT」 등 글자 컷 7곳 반전) — text_scan.json(prep/textflip.py)
+    FL = [w for w in WN if not w.get("noflip")]
+    if not os.path.exists("text_scan.json"): fail("⑰ text_scan.json 없음 — prep/textflip.py 로 글자 조각 검사", False)
+    else:
+        TS = json.load(open("text_scan.json", encoding="utf-8")); SC = [(float(r[0]), float(r[1])) for r in TS.get("scanned", [])]
+        TX = [(float(r[0]), float(r[1]), str(r[2]) if len(r) > 2 else "") for r in TS.get("text", []) + TS.get("manual", [])]
+        un = [w for w in FL if not any(a - 0.3 <= s0(w) + slen(w) / 2 <= b + 0.3 for a, b in SC)]
+        if un: fail(f"⑰ 반전 조각 {len(un)}개 글자 검사 안 됨(화면 {', '.join(mm(w['a']) for w in un[:5])}{' …' if len(un) > 5 else ''}) — prep/textflip.py 다시", False)
+        for w in FL:
+            hit = [x for x in TX if s0(w) < x[1] and s0(w) + slen(w) > x[0]]
+            if hit: fail(f"⑰ 글자 조각 반전 {mm(w['a'])} 원본 {mm(s0(w))} 「{hit[0][2][:30]}」 — noflip(plan_v9 다시)")
 else:
     ASS, V = sys.argv[2], sys.argv[3]
     b = subprocess.run(["ffmpeg", "-v", "error", "-i", V, "-ac", "1", "-ar", "16000", "-f", "f32le", "-"], capture_output=True).stdout

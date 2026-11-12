@@ -18,11 +18,13 @@ for a, b in gaps:
 src = open("script.py", encoding="utf-8").read(); lines = src.splitlines(keepends=True)
 SE = [n.value for n in ast.parse(src).body if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", "") == "S"][0].elts
 ns = {}; exec(src, ns); S = ns["S"]
+def _flat(r):   # ★11-07 문장 구간(sent) 꼴: [(a,b), [(a,b),(a,b)], …] → (a,b) 목록
+    return [q for e in r for q in (e if isinstance(e[0], (list, tuple)) else [e])]
 zone = None; tk = []
 for k, x in enumerate(S):
     if x[0] == "ZONE": zone = x[1]; continue
     if zone != "main": continue
-    if x[0] == "N": t = x[2][0][0] if isinstance(x[2], (list, tuple)) else x[2]
+    if x[0] == "N": t = _flat(x[2])[0][0] if isinstance(x[2], (list, tuple)) else x[2]   # ★11-07 sent 꼴도
     elif x[0] == "D": t = min(L[i]["ws"] for i in x[1])
     elif x[0] == "A": t = x[1]
     else: continue

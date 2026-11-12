@@ -21,9 +21,11 @@ CFG = json.load(open("ep.json", encoding="utf-8"))
 TITLE = sys.argv[sys.argv.index("--title") + 1] if "--title" in sys.argv else CFG.get("title_ko", CFG.get("title", ""))
 ns = {}; exec(open("script.py", encoding="utf-8").read(), ns); S = ns["S"]
 SH = json.load(open("shots.json", encoding="utf-8")); L = {x["id"]: x for x in json.load(open("lines.json", encoding="utf-8"))}
+def _flat(r):   # ★11-07 문장 구간(sent) 꼴: [(a,b), [(a,b),(a,b)], …] → (a,b) 목록
+    return [q for e in r for q in (e if isinstance(e[0], (list, tuple)) else [e])]
 def desc(t): return next((x.get("desc", "") for x in SH if x["s"] <= t < x["e"]), "")
 def src0(x):
-    if x[0] == "N": return (x[2][0][0] if isinstance(x[2], list) else x[2])
+    if x[0] == "N": return (_flat(x[2])[0][0] if isinstance(x[2], (list, tuple)) else x[2])   # ★11-07 sent 꼴도
     if x[0] == "D": ids = x[1] if isinstance(x[1], list) else [x[1]]; return L[ids[0]]["ws"]
     if x[0] == "A": return x[1]
 def short(d): return re.sub(r"\s+", " ", d)[:110]

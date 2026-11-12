@@ -84,6 +84,25 @@ def asr_sm(mp3, lang="ko"):
     t = json.loads(get(f"{API}/jobs/{jid}/transcript?format=json-v2"))
     return [{"word": (it.get("alternatives") or [{}])[0].get("content", ""), "start": it["start_time"], "end": it["end_time"]} for it in t.get("results", []) if it["type"] == "word"]
 
+def asr_local(wav, lang="ko"):
+    """10-23 Speechmatics 403 대신 — 이 PC 캐시 faster-whisper(large-v3-turbo int8 CPU) 낱말 시각 [{word,start,end}] (문장부호 빼고)"""
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    from faster_whisper import WhisperModel
+    m = WhisperModel("mobiuslabsgmbh/faster-whisper-large-v3-turbo", device="cpu", compute_type="int8", cpu_threads=int(os.environ.get("WSM_THREADS", "6")))
+    segs, _ = m.transcribe(wav, language=lang, word_timestamps=True, vad_filter=False, beam_size=5, condition_on_previous_text=False)
+    out = []
+    for sg in segs:
+        for w in sg.words or []:
+            t = re.sub(r"[^0-9A-Za-z가-힣]", "", w.word)
+            if t: out.append({"word": t, "start": round(w.start, 3), "end": round(w.end, 3)})
+    return out
+
+def _sm_or_local(mp3, wav):
+    try: return asr_sm(mp3)
+    except SystemExit as e:
+        if "403" not in str(e): raise
+        return asr_local(wav)
+
 def words_of(wav, how):
     """배치 wav 전체 낱말 시각(캐시 <wav>_words_<how>.json)"""
     cj = wav[:-4] + f"_words_{how}.json"
@@ -92,7 +111,11 @@ def words_of(wav, how):
     if how == "sm":
         mp3 = wav[:-4] + "_sm.mp3"
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", wav, "-ac", "1", "-ar", "16000", "-b:a", "64k", mp3], check=True)
-        allw = asr_sm(mp3); os.remove(mp3)
+        try: allw = asr_sm(mp3)
+        except SystemExit as e:                # 10-23 키 403(한도) → 로컬 받아쓰기로
+            if "403" not in str(e): raise
+            print("  Speechmatics 403 → 로컬 faster-whisper", flush=True); allw = asr_local(wav)
+        os.remove(mp3)
     else:                                   # Groq 는 긴 파일 뒤쪽이 꼬여 약 50초 토막으로(b007)
         gp = gaps(env_db(load16(wav)), mind=0.18); cuts = [0.0]
         while D - cuts[-1] > 70:
@@ -211,7 +234,7 @@ def frag_ok(p, text, why):
     이웃 문장 토막이면 받아쓴 첫 낱말이 대본 첫 낱말과 다르고 둘째 낱말이 대본 첫 낱말이 된다(16 핀치 「고 로봇은…」)."""
     m = p[:-4] + "_chk.mp3"
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", p, "-ac", "1", "-ar", "16000", "-b:a", "64k", m], check=True)
-    ws = [norm(w["word"]) for w in (asr_groq(m) if os.path.exists(os.path.expanduser("~/.volcano/keys/groq")) else asr_sm(m))]; os.remove(m)  # Groq 열쇠 없는 PC(10-19) → Speechmatics; ws = [w for w in ws if w]
+    ws = [norm(w["word"]) for w in (asr_groq(m) if os.path.exists(os.path.expanduser("~/.volcano/keys/groq")) else _sm_or_local(m, p))]; os.remove(m)  # Groq 열쇠 없는 PC(10-19) → Speechmatics; ws = [w for w in ws if w]
     t = [norm(x) for x in text.split()]; t = [x for x in t if x]
     if not ws or not t: return why
     keep = []
@@ -235,7 +258,7 @@ if __name__ == "__main__":
     db = env_db(load16(wav)); W = words_of(wav, HOW)
     segs, Wn, log = split(wav, texts, W, db); os.makedirs(OUT, exist_ok=True)
     for ni, c0, c1, rule in log:
-        if rule != "R3": print(f"  경계 n{ni:03d}| {c0} → {c1} {rule}")   # 11-01 c0 가 글자일 때가 있어 :.2f 가 죽음(가면의 여왕 b03)
+        if rule != "R3": print(f"  경계 n{ni:03d}| {c0} → {c1} {rule}" if isinstance(c0, str) or isinstance(c1, str) else f"  경계 n{ni:03d}| {c0:.2f} → {c1:.2f} {rule}")   # 10-24 c0 이 글자(못 찾음)면 그대로 찍음
     bad = []; gp = gaps(db)
     for q in range(len(segs) - 1):            # 마지막 경계를 규칙으로 다시 재 봄 — 옮길 데가 남았으면(앞으로만 밀기 등) 실패. 16 핀치 옛 경계 97곳 중 문제 55곳을 이걸로 잡음
         e = segs[q][1]; c, r = refine(e, db, gp, texts[q + 1][1])

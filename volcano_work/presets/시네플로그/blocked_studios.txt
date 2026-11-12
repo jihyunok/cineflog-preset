@@ -21,12 +21,14 @@ Sony Pictures / Columbia / TriStar / Screen Gems / Sony Pictures Classics / Stag
 넷플릭스 외화는 N 오리지널만 — 그 밖의 넷플 공개작은 원래 배급사로 판단
 쿠팡플레이 / 티빙 / 웨이브 / 왓챠 오리지널
 방송사 JTBC / KBS / MBC / SBS
+KT 계열 ENA / 지니TV 오리지널 / KT스튜디오지니 제작 드라마 (11-05 사용자 「KT꺼는 빼자」)
+CJ ENM 계열 (tvN·OCN·Mnet·티빙·스튜디오드래곤 제작 포함) / 카카오엔터테인먼트 (카카오TV·카카오엔터 제작 드라마) (11-06 사용자 「CJ ENM 카카오엔터테인먼트 추가해」)
 [장르]
 음악 영화 / 뮤지컬 / 애니메이션(스톱모션 포함)
 50~70년 넘은 옛 흑백 영화
 [조심 — 하면 수정이 한두 번 걸림, 고를 땐 뒤로]
 디즈니 극장 실사(디즈니 코리아·Touchstone·Buena Vista) — OTT(디즈니+ 오리지널)는 괜찮음
-라이온스게이트 / Summit / 유니버설 / Focus Features / 애플TV / tvN·OCN·MBN·채널A·TV조선
+라이온스게이트 / Summit / 유니버설 / Focus Features / 애플TV / MBN·채널A·TV조선 (tvN·OCN 은 11-06 CJ ENM 금지로 옮김)
 「○○ 코리아」 국내 지사가 있는 배급사 전부
 [작품]
 쇼생크 탈출 (The Shawshank Redemption, 1994)
@@ -74,3 +76,11 @@ Sony Pictures / Columbia / TriStar / Screen Gems / Sony Pictures Classics / Stag
 패신저스 (Passengers, 2016)
 터미네이터 2 (Terminator 2, 1991)
 아논 (Anon, 2018)
+# 11-12 재검사 줄2: 레드 원 — 미국·캐나다는 아마존 MGM, 한국 포함 해외 극장 배급은 워너브라더스(워너브러더스 코리아). 10-29 에 30편으로 만들었으나(막힌 목록 11-02 전) 올리지 않음.
+레드 원 (Red One, 2024)
+# 11-12 다른 PC(movie-review-master) 금지 작품 합침 — 11-05 KT(ENA·지니TV) 드라마 등 (회사 줄은 [플랫폼], 조심 줄은 위로 옮김)
+남남 (Not Others, 2023)
+유괴의 날 (The Kidnapping Day, 2023)
+신병 (New Recruit, 2022)
+행복배틀 (Battle for Happiness, 2023)
+마당이 있는 집 (The Lady in Dignity, 2023)

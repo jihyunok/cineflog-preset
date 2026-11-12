@@ -98,20 +98,38 @@ def dlg(W):
     print("대사 자막", sum(1 for i in range(len(D)) if N.get(str(i))), "/", len(D))
 
 
-def tts(W, only=None):
-    """VOICEVOX → W_ja/narr/nNNN.wav(1부터) → 자리에 맞춤 bNNN.wav. 넘치면 tr(더 짧게) 다시 → 다시 읽기 (최대 3번)."""
+def tts(W, mode=None):
+    """VOICEVOX → W_ja/narr/nNNN.wav(1부터) → 자리에 맞춤 bNNN.wav. 넘치면 tr(더 짧게) 다시 → 다시 읽기 (최대 3번).
+    mode="noagy": 11-12 agy 금지(구글 계정 정지 위험) — tr 다시 부르지 않고 한 번만 읽어 맞추고 넘친 줄만 알린다.
+      줄이기는 클로드가 W_ja/narr_new.json 을 직접 고친 뒤 다시 돌린다(글이 같은 줄은 다시 읽지 않음)."""
     Wj = J(W); B = R.blocks(W); N = json.load(open(os.path.join(Wj, "narr_new.json"), encoding="utf-8"))
     def one(i):
         p = os.path.join(Wj, f"narr/n{i+1:03d}.wav"); js = p + ".txt"
         if os.path.exists(js) and open(js, encoding="utf-8").read() == N[str(i)]: return
         vv.synth(N[str(i)], VID, SPEED, PITCH, out=p); open(js, "w", encoding="utf-8").write(N[str(i)])
-    for rnd, k in enumerate((None, 0.85, 0.7)):
+    for rnd, k in enumerate((None,) if mode == "noagy" else (None, 0.85, 0.7)):
         if k: tr(W, only=over, k=k); N = json.load(open(os.path.join(Wj, "narr_new.json"), encoding="utf-8"))
         with ThreadPoolExecutor(3) as ex: list(ex.map(one, range(len(B))))
         R.fit(Wj)
         F = json.load(open(os.path.join(Wj, "tts_fit.json"))); over = [i for i, d, room in F if d > room + 0.3]
         print("넘침", len(over), over[:20], flush=True)
         if not over: break
+
+
+def unlap(W, gap=0.06):
+    """11-12 재혼황후: 덩어리 사이 틈이 거의 없는 영상(나레가 처음부터 끝까지 쉬지 않음)은 자리(길이 + PAD×2) 때문에
+    앞 녹음 끝이 다음 녹음 처음과 0.3초까지 겹쳤다(28곳). → 겹치는 bNNN.wav 만 조금 더 빠르게(최대 1.08배) 해서
+    다음 녹음 시작 gap 초 전에 끝나게. tts_fit.json 길이도 고친다(subs·mix 가 씀). tts(fit) 를 다시 돌리면 그 뒤에 다시 돌린다."""
+    Wj = J(W); B = R.blocks(W); fp = os.path.join(Wj, "tts_fit.json"); F = json.load(open(fp)); fixed = []
+    for i in range(len(B) - 1):
+        a0, n0 = max(0, B[i][0] - 0.05), max(0, B[i + 1][0] - 0.05)
+        p = os.path.join(Wj, f"narr/b{i:03d}.wav"); d = R.dur(p); lim = n0 - a0 - gap
+        if d > lim + 0.005:
+            sp = min(d / lim, 1.08); tmp = p + ".u.wav"
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", p, "-af", f"atempo={sp:.4f}", "-ar", "48000", "-ac", "2", tmp], check=True)
+            os.replace(tmp, p); F[i] = [i, round(R.dur(p), 2), F[i][2]]; fixed.append((i, round(sp, 3)))
+    json.dump(F, open(fp, "w"))
+    print("겹침 풀기", len(fixed), fixed)
 
 
 def cut(t, n=20):
@@ -157,22 +175,49 @@ def subs(W, y=660, size=58):
 
 
 def vf(W):
+    """11-12 재혼황후(아랍어 요약 채널): 박힌 자막·로고가 없고 인물 이름표만 잠깐 뜨는 영상 → crop_ja.txt·zoom_args.txt 둘 다 없으면 확대 안 함.
+    W_ja/blur_ja.json [[시작, 끝, x, y, w, h], ...](1280x720 기준) 이 있으면 그 시간에만 그 네모를 흐리게 덮는다(이름표·구독 막대 가리기).
+    7번째 칸이 "black" 이면 흐리기 대신 검은 네모(검은 바탕 끝 인사 글자 「سلام」 같은 것)."""
     Wj = J(W); cj = os.path.join(Wj, "crop_ja.txt")      # 11-01 가면의 여왕·우영우: 대사 자막(그림 안 두 줄)이 확대 아래쪽에 걸림 → 일본어판만 더 좁게
-    cr = open(cj if os.path.exists(cj) else os.path.join(W, "zoom_args.txt"), encoding="utf-8").read().split()[0]
+    za = os.path.join(W, "zoom_args.txt")
+    cr = open(cj if os.path.exists(cj) else za, encoding="utf-8").read().split()[0] if (os.path.exists(cj) or os.path.exists(za)) else None
     esc = lambda p: p.replace("\\", "/").replace(":", "\\:")
-    open(os.path.join(Wj, "vf.txt"), "w", encoding="utf-8").write(f"crop={cr},scale=1280:720,setsar=1,subtitles='{esc(os.path.join(Wj, 'narr.ass'))}'")
-    print("vf 전체 확대", cr)
+    head = (f"crop={cr}," if cr else "") + "scale=1280:720,setsar=1"
+    bp = os.path.join(Wj, "blur_ja.json"); BL = json.load(open(bp, encoding="utf-8")) if os.path.exists(bp) else []
+    BK = [r for r in BL if len(r) > 6 and r[6] == "black"]; BL = [r[:6] for r in BL if not (len(r) > 6 and r[6] == "black")]
+    if BK:
+        head += "".join(f",drawbox=x={x}:y={y}:w={w}:h={h}:color=black:t=fill:enable='between(t,{a},{b})'" for a, b, x, y, w, h, _ in BK)
+    if BL:
+        g = [f"{head},split={len(BL) + 1}[v0]" + "".join(f"[c{k}]" for k in range(len(BL)))]
+        for k, (a, b, x, y, w, h) in enumerate(BL):
+            r = max(2, min(24, min(w, h) // 4))
+            g.append(f"[c{k}]crop={w}:{h}:{x}:{y},boxblur={r}:3[k{k}]")
+        for k, (a, b, x, y, w, h) in enumerate(BL):
+            g.append(f"[v{k}][k{k}]overlay={x}:{y}:enable='between(t,{a},{b})'[v{k + 1}]")
+        g.append(f"[v{len(BL)}]subtitles='{esc(os.path.join(Wj, 'narr.ass'))}'")
+        s = ";".join(g)
+    else:
+        s = f"{head},subtitles='{esc(os.path.join(Wj, 'narr.ass'))}'"
+    open(os.path.join(Wj, "vf.txt"), "w", encoding="utf-8").write(s)
+    print("vf", "전체 확대 " + cr if cr else "확대 없음", "· 흐리기", len(BL), "· 검은 네모", len(BK))
 
 
-def mix(W): R.mix(J(W), os.path.join(W, "src720.mp4"), "@" + os.path.join(J(W), "vf.txt"))
+def mix(W):
+    """W_ja/bg_only.json [[a, b], ...] 이 있으면 그 구간도 원음 대신 배경(no_vocals)만 쓴다.
+    11-12 재혼황후: 드라마 소리 없이 아랍어 나레만 있는 영상(배경 −57 LUFS)인데, 받아쓰기 낱말 구간이 끝 인사 꼬리(1800.7초)를 못 덮어 원래 나레가 0.15초 샜다 → [[0, 영상 끝]]."""
+    bp = os.path.join(J(W), "bg_only.json")
+    if os.path.exists(bp):
+        X = json.load(open(bp, encoding="utf-8")); sp0 = R.spans
+        R.spans = lambda w: sp0(w) + [[list(x) for x in X]]
+    R.mix(J(W), os.path.join(W, "src720.mp4"), "@" + os.path.join(J(W), "vf.txt"))
 
 
 def all_(W, nodlg=None):
     setup(W); tr(W)
     if not nodlg: dlg(W)
-    tts(W); subs(W); vf(W); mix(W)
+    tts(W); unlap(W); subs(W); vf(W); mix(W)
 
 
 if __name__ == "__main__":
-    c = sys.argv[1]; f = {"setup": setup, "tr": tr, "dlg": dlg, "tts": tts, "subs": subs, "vf": vf, "mix": mix, "all": all_}[c]
+    c = sys.argv[1]; f = {"setup": setup, "tr": tr, "dlg": dlg, "tts": tts, "unlap": unlap, "subs": subs, "vf": vf, "mix": mix, "all": all_}[c]
     f(*sys.argv[2:])

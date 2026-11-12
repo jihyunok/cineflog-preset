@@ -101,15 +101,19 @@ def make_pack(work, title, tmp):
     fc = open(f"{work}/fc.txt", encoding="utf-8").read()
     cfg = json.load(open(f"{work}/ep.json", encoding="utf-8"))
     video = re.search(r"\[0:v\](.*?)(?:,subtitles=)", fc, re.S).group(1)
-    mus_chain = re.search(r"\[2:a\](.*?)\[mus\]", fc, re.S).group(1)
-    end = float(re.search(r"atrim=0:([\d.]+),alimiter", fc).group(1))
-    music = os.path.expanduser(cfg.get("music", r"~/volcano_work/달빛롱폼/bgm/Healing.mp3"))
+    end = float(re.search(r"atrim=0:([\d.]+),(?:alimiter|volume)", fc).group(1))
+    m_ = re.search(r"\[2:a\](.*?)\[mus\]", fc, re.S)
+    if m_: mus_chain = m_.group(1)
+    else:   # ★11-07 build_v9 새 섞기(고정 이득): 끝 음원을 mix.wav 에 미리 섞어 fc.txt 에 음원 줄이 없다 → build_v9 와 같은 규칙(마지막 나레 1초 앞부터 0.12·앞뒤 2초 페이드)으로 다시
+        PL = json.load(open(f"{work}/narr_place.json", encoding="utf-8")); t_mus = PL[-1]["t"] - 1.0
+        mus_chain = f"aresample=48000,atrim=0:{end - t_mus + 1:.2f},volume=0.12,afade=t=in:d=2,afade=t=out:st={end - t_mus - 2:.2f}:d=2,adelay={int(t_mus * 1000)}|{int(t_mus * 1000)}"
+    music = os.path.expanduser(cfg.get("music") or "")   # ★11-12 「배경음은 넣지마」 — 없으면 무음 입력
     graph = f"[0:v]{video}[v];[2:a]{mus_chain}[mus];[1:a][mus]amix=inputs=2:normalize=0:duration=first,atrim=0:{end:.2f}[a]"
     gf = f"{tmp}/fc_pack.txt"
     open(gf, "w", encoding="utf-8").write(graph)
     v = f"{tmp}/01_영상_자막없음.mp4"
     print("자막 없는 영상 굽기…")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", f"{work}/body.mkv", "-i", f"{work}/org.wav", "-i", music, "-/filter_complex", gf,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", f"{work}/body.mkv", "-i", f"{work}/org.wav", *(["-i", music] if os.path.exists(music) else ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo"]), "-/filter_complex", gf,
                     "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
                     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", v], check=True)
     shutil.copy2(f"{work}/narr_track.wav", f"{tmp}/02_나레이션.wav")
@@ -149,10 +153,12 @@ def main():
     num, kind, title = m.groups()
     name = f"{num}_{title}"
     channel = "무비세상" if kind == "b" else "시네플로그"
+    VER = bool(kind and kind.startswith("v"))
     out = os.path.expanduser("~/volcano_work/시네플로그/완성본") + ("/무비세상" if kind == "b" else "")
     dest = f"{ROOT}/{name}/{channel}"
     if "--pack-only" not in sys.argv:
-        files = [f for f in os.listdir(out) if f.startswith(name) and os.path.isfile(f"{out}/{f}") and not f.endswith("_캡컷")]
+        # ★11-07 다시 만든 판(epNNv2_제목)은 옛 파일을 덮지 않게 「NN_제목_v2…」 파일만, 캡컷편집용도 「제목_캡컷편집용_v2」 로(사용자 「지금다시만들어」 — 옛 완성본 그대로)
+        files = [f for f in os.listdir(out) if (f.startswith(f"{name}_{kind}") if VER else f.startswith(name)) and os.path.isfile(f"{out}/{f}") and not f.endswith("_캡컷")]
         for f in files:
             put(f"{out}/{f}", f"{dest}/{f}")
         if "--no-src" not in sys.argv:
@@ -170,7 +176,7 @@ def main():
     tmp = tempfile.mkdtemp(prefix="_pack_", dir=work)
     make_pack(work, title, tmp)
     for f in sorted(os.listdir(tmp)):
-        put(f"{tmp}/{f}", f"{dest}/{title}_캡컷편집용/{f}", move=True)
+        put(f"{tmp}/{f}", f"{dest}/{title}_캡컷편집용" + (f"_{kind}" if VER else "") + f"/{f}", move=True)
     os.rmdir(tmp)
     print("끝", dest)
 

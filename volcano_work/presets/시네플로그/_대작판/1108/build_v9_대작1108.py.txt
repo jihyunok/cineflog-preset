@@ -1,0 +1,539 @@
+# -*- coding: utf-8 -*-
+"""시네플로그 v9 굽기 — plan_v9.py 가 짠 windows.json · narr_place.json 그대로. 굽기 전에 gate.py 를 꼭 통과해야 한다.
+★10-14 (17 그레이하운드 Apple IPE 영상 소유권 주장 뒤 "그렇게해줘"): 모든 조각 좌우반전(noflip 빼고) · 확대 1.12배(noflip 은 1.2배) · 색조·선명도 한 단계 세게 ·
+  액션 조각 = 영상만 1.05배속 · 대사 창 = drate.py 가 적은 rate(≤1.05)·pre 로 영상·소리 같이 배속(입 모양 맞음, 낱말 안 잘림) · 박힌 자막이 떠 있는 동안만 그 줄 위까지 확대 ·
+  (옛 v9: 대사 창은 반전·배속 없이 1.0배·확대 1.05배 → 대사 창이 63% 인 17편이 걸림)
+★10-14 v11: v10 도 소유권 주장 그대로 → 대사 창은 화면 3초 안(plan_v9 가 처음부터 rate 1.05·pre 0 으로 짬, drate.py 안 씀) · 넘는 대사는 나레로. gate ⑫ 가 3초 넘는 조각을 막는다.
+색조 eq 전부 · 자막(나레 경기천년제목 100 · 대사 나다스탈리크 104, 그림 안 아래 MarginV 165) · 원본 -17 LUFS 이득, 나레 밑 0.2 · 끝 음원은 아웃트로 밑에만(10-14 끝 검은 화면 뺌) · 최종 -16 LUFS.
+사용: python build_v9.py cut    (gate pre 통과 뒤 조각 자르기 → body.mkv)
+      python build_v9.py        (자막·소리 → gate final → final.mp4)
+      python build_v9.py subs   (자막만 다시)"""
+import json, math, os, re, subprocess, sys
+import numpy as np
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
+FF = ["ffmpeg", "-v", "error", "-y"]
+CFG = json.load(open("ep.json", encoding="utf-8"))
+SRC = CFG["src"]; FPS = CFG.get("fps", 24000 / 1001); SH = CFG.get("h", 804)       # 원본 그림 높이
+W, H = 1920, 1080; BAR = (H - SH) // 2; SPD = 1.05
+# ★10-22 사용자 "앞으로 영상에 자막이 있으면 세로로 꽉채우고 양 옆으로 잘라줘"(05 다크타워: 박힌 자막 가리려 1.2~1.3배 확대 → 위아래 잘림·검은 띠 지적)
+#   원본에 자막이 박혀 있으면(ep.json "burn" 있음, 또는 "fill": true) 조각마다 위는 그대로 두고 높이를 꽉 채워 16:9 로 — 양옆만 잘림.
+#   자막이 보이는 조각은 자막 윗줄 바로 위까지만 써서(아래만 조금 덜어 냄) 자막을 빼고, 없으면 그림 높이 전부. 기본 확대 1.12·자막 확대 덮기는 안 씀.
+# ★★10-22 텔레그램(06 허큘리스 A판 "왜 이것도 잘렸어?" → "이번거는 그냥 두고 다음부터는 풀로 채워서 만들어.") → 박힌 자막이 없어도 기본 FILL(세로 꽉·양옆 자르기). 옛 꼴은 ep.json "fill": false.
+FILL = CFG.get("fill", True)
+OH = H if FILL else SH
+if FILL: BAR = 0
+EQ = "eq=saturation=1.25:contrast=1.08:brightness=0.015:gamma=1.02,hue=h=6"          # 10-14 한 단계 세게(옛 1.12·1.05·0.01·4)
+ZOOM, ZOOM_NF, SHARP = CFG.get("zoom", 1.12), max(1.2, CFG.get("zoom", 1.12)), 0.85   # ★10-23 ep.json "zoom"(드루와 02: 시청 등급·채널 홍보 딱지가 그림 오른쪽 위 안에 → 양옆 더 잘라 냄)                                                # 10-14 확대 1.05→1.12(반전 못 하는 글자 컷 1.2) · 선명도 0.55→0.85
+FX = CFG.get("fx", False); MOVE, GRAIN = 0.05, 3                                      # ★10-19 사용자 "세 개 다 넣고 견본 보여줘": 조각마다 줌인·줌아웃 번갈아(+5%) · 필름 그레인 → 견본 뒤 "그냥 원래대로 하자" = 기본 끔(ep.json "fx": true 면 켬)
+                                                                                     #   테두리 블러(그림 92% + 둘레 흐리게)는 견본 보고 "테두리 블러는 빼자" · 그레인 6 은 파일 5배(3초 10.3MB) → 3(2.3MB, 없을 때 1.9MB)
+def vf_fx(k, L):
+    if not FX: return f"pad={W}:{H}:0:{BAR}:black,format=yuv420p[vo]"
+    z = f"(1+{MOVE}*t/{L:.3f})" if k % 2 == 0 else f"(1+{MOVE}*(1-t/{L:.3f}))"
+    return f"scale=w='trunc(1920*{z}/2)*2':h='trunc({OH}*{z}/2)*2':eval=frame,crop=1920:{OH},noise=c0s={GRAIN}:c0f=t,pad={W}:{H}:0:{BAR}:black,format=yuv420p[vo]"
+LT = CFG["logo"][3] + 4 if CFG.get("logo") else 0       # ★10-14 01·02 다시 만들기 "로고는 화면키워" — 원본 로고(AYA 등) 아래끝까지 확대로 잘라 냄(ep.json logo=[x0,y0,x1,y1])
+SRC_H = CFG.get("src_h", SH)   # ★10-23 드루와 02: 원본(1080)이 위아래 검은 띠 + 그림 안 박힌 자막 → "fill": false · h(내보낼 그림 높이) · logo(그림 위끝) · src_h 1080 으로 자막 위까지만 잘라 씀(벤치 무비프라자처럼 위아래 검은 띠)
+def vf_base(z):
+    cw = round(1920 / z / 2) * 2; chh = round(SH / z / 2) * 2; yo = min(SRC_H - chh, max((SH - chh) // 2, LT))
+    xo = min(1920 - cw, CFG["crop_x"]) if "crop_x" in CFG else (1920 - cw) // 2   # ★10-23 ep.json "crop_x"(왼쪽 끝) — 드루와 02 오른쪽 위 방송사 홍보 딱지(x 1670~)를 피해 왼쪽으로 치우쳐 자름
+    return f"crop={cw}:{chh}:{xo}:{yo},scale=1920:{SH}," + EQ
+CLIPS = CFG.get("clips", "clips")
+MODE = sys.argv[1] if len(sys.argv) > 1 else "build"
+FONTS = CFG.get("fonts", "fonts")
+def dur(p): return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", p], capture_output=True, text=True).stdout)
+def gate(*a):
+    r = subprocess.run([sys.executable, os.path.join(HERE, "gate.py"), *a], text=True, encoding="utf-8", errors="replace")
+    if r.returncode != 0: sys.exit("관문에 걸림 — 굽지 않는다(위 목록을 고친 뒤 다시)")
+
+WN = json.load(open("windows.json", encoding="utf-8"))
+os.makedirs(CLIPS, exist_ok=True)
+Y0, HH, X0, WWD = CFG.get("burn", [560, 220, 360, 1200])   # 박힌 자막 자리(burn_detect 와 같은 판정) — 804 높이 영화 기본, 1080 꽉 찬 영화는 ep.json burn
+def score(a):
+    w = a > 225; d = a < 50; nb = np.zeros_like(w)
+    for dy, dx in ((1, 0), (2, 0), (0, 1), (0, 2), (-1, 0), (0, -1)): nb |= np.roll(np.roll(d, dy, 0), dx, 1)
+    return int((w & nb).sum())
+def top(a):
+    r = np.where((a > 225).sum(1) > 4)[0]; return int(Y0 + r.min() * 2) if len(r) else 700
+FPS8 = 8
+# ★10-17 03 아이 돈 언더스탠드 유 다시: 이탈리아어 구간에만 노란 영어 자막이 박혀 있다(y≈713~742/800) → ep.json "burn_color": "yellow" 면
+#   (R+G)/2 − 0.6B 로 바꿔 노랑만 밝게(흰색 ≈102·노랑 ≈255) 본 뒤 같은 잣대(>225 글자 · <50 테두리)로 찾는다.
+YEL = "colorchannelmixer=rr=0.5:rg=0.5:rb=-0.6:gr=0.5:gg=0.5:gb=-0.6:br=0.5:bg=0.5:bb=-0.6," if CFG.get("burn_color") == "yellow" else ""
+def frames(s0, L, R=None):
+    y0, hh, x0, wd = R or (Y0, HH, X0, WWD)
+    b = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{max(s0, 0):.3f}", "-t", f"{L:.3f}", "-i", SRC,
+                        "-vf", f"fps={FPS8},crop={wd}:{hh}:{x0}:{y0},scale={wd//2}:{hh//2},{YEL}format=gray", "-f", "rawvideo", "-"], capture_output=True).stdout
+    return np.frombuffer(b, np.uint8).reshape(-1, hh // 2, wd // 2)
+def burn(s0, L):
+    a = frames(s0, L); sc = [score(x) for x in a]; out = []; i = 0
+    while i < len(sc):
+        if sc[i] > 60:
+            j = i
+            while j < len(sc) and sc[j] > 60: j += 1
+            out.append((i / FPS8, j / FPS8, min(top(a[x]) for x in range(i, j)))); i = j
+        else: i += 1
+    return out
+TOPB = CFG.get("burn_top")   # ★10-23 드루와 02: 박힌 자막이 그림 위쪽(y130~210)에 뜨는 장면이 많음 → ep.json "burn": [130, 130, 360, 1200] + "burn_top": true 면 조각마다 위 띠에서 자막을 찾아 그 아래부터 잘라 씀
+def bot(a):
+    r = np.where((a > 225).sum(1) > 4)[0]; return int(Y0 + r.max() * 2) if len(r) else 0
+def burn_top(s0, L):
+    a = frames(s0, L); hit = [x for x in a if score(x) > 60]
+    yb = max(bot(x) for x in hit) if hit else 0
+    return yb if LT < yb <= LT + 150 else 0
+# ★★10-23 드루와 02 텔레그램 「왜자꾸 띠를 없애라니까 이렇게 만드는거야? 내가 양 옆자르고 풀화면 만들라고 했잖아」 → 방송 원본(위아래 띠·그림 안 박힌 자막·홍보 딱지)도 FILL.
+#   ep.json "fill_box": [x0, y0, x1, y1] = 쓸 수 있는 그림 칸(띠·딱지 밖), "burn_bot": [y0, hh, x0, w] = 아래 박힌 자막 찾는 칸.
+#   조각마다 위 자막(burn_top) 아래 ~ 아래 자막 윗줄 위까지를 16:9 로 잘라 1920x1080 꽉(양옆 잘림, 가로는 x0~x1 안에서 가운데).
+FB, BB = CFG.get("fill_box"), CFG.get("burn_bot")
+#   방송 자막은 흰 글자 + 옅은 그림자(검은 테두리 없음)라 score 로는 못 잡음 → ① 원본 말소리(src_words) 가 조각과 겹치면 자막 있음, ② 흰 글자 가장자리 줄 찾기(txt_top).
+#   자막 있으면 아래끝 = "fill_sub_y1"(기본 820, 두 줄 자막 윗줄 위) 과 찾은 윗줄 −12 중 작은 것.
+import edges as _e0
+FW = _e0.load_words(CFG.get("words", "src_words.json")) if FB else []
+FWS = np.array([w[0] for w in FW]); FWE = np.array([w[1] for w in FW])
+# ★11-03 ep38 사용자 「중간에 원본 자막이 들어가 있어」 — 화면 글자 번역(노란 자막)·말 없는 자막은 말소리·흰 글자 검사로 못 잡음 →
+#   ep.json "burn_srt": 박힌 자막 OCR 목록(srt_ko.txt: 번호	시작	끝	글) 시각과 겹치는 조각도 자막 윗줄 위까지만 자름.
+BSRT = [(float(r.split("	")[1]), float(r.split("	")[2])) for r in open(CFG.get("burn_srt") or CFG.get("fill_srt"), encoding="utf-8") if r.count("	") >= 3] if FB and (CFG.get("burn_srt") or CFG.get("fill_srt")) else []   # 11-02 최진영 PC 편들은 같은 뜻으로 "fill_srt" 를 씀
+def txt_top(x):
+    w = x > 220; e = np.abs(x.astype(np.int16) - np.roll(x, 2, 1).astype(np.int16)) > 60
+    rows = np.where((w & (e | np.roll(e, -2, 1))).sum(1) > 14)[0]
+    if len(rows) < 5: return None
+    runs = np.split(rows, np.where(np.diff(rows) > 3)[0] + 1); runs = [g for g in runs if len(g) >= 5]
+    return int(runs[0][0]) if runs else None
+# ★10-29 드루와 08: 원본 일부 장면만 위아래 띠(와이드) → ep.json "lbox_spans": [[원본a, 원본b, 그림 윗줄y, 아랫줄y], …](detect_lbox.py) 와 겹치면 띠 안쪽만 써서 꽉(「양 옆자르고 풀화면」)
+LBOX = CFG.get("lbox_spans", [])
+def lbox(s0, L): return next(((y0, y1) for a_, b_, y0, y1 in LBOX if a_ < s0 + L and b_ > s0), None)
+def fill_crop(s0, L, yb):
+    yt = max(FB[1], yb + 10) if yb else FB[1]; yl = FB[3]
+    lb = lbox(s0, L)
+    if lb: yt = max(yt, lb[0] + 4); yl = min(yl, lb[1] - 4)
+    sp = bool(len(FW)) and bool(((FWS < s0 + L + 0.3) & (FWE > s0 - 0.8)).any())
+    sp = sp or any(a_ < s0 + L + 0.3 and b_ > s0 - 0.3 for a_, b_ in BSRT)
+    tops = []
+    if BB:
+        for x in frames(s0, L, BB):
+            t = txt_top(x)
+            if t is not None: tops.append(BB[0] + t * 2)
+    if sp or tops: yl = min([yl, CFG.get("fill_sub_y1", 820)] + [t - 12 for t in tops])   # 11-01 ep34: fill_box 아래끝(800)보다 크게 자르면 crop 실패 → fill_box 안으로
+    # ★10-27 드루와 05: 화 첫머리 장면에 박힌 가는 제작진 크레딧·「제N회」는 txt_top 이 못 잡음 → agy 로 찾은 원본 구간 ep.json "text_spans": [[a, b, 윗줄y], …] 와 겹치면 그 위까지만
+    for a_, b_, y_ in CFG.get("text_spans", []):
+        if a_ < s0 + L and b_ > s0: yl = min(yl, y_ - 12)
+    yl = max(yl, yt + CFG.get("fill_min_h", 540)); hc = (yl - yt) // 2 * 2; cw = round(hc * 16 / 9 / 2) * 2   # ★11-02 ep.json "fill_min_h"(기본 540) — 자막 윗줄이 540 근처면(포춘 노란 영어 붙은 세 줄 자막 src y≈535) 최소 높이 540 때문에 윗끝 1~3줄이 남음 → 500 등으로
+    xo = max(FB[0], min((1920 - cw) // 2, FB[2] - cw))
+    return f"crop={cw}:{hc}:{xo}:{yt},scale=1920:{H}:flags=lanczos," + EQ
+def vf_top(yb):
+    lo = LT + round(SH / ZOOM / 2) * 2; yo = yb + 10; chh = round((lo - yo) / 2) * 2; cw = round(chh * 1920 / SH / 2) * 2
+    xo = CFG["crop_x"] + (round(1920 / ZOOM / 2) * 2 - cw) // 2 if "crop_x" in CFG else (1920 - cw) // 2
+    return f"crop={cw}:{chh}:{xo}:{yo},scale=1920:{SH}," + EQ
+def key(w, k): return f"{w['kind']}_{w['s']:.3f}_{w['b'] - w['a']:.3f}_{int(bool(w.get('noflip')))}_{w.get('rate', 0):.4f}_{w.get('pre', 0):.3f}" + (f"_fx{k % 2}_{MOVE}_{GRAIN}" if FX else "") + ("_fill" if FILL else "") + ("_tb" if TOPB else "") + ("_fb" if FB else "") + (lambda lb: f"_lb{lb[0]}_{lb[1]}" if lb else "")(lbox(w["s"] - w.get("pre", 0), (w["b"] - w["a"]) * w.get("rate", SPD if w["kind"] == "A" else 1.0)) if LBOX else None)
+def cut(k): return cut_w(WN[k], k)
+def cut_w(w, k):
+    p = f"{CLIPS}/{key(w, k)}.mkv"
+    if os.path.exists(p): return p
+    f0 = round(w["a"] * FPS); f1 = round(w["b"] * FPS); n = max(1, f1 - f0); L = n / FPS
+    act = w["kind"] == "A"; r = w.get("rate", SPD if act else 1.0); sl = L * r; s0 = w["s"] - w.get("pre", 0)
+    flip = not w.get("noflip")
+    bs = [] if TOPB else burn(s0, sl); yb = burn_top(s0, sl) if TOPB else 0
+    if FILL and FB:
+        ch = ["[0:v]" + (f"setpts=PTS/{r:.4f}," if r != 1 else "") + fill_crop(s0, sl, yb) + "[v0]"]; bs = []
+    elif FILL:
+        tp = [t for _, _, t in bs if t >= SH * 0.8]                       # 그림 아래쪽 5분의 1 안에서 찾은 것만 자막(밝은 장면 헛잡힘은 버림)
+        hc = (max(int(SH * 0.85), min(tp) - 10) if tp else SH) - LT; cw = min(1920, round(hc * 16 / 9 / 2) * 2)
+        ch = ["[0:v]" + (f"setpts=PTS/{r:.4f}," if r != 1 else "") + f"crop={cw}:{hc}:{(1920 - cw) // 2}:{LT},scale=1920:{H}," + EQ + "[v0]"]
+        bs = []
+    else:
+        ch = None
+    if ch is None: ch = ["[0:v]" + (f"setpts=PTS/{r:.4f}," if r != 1 else "") + "split=%d[b]" % (1 + len(bs)) + "".join(f"[z{i}]" for i in range(len(bs))), f"[b]{vf_top(yb) if yb else vf_base(ZOOM if flip else ZOOM_NF)}[v0]"]
+    for i, (a, b, tp) in enumerate(bs):
+        h = max(540, min(SH - 104, tp - 12)) - LT; ww = round(1920 * h / SH / 2) * 2     # 위는 로고 아래부터(LT)
+        a2, b2 = a / r, b / r
+        ch.append(f"[z{i}]crop={ww}:{h}:{(1920 - ww) // 2}:{LT},scale=1920:{SH},{EQ}[zz{i}]")
+        ch.append(f"[v{i}][zz{i}]overlay=0:0:enable='between(t,{max(0, a2 - 0.1):.3f},{b2 + 0.1:.3f})'[v{i + 1}]")
+    ch.append(f"[v{len(bs)}]" + ("hflip," if flip else "") + vf_fx(k, L))
+    subprocess.run(FF + ["-ss", f"{max(s0, 0):.4f}", "-i", SRC, "-frames:v", str(n), "-filter_complex", ";".join(ch), "-map", "[vo]", "-map", "0:a:0",
+                         "-af", (f"atempo={r:.4f}," if not act and r != 1 else "") + f"apad,atrim=0:{L:.5f},afade=t=in:d=0.03,afade=t=out:st={max(0, L - w.get('fo', 0.05)):.3f}:d={w.get('fo', 0.05):.3f},aresample=48000",
+                         "-c:v", "libx264", "-preset", "veryfast", "-crf", os.environ.get("CUT_CRF", "17"), "-c:a", "pcm_s16le", "-ac", "2", "-r", "24000/1001", p + ".tmp.mkv"], check=True)
+    os.replace(p + ".tmp.mkv", p)
+    return p
+if MODE == "cut":
+    gate("pre")
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(int(os.environ.get("CUT_JOBS", 6))) as ex: ps = list(ex.map(cut, range(len(WN))))   # 10-20 메모리 부족(13.9GB PC)으로 멈춤 → CUT_JOBS=3
+    # ★10-23 대작 07 사용자 「앞부분을 좀더 자연스럽게 이어지게 해봐 지금 너무 짜집기 느낌이야」 → ep.json "hook_xfade"(초): 훅 조각끼리 디졸브(영상 xfade·소리 acrossfade).
+    #   조각마다 이음새 쪽으로 반씩(d/2) 원본을 더 잘라 겹치므로 길이·시각은 그대로(나레·자막 자리 안 바뀜). 훅 조각을 hook_xfade.mkv 하나로 바꿔 concat.
+    HX = CFG.get("hook_xfade", 0); hk = [k for k, w in enumerate(WN) if w.get("z") == "hook"]
+    if HX and len(hk) > 1:
+        assert hk == list(range(len(hk))), "훅 조각은 맨 앞에 이어져 있어야 함"
+        hp = []
+        for i, k in enumerate(hk):
+            w = WN[k]; r = w.get("rate", SPD if w["kind"] == "A" else 1.0); e1 = HX / 2 if i else 0.0; e2 = HX / 2 if i < len(hk) - 1 else 0.0
+            hp.append(cut_w(dict(w, a=w["a"] - e1, b=w["b"] + e2, pre=w.get("pre", 0) + e1 * r), k))
+        fcx = []; lv, la = "[0:v]", "[0:a]"
+        for i in range(1, len(hp)):
+            o = WN[hk[i]]["a"] - WN[hk[0]]["a"] - HX / 2
+            fcx.append(f"{lv}[{i}:v]xfade=transition=fade:duration={HX:.3f}:offset={o:.4f}[xv{i}]"); lv = f"[xv{i}]"
+            fcx.append(f"{la}[{i}:a]acrossfade=d={HX:.3f}:c1=qsin:c2=qsin[xa{i}]"); la = f"[xa{i}]"
+        args = sum((["-i", q] for q in hp), [])
+        subprocess.run(FF + args + ["-filter_complex", ";".join(fcx), "-map", lv, "-map", la, "-c:v", "libx264", "-preset", "veryfast", "-crf", os.environ.get("CUT_CRF", "17"),
+                                    "-pix_fmt", "yuv420p", "-c:a", "pcm_s16le", "-ac", "2", "-ar", "48000", "-r", "24000/1001", f"{CLIPS}/hook_xfade.mkv"], check=True)
+        print("훅 디졸브", len(hp), "조각 ·", round(dur(f"{CLIPS}/hook_xfade.mkv"), 3), "초 (계획", round(WN[hk[-1]]["b"] - WN[hk[0]]["a"], 3), ")")
+        ps = [f"{CLIPS}/hook_xfade.mkv"] + ps[len(hk):]
+    open("all.txt", "w", encoding="utf-8").write("".join(f"file '{p}'\n" for p in ps))
+    subprocess.run(FF + ["-f", "concat", "-safe", "0", "-i", "all.txt", "-c", "copy", "body.mkv"], check=True)
+    print("조각", len(ps), "· 몸통", round(dur("body.mkv"), 2), "초 (계획", round(WN[-1]["b"], 2), ")"); sys.exit()
+
+# ── 나레·자막·소리·굽기
+BODY = dur("body.mkv")
+PL = json.load(open("narr_place.json"))
+narr = [(q["ni"], q["t"], dur(f"narr/n{q['ni']:03d}.wav"), f"narr/n{q['ni']:03d}.wav") for q in PL]
+NS = sum(d for _, _, d, _ in narr)
+print("나레", len(narr), "· 합", round(NS), "초 · 비중", round(100 * NS / BODY), "%")
+END = max(BODY, narr[-1][1] + narr[-1][2] + 1.5); OUT = END - BODY      # ★10-14 사용자 "영상 끝나고 10초넘게 시커먼화면이 나오는거확인하고 지워" → 옛 「아웃트로 뒤 음원 15초」(검은 화면) 뺌, 마지막 나레 1.5초 뒤 끝
+NAR = [(t - 0.25, t + d + 0.25) for _, t, d, _ in narr]
+def under(a, b): return any(a < y and b > x for x, y in NAR)
+
+from PIL import ImageFont
+NF = CFG.get("nfont") or ["GyeonggiTitle", "GyeonggiTitleB.ttf", -1]; DF = CFG.get("dfont") or ["Stylish", "Stylish.ttf", -1]   # ★10-16 편마다 자막 글꼴 [ASS 이름, fonts 안 파일, 기울임 -1|0] — 04v2 사용자 "글자체들은 원래프리셋대로해줘"(영화리뷰롱폼 글꼴)
+NSZ = 100; FN = ImageFont.truetype(f"{FONTS}/{NF[1]}", NSZ); MAXW = 1300
+def wid(t): return FN.getlength(t)
+# ★11-05 사용자 「넷플릭스 텍스트 공식 적용해서 만들고 저장하고 커밋해」(드라마 카지노) — 넷플릭스 자막 규칙(모든 채널 공통, 기억 gukbbong-netflix-subtitles):
+#   한 줄 · 16자(영문·공백 0.5) · 초당 12자(최소 5/6초) · 자막에 쉼표·마침표 없음(숫자 2,160 · 말줄임 … 은 둠). ep.json "nf": false 면 끔.
+NFON = CFG.get("nf", True)
+def nf_len(t): return sum(0.5 if c.isascii() else 1 for c in t)
+def nf_clean(t):
+    if not NFON: return t
+    t = re.sub(r"(?<!\d),|,(?!\d)", " ", t); t = re.sub(r"(?<![.…])\.(?![.…])", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+def nf_end(a, b, t): return max(b, a + max(5 / 6, len(t.replace(" ", "")) / 12)) if NFON else b
+def nf_fit(s): return wid(s) <= MAXW and (not NFON or nf_len(s) <= 16)
+def balance(s):
+    if nf_fit(s): return [s]
+    ws = s.split(" "); k = math.ceil(wid(s) / MAXW)
+    while True:
+        tgt = len(s) / k; parts = [""]
+        for w in ws:
+            if parts[-1] and len(parts[-1]) + 1 + len(w) > tgt * 1.15 and len(parts) < k: parts.append(w)
+            else: parts[-1] = (parts[-1] + " " + w).strip()
+        if all(nf_fit(p) for p in parts) or k > 6: break
+        k += 1
+    out = []
+    for p in parts:
+        if out and (len(p.replace(" ", "")) < 5 or len(out[-1].replace(" ", "")) < 5) and wid(out[-1] + " " + p) <= MAXW * 1.1 and (not NFON or nf_len(out[-1] + " " + p) <= 16): out[-1] += " " + p   # 11-05 넷플릭스 16자 — 짧은 꼬리 붙이기도 16자 안에서만
+        else: out.append(p)
+    return out
+def chunks(text, st, en):
+    """문장(. ? ! , 8자+)마다 자막 덩어리, 길면 balance 로 나누고 줄마다 그 줄 첫 글자의 실제 시각"""
+    out = []; cur = ""; c0 = None
+    for i, ch in enumerate(text):
+        if c0 is None:
+            if ch == " ": continue
+            c0 = i
+        cur += ch
+        if ch in ".?!" or (ch == "," and len(cur.strip()) >= 8) or i == len(text) - 1:
+            s = cur.strip().rstrip(".,")
+            if s:
+                parts = balance(s); pos = c0; starts = []
+                for p in parts:
+                    pos = text.find(p, pos); starts.append(pos); pos += len(p)
+                for k, p in enumerate(parts):
+                    a0 = st[starts[k]]; b0 = st[starts[k + 1]] if k + 1 < len(parts) else en[i]
+                    if out and a0 < out[-1][1] + 0.3: a0 = out[-1][1] + 0.3
+                    out.append((nf_clean(p), a0, max(b0, a0 + 0.3)))
+            cur = ""; c0 = None
+    return out
+def voice_on(w):
+    r = subprocess.run(["ffmpeg", "-v", "error", "-i", w, "-ac", "1", "-ar", "16000", "-f", "f32le", "-"], capture_output=True)
+    x = np.frombuffer(r.stdout, np.float32); on = np.sqrt(np.mean(x[:len(x) // 160 * 160].reshape(-1, 160) ** 2, 1)) > 0.02; k = 0
+    while k < len(on):
+        if not on[k]:
+            j = k
+            while j < len(on) and not on[j]: j += 1
+            if j - k < 15 and k > 0: on[k:j] = True
+            k = j
+        else: k += 1
+    return on
+def ts(x):
+    h = int(x // 3600); m = int(x % 3600 // 60); s = x % 60
+    return f"{h}:{m:02d}:{s:05.2f}"
+def tsec(x):
+    h, m, s = x.split(":"); return int(h) * 3600 + int(m) * 60 + float(s)
+ev = []; snapped = 0; evn = []          # evn = 덩어리마다 나레 번호(지무비식 자막이 강조 말을 찾는다)
+for i, t, d, w in narr:
+    al = json.load(open(f"narr/n{i:03d}.json", encoding="utf-8")); cs = chunks("".join(al["chars"]), al["st"], al["en"])
+    on = voice_on(w)
+    for k in range(len(cs)):          # 줄 시작이 무음이면 실제 목소리 시작으로(subcheck4 잣대)
+        s, a, b = cs[k]; f = min(max(int(a * 100), 0), len(on) - 1)
+        if not on[f]:
+            j = f
+            while j < len(on) and not on[j]: j += 1
+            nxt = cs[k + 1][1] if k + 1 < len(cs) else b + 0.25
+            if 0.15 < j / 100 - a and j / 100 < nxt - 0.3: cs[k] = (s, j / 100, max(b, j / 100 + 0.3)); snapped += 1
+    for k, (s, a, b) in enumerate(cs):
+        a2 = t + a; b2 = t + (cs[k + 1][1] if k + 1 < len(cs) else min(b + 0.25, d))
+        ev.append((a2, nf_end(a2, max(b2, a2 + 0.3), s), s)); evn.append(i)   # 11-05 넷플릭스 12cps — 겹치면 아래 겹침 정리가 다음 줄 앞에서 끊음
+print("목소리 시작에 맞춘 나레 자막 줄", snapped)
+
+# ★10-16 04v2 지무비식 자막(ep.json "capstyle": "jimovie") — 사용자 "글자가 내가새로준 지침에 보면 큰글자도있고 색깔있는글자도 있고 다양한데 넌 그걸안지켰네?"
+#   영화리뷰롱폼 엔진(presets/시네플로그롱폼 builders/text_layout·caption_stream)의 꼴: 일반 나레 = 흰 카페24당당해 작게(사장님 b29 58px),
+#   핵심 말이 든 나레 = 줄 전체 디스플레이(잉크 118, 흰 부분 본명조) + 그 말만 감정 글꼴·색(TONE_FONT), 짧은 결정타 = 펀치(잉크 158),
+#   대사 = 광화문(잉크 54), 핵심 대사 몇 줄 = 줄 전체 노랑 크게. 강조할 말·감정은 작업 폴더 emph.json(나레 번호 → [말, 감정]).
+JM = CFG.get("capstyle") == "jimovie"
+from jm_style import JM_FONTS, JM_TONE, JM_GRAD, JM_INK, JM_W   # 글꼴·감정·색·크기 표는 jm_style.py 한 곳(캡컷 capcut_font.py 도 읽는다)
+def jm_c(rgb): return "&H00%02X%02X%02X&" % (rgb[2], rgb[1], rgb[0])
+def jm_fs(key, ink): return round(ink * 100 / JM_FONTS[key][2])
+_jm_pil = {}
+def jm_w(key, size, t):
+    k = (key, size)
+    if k not in _jm_pil: _jm_pil[k] = ImageFont.truetype(f"{FONTS}/{JM_FONTS[key][0]}", size)
+    return _jm_pil[k].getlength(t)
+JM_POP = r"{\fscx72\fscy72\t(0,110,\fscx108\fscy108)\t(110,190,\fscx100\fscy100)}"
+def jm_span(s, p):
+    """자막 덩어리 s 안에서 강조 말 p 가 걸친 자리 (i0, i1) — 덩어리 경계에 걸리면 걸친 쪽만(2자 이상)"""
+    if p in s: i = s.index(p); return i, i + len(p)
+    for L in range(min(len(s), len(p)) - 1, 1, -1):
+        if s.endswith(p[:L]): return len(s) - L, len(s)
+        if s.startswith(p[-L:]): return 0, L
+    return None
+def jm_nar(s, p, tone, n_emph):
+    sp = jm_span(s, p) if p else None
+    if not sp: return "NP", s
+    i0, i1 = sp; key, rgb, ital = JM_TONE[tone]
+    if tone == "emotion" and n_emph % 2: key = "성경"
+    if rgb is None: rgb = JM_GRAD[n_emph % len(JM_GRAD)]
+    segs = [(s[:i0], "본명조", None, 0), (s[i0:i1], key, rgb, ital), (s[i1:], "본명조", None, 0)]
+    core = len(s[i0:i1].replace(" ", "")); allc = len(s.replace(" ", ""))
+    ink = JM_INK["punch"] if core >= 0.8 * allc and allc <= 9 else JM_INK["emph"]
+    sizes = [jm_fs(k, ink) for _, k, _, _ in segs]
+    w = sum(jm_w(k, z, t) for (t, k, _, _), z in zip(segs, sizes) if t)
+    if w > JM_W: sizes = [max(30, int(z * JM_W / w)) for z in sizes]
+    out = JM_POP
+    for (t, k, c, it), z in zip(segs, sizes):
+        if t: out += "{\\fn%s\\fs%d\\c%s\\i%d}%s" % (JM_FONTS[k][1], z, jm_c(c) if c else "&H00FDFDFC&", it, t)
+    return "NE", out
+if JM:
+    EMPH = json.load(open(CFG.get("emph", "emph.json"), encoding="utf-8")); EN = EMPH.get("n", {}); DY = EMPH.get("dlg_yellow", [])
+    evj = []; ne = 0
+    for (a, b, s), i in zip(ev, evn):
+        p, tone = EN.get(str(i), [None, None]); st_, txt = jm_nar(s, p, tone, ne)
+        if st_ == "NE": ne += 1
+        evj.append((a, b, txt, st_))
+    print("지무비식 나레 자막: 강조", ne, "/", len(evj))
+
+JM_STYLES = (f"Style: NP,{JM_FONTS['카페24당당해'][1]},{jm_fs('카페24당당해', JM_INK['plain'])},&H00FDFDFC,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,-1,0,1,2,4,2,60,60,165,1\n"
+             f"Style: NE,{JM_FONTS['본명조'][1]},{jm_fs('본명조', JM_INK['emph'])},&H00FDFDFC,&H00FFFFFF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,6,3,2,40,40,165,1\n"
+             f"Style: DJ,{JM_FONTS['광화문'][1]},{jm_fs('광화문', JM_INK['dlg'])},&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,3,2,2,60,60,165,1\n"
+             f"Style: DY,{JM_FONTS['광화문'][1]},{jm_fs('광화문', JM_INK['dlg_y'])},&H0000E7FE,&H0000E7FE,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,5,3,2,60,60,165,1\n") if JM else ""
+ass = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {W}
+PlayResY: {H}
+WrapStyle: 2
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: N,{NF[0]},{NSZ},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,0,{NF[2]},0,0,100,100,0,0,1,5,1,2,60,60,165,1
+Style: D,{DF[0]},104,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,0,{DF[2]},0,0,100,100,0,0,1,5,1,2,60,60,165,1
+{JM_STYLES}Style: TOP,Noto Sans KR Black,104,&H00B5B5B5,&H00B5B5B5,&H00000000,&H64000000,-1,-1,0,0,100,100,0,0,1,4,0,9,40,40,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+rows = [f"Dialogue: 0,{ts(a)},{ts(b)},{st_},,0,0,0,,{s}" for a, b, s, st_ in evj] if JM else [f"Dialogue: 0,{ts(a)},{ts(b)},N,,0,0,0,,{s}" for a, b, s in ev]
+nd = 0
+for w in WN:
+    if w["kind"] != "D": continue
+    pre, rr = w.get("pre", 0), w.get("rate", 1.0)          # drate: 원본 시각 → 화면 시각 (원본 t → (t + pre) / rate)
+    if "subs" in w:
+        parts = [(p, w["a"] + (a + pre) / rr, w["a"] + (b + pre) / rr) for p, a, b in w["subs"]]
+        if NFON:   # 11-05 넷플릭스 16자 — 낱말 시각 자막도 길면 나누고 시간은 글자 비율로
+            sp = []
+            for p, a0, b0 in parts:
+                qs = balance(nf_clean(p)); tot = sum(len(q) for q in qs) or 1; acc = 0
+                for q in qs: sp.append((q, a0 + (b0 - a0) * acc / tot, a0 + (b0 - a0) * (acc + len(q)) / tot)); acc += len(q)
+            parts = sp
+    else:
+        ps = w["ko"].split(" / ")
+        if NFON: ps = [q for p in ps for q in balance(nf_clean(p))]   # 11-05 넷플릭스 16자 — 대사 자막도 길면 나눔
+        n = len(ps); s0, e1 = 0.05, w.get("sub1", w["b"] - w["a"] - 0.05)
+        tot = sum(len(p) for p in ps); acc = 0; parts = []
+        for p in ps:
+            a0 = w["a"] + (s0 + (e1 - s0) * acc / tot + pre) / rr; acc += len(p); parts.append((p, a0, w["a"] + (s0 + (e1 - s0) * acc / tot + pre) / rr))
+    for p, a0, b0 in parts:
+        p = nf_clean(p); b0 = nf_end(a0, b0, p)
+        if JM and any(y in p for y in DY): rows.append(f"Dialogue: 0,{ts(a0)},{ts(max(b0, a0 + 0.6))},DY,,0,0,0,,{JM_POP}{p}")
+        else: rows.append(f"Dialogue: 0,{ts(a0)},{ts(max(b0, a0 + 0.6))},{'DJ' if JM else 'D'},,0,0,0,,{p}")
+    nd += 1
+print("대사 창 자막", nd)
+rows.sort(key=lambda r: tsec(r.split(",")[1])); cutn = 0
+for k in range(len(rows) - 1):           # 두 줄 겹침 없게: 앞 줄은 다음 줄 뜨기 0.02초 전에 끈다
+    f = rows[k].split(",", 9); nxt = tsec(rows[k + 1].split(",")[1])
+    if tsec(f[2]) > nxt - 0.02: f[2] = ts(max(tsec(f[1]) + 0.3, nxt - 0.02)); rows[k] = ",".join(f); cutn += 1
+    if tsec(f[2]) > nxt - 0.02:          # ★10-14 02 패밀리 플랜: 「뭐?」「응」 같은 0.3초 줄은 더 못 줄인다 → 다음 줄을 0.02초 뒤로 민다(관문 ⑪)
+        g = rows[k + 1].split(",", 9); g[1] = ts(tsec(f[2]) + 0.02)
+        if tsec(g[2]) < tsec(g[1]) + 0.3: g[2] = ts(tsec(g[1]) + 0.3)
+        rows[k + 1] = ",".join(g)
+print("겹친 자막 줄 끝 당김", cutn)
+# ★10-20 무드킹식 인물 이름표 — 사용자 "https://www.youtube.com/watch?v=fK2xpgBdMJM 이영상 봐봐." · "인물소개 잘해놨어"
+#   인물이 처음 나오는 줄(script 옵션 {"tag": "이름"} 또는 {"tag": ["이름", "관계"]})의 첫 조각에, 얼굴 옆(가슴 높이) 노란 굵은 이름(잘난체 2)을 그 조각 동안(최대 3초).
+#   자리는 body.mkv 그 조각 가운데 프레임의 얼굴(OpenCV) — 얼굴이 왼쪽이면 오른쪽에, 오른쪽이면 왼쪽에. 못 찾으면 왼쪽 아래. 손으로 고칠 땐 ep.json "tag_pos": {"이름": [x, y]}.
+TAGF = CFG.get("tag_font", ["Jalnan 2 TTF", "Jalnan2TTF.ttf"]); TAGS = []   # ★11-01 잘난체 없는 PC → ep.json "tag_font": ["Black Han Sans", "BlackHanSans-Regular.ttf"]
+if any(w.get("tag") for w in WN):
+    import cv2, shutil as _sh
+    if not os.path.exists(f"{FONTS}/{TAGF[1]}"): _sh.copy2(os.path.expanduser(f"~/AppData/Local/Microsoft/Windows/Fonts/{TAGF[1]}"), f"{FONTS}/{TAGF[1]}")
+    # 얼굴 찾기 = YuNet(models/yunet.onnx, 다른 프리셋에 있던 것) — OpenCV 5.0 엔 Haar 가 없고, 한글 경로는 못 읽어 바이트로 넣는다
+    _det = cv2.FaceDetectorYN.create("onnx", np.frombuffer(open(os.path.join(HERE, "..", "models", "yunet.onnx"), "rb").read(), np.uint8), np.array([], np.uint8), (960, 540), 0.7)
+    def _face(t):
+        b = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.3f}", "-i", "body.mkv", "-frames:v", "1", "-vf", "scale=960:540", "-f", "rawvideo", "-pix_fmt", "bgr24", "-"], capture_output=True).stdout
+        if len(b) < 960 * 540 * 3: return None
+        _, fs = _det.detect(np.frombuffer(b[:960 * 540 * 3], np.uint8).reshape(540, 960, 3))
+        if fs is None or not len(fs): return None
+        x, y, w_, h_ = max(fs, key=lambda f: f[2] * f[3])[:4]
+        return (x * 2, y * 2, w_ * 2, h_ * 2)
+    TPOS = CFG.get("tag_pos", {})
+    for k in sorted({w["k"] for w in WN if w.get("tag")}):
+        ws = [w for w in WN if w["k"] == k]; w = ws[min(ws[0].get("tag_w", 0), len(ws) - 1)]   # "tag_w" = 그 줄 몇 번째 조각에(이름을 말하는 조각, 기본 첫 조각)
+        tg = w["tag"]; name, rel = (tg, None) if isinstance(tg, str) else (tg[0], tg[1] if len(tg) > 1 else None)
+        a0 = w["a"] + 0.1; b0 = min(w["b"], w["a"] + 3.0); tw = len(name) * 92
+        # ★10-26 사용자 캡처(브로디 이름표가 아래 자막과 거의 겹침) "자막있는곳에 넣지 말고 왼쪽 위나 오른쪽 위쪽으로 옮겨야하지 않겠어?"
+        #   → 이어서 "모서리 말고 인물 옆으로 넣어" → 얼굴 바로 옆(얼굴 높이, 얼굴이 왼쪽이면 오른쪽 옆·오른쪽이면 왼쪽 옆), 아래 자막 자리(y 640↓)엔 안 내려감.
+        #     얼굴 못 찾으면 왼쪽 위. tag_pos 로 손볼 때도 y ≤ 620
+        rw = max(tw, len(rel) * 56 if rel else 0); YMAX = 560 if rel else 600
+        if name in TPOS: x, y = TPOS[name][0], min(YMAX, TPOS[name][1])
+        else:
+            f = _face((w["a"] + w["b"]) / 2)
+            if f:
+                fx, fy, fw, fh = f
+                x = min(1920 - rw / 2 - 50, fx + fw + 60 + rw / 2) if fx + fw / 2 < 960 else max(rw / 2 + 50, fx - 60 - rw / 2)
+                y = min(YMAX, max(150, fy + fh * 0.5))
+            else: x, y = 90 + rw / 2, 150
+        txt = name + (r"\N{\fs58}(" + rel + ")" if rel else "")
+        TAGS.append(f"Dialogue: 1,{ts(a0)},{ts(b0)},TAG,,0,0,0,,{{\\pos({x:.0f},{y:.0f})\\fad(120,150)\\fscx80\\fscy80\\t(0,120,\\fscx106\\fscy106)\\t(120,200,\\fscx100\\fscy100)}}{txt}")
+    print("인물 이름표", len(TAGS), [t.split("}")[-1] for t in TAGS])
+    ass = ass.replace("\n[Events]", f"Style: TAG,{TAGF[0]},96,&H004ADCFF,&H004ADCFF,&H00000000,&H96000000,0,0,0,0,100,100,0,0,1,5,2,5,0,0,0,1\n\n[Events]", 1)
+ass += f"Dialogue: 0,{ts(0)},{ts(END)},TOP,,0,0,0,,{CFG.get('brand', '「대작」')}\n" +"\n".join(rows + TAGS) + "\n"   # 10-19 사용자 "이채널은 시네플로그라고 하지말고 대작이라고 해줘"
+open("subs.ass", "w", encoding="utf-8").write(ass)
+# ★10-20 사용자 "그리고 대작 워터마크 무드킹처럼 만들어" → brand/대작_워터마크.png(make_watermark.py)를 오른쪽 위에 얹고, 화면에 굽는 자막(subs_burn.ass)엔 TOP 글자를 뺀다
+#   (TOP 줄은 캡컷용으로 subs.ass 에 남김). ep.json "brand_png": false 면 옛 글자.
+# ★10-22 사용자 "워터마크는 A버전만 잇고 B버전이는 워터 마크가 없는걸로 해야해" → B판(다른 채널) ep.json "watermark": false = 그림·TOP 글자 둘 다 안 굽는다
+# ★10-25 사용자 "앞으로 영화 만들때 대작 워터마크 넣디마" → 「대작」 워터마크 기본 꺼짐(A판도). 채널 그림(brand_file, 드루와 등)이 있으면 그대로, 다시 넣으려면 ep.json "watermark": true
+# ★10-25 "드루와도 삭제" → 채널 그림(드루와)도 기본 꺼짐
+NOWM = CFG.get("watermark", False) is False
+WM = os.path.join(HERE, "..", "brand", CFG.get("brand_file", "대작_워터마크.png")) if CFG.get("brand_png", True) and not NOWM else None
+if WM and not os.path.exists(WM): WM = None
+open("subs_burn.ass", "w", encoding="utf-8").write("".join(l for l in ass.splitlines(True) if not ((WM or NOWM) and l.startswith("Dialogue") and ",TOP," in l)))
+if MODE == "subs": sys.exit()
+
+import wave
+SR = 48000; N = int((END + 1) * SR)
+def load(p):
+    b = subprocess.run(["ffmpeg", "-v", "error", "-i", p, "-vn", "-ar", str(SR), "-ac", "2", "-f", "f32le", "-"], capture_output=True).stdout
+    return np.frombuffer(b, np.float32).reshape(-1, 2)
+def save(p, x):
+    with wave.open(p, "wb") as f:
+        f.setnchannels(2); f.setsampwidth(2); f.setframerate(SR)
+        for i in range(0, len(x), 4800000):   # 10-21 2시간(드루와 01) 한 번에 바꾸면 메모리 부족 → 100초씩
+            f.writeframes((np.clip(x[i:i + 4800000], -1, 1) * 32767).astype(np.int16).tobytes())
+o = subprocess.run(["ffmpeg", "-i", "body.mkv", "-vn", "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
+I = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", o)[-1]); g = max(-10, min(14, -17 - I)); print("원본", I, "LUFS → 이득", round(g, 1))
+def load_into(p, dst):                    # ★10-23 드루와 02 MemoryError(2시간 소리 3GB 를 한 번에 읽음) → 100초씩 바로 배열에
+    pr = subprocess.Popen(["ffmpeg", "-v", "error", "-i", p, "-vn", "-ar", str(SR), "-ac", "2", "-f", "f32le", "-"], stdout=subprocess.PIPE); k = 0
+    while k < len(dst):
+        c = pr.stdout.read(min(4800000, len(dst) - k) * 8)
+        if not c: break
+        x = np.frombuffer(c[:len(c) // 8 * 8], np.float32).reshape(-1, 2); dst[k:k + len(x)] = x; k += len(x)
+    pr.stdout.close(); pr.kill(); pr.wait()
+org = np.zeros((N, 2), np.float32); load_into("body.mkv", org); org *= np.float32(10 ** (g / 20))   # 10-21 임시 배열 없이
+env = np.ones(N, np.float32); R = int(0.15 * SR)
+duck = []
+for a, b in NAR:
+    if duck and a <= duck[-1][1]: duck[-1][1] = b
+    else: duck.append([a, b])
+for a, b in duck:                         # 나레 밑 원본 0.2(강의 4강: 나레 겹치는 구간 원본 -25 근처, 완전히 죽이지는 않음)
+    ia, ib = max(0, int(a * SR)), min(N, int(b * SR)); env[ia:ib] = 0.2
+    env[max(0, ia - R):ia] = np.minimum(env[max(0, ia - R):ia], np.linspace(1, 0.2, ia - max(0, ia - R)))
+    env[ib:min(N, ib + R)] = np.minimum(env[ib:min(N, ib + R)], np.linspace(0.2, 1, min(N, ib + R) - ib))
+import edges as _e
+SW = _e.load_words(CFG.get("words", "src_words.json")); nsd = 0
+for w in WN:                              # 나레 없는 액션 조각에 걸린 원본 말소리(자막 없음)는 0.3
+    if w["kind"] != "A" or under(w["a"], w["b"]): continue
+    L = (w["b"] - w["a"]) * SPD
+    if any(w["s"] < x[1] - 0.1 and w["s"] + L > x[0] + 0.1 for x in SW):
+        ia, ib = int(w["a"] * SR), int(w["b"] * SR); env[ia:ib] = np.minimum(env[ia:ib], 0.3); nsd += 1
+print("말소리 낮춘 액션 조각", nsd)
+# ★10-23 드루와 02 텔레그램 「괴물이 말하는것처럼 끌면서 울려」「판사의 몸에 들어온 지옥에 악마. 이 첫구절부터 그래」 → 나레 밑 0.2 로 깐 원본에
+#   배우 말소리(악마 목소리 등)가 있으면 두 목소리가 겹쳐 울림처럼 들림(나레 밑 조각 1,965개 중 1,233개). 나레 구간 안에서 원본 말소리가 나오는 곳만
+#   ep.json "duck_speech"(기본 0.05, 약 -26dB)로 더 낮춘다. 원본 시각 → 화면 시각은 조각마다 a + (원본초 - s0) / rate.
+DS = CFG.get("duck_speech", 0.05); iv = []
+SWS = np.array([x[0] for x in SW]); SWE = np.array([x[1] for x in SW])
+for w in WN:
+    if not under(w["a"], w["b"]): continue
+    r = w.get("rate", SPD if w["kind"] == "A" else 1.0); s0 = w["s"] - w.get("pre", 0); L = (w["b"] - w["a"]) * r
+    for j in np.where((SWS < s0 + L) & (SWE > s0))[0]:
+        ta = max(w["a"], w["a"] + (SWS[j] - s0) / r - 0.12); tb = min(w["b"], w["a"] + (SWE[j] - s0) / r + 0.12)
+        for a, b in duck:                 # 나레 구간과 겹치는 곳만
+            x, y = max(ta, a), min(tb, b)
+            if y > x: iv.append([x, y])
+iv.sort(); mg = []
+for a, b in iv:
+    if mg and a <= mg[-1][1] + 0.1: mg[-1][1] = max(mg[-1][1], b)
+    else: mg.append([a, b])
+for a, b in mg:
+    ia, ib = max(0, int(a * SR)), min(N, int(b * SR)); env[ia:ib] = np.minimum(env[ia:ib], DS)
+    p0 = max(0, ia - R); env[p0:ia] = np.minimum(env[p0:ia], np.linspace(0.2, DS, ia - p0, dtype=np.float32))
+    p1 = min(N, ib + R); env[ib:p1] = np.minimum(env[ib:p1], np.linspace(DS, 0.2, p1 - ib, dtype=np.float32))
+print("나레 밑 원본 말소리 더 낮춤", len(mg), "곳", round(sum(b - a for a, b in mg), 1), "초")
+QG = CFG.get("quiet_gain", 0.35); nq = 0          # ★10-14 유명 노래 구간(ep.json quiet = 원본 초 [[a,b],…]) — 그 원본을 쓴 조각은 원본 소리를 더 낮춤(음악 저작권 소리 판정 피하기)
+for w in WN:
+    L = (w["b"] - w["a"]) * w.get("rate", SPD if w["kind"] == "A" else 1.0); s0 = w["s"] - w.get("pre", 0)
+    if any(s0 < b and s0 + L > a for a, b in CFG.get("quiet", [])):
+        ia, ib = int(w["a"] * SR), int(w["b"] * SR); env[ia:ib] *= QG; nq += 1
+print("노래 구간이라 원본 소리 더 낮춘 조각", nq)
+org *= env[:, None]; del env
+if not CFG.get("lean"): save("org.wav", org)   # 10-21 ep.json "lean": 2시간짜리는 메모리·디스크 아끼기(org.wav 안 씀)
+nar = np.memmap("nar.f32", np.float32, "w+", shape=(N, 2)) if CFG.get("lean") else np.zeros((N, 2), np.float32)   # ★10-23 lean = 나레 트랙은 디스크에(메모리 3GB 아낌)
+for i, t, d, w in narr:
+    x = load(w); k = int(t * SR); nar[k:k + len(x)] += x[:N - k]
+save("narr_track.wav", nar)
+for i in range(0, N, 4800000): org[i:i + 4800000] += nar[i:i + 4800000]
+del nar
+if os.path.exists("nar.f32"): os.remove("nar.f32")
+HM = CFG.get("hook_music")      # ★10-23 대작 07 「짜집기 느낌」 → 훅 밑에만 깔리는 음악 [경로, 시작초, 크기] — 끊긴 조각 소리를 한 덩어리로 묶음(출처는 업로드 글에)
+if HM:
+    hend = max(w["b"] for w in WN if w.get("z") == "hook")
+    m = load(os.path.expanduser(HM[0]))[int(HM[1] * SR):int((HM[1] + hend + 0.8) * SR)].copy()
+    ev = np.full(len(m), HM[2], np.float32); fi, fo = int(0.8 * SR), int(1.8 * SR)
+    ev[:fi] *= np.linspace(0, 1, fi); ev[-fo:] *= np.linspace(1, 0, fo)
+    org[:len(m)] += m * ev[:, None]; del m; print("훅 음악", os.path.basename(HM[0]), HM[1], "초부터", round(hend + 0.8, 1), "초")
+save("mix.wav", org); del org
+gate("final", "subs.ass", "narr_track.wav")
+if CFG.get("lean") and os.path.exists("narr_track.wav"): os.remove("narr_track.wav")   # 10-21 소리 맞춤 사본 자리
+t_mus = narr[-1][1] - 1.0
+music = os.path.expanduser(CFG.get("music", r"~/volcano_work/달빛롱폼/bgm/Healing.mp3"))
+# ★10-21 싱크(드루와 01 「싱크 안 맞아」): concat 이음새마다 화면 시각표가 벌어져 2시간에 1.4초 늘어남(소리는 맞음) → 프레임 순서대로 시각 다시 매김(setpts=N/FPS/TB)
+fc = f"[2:a]aresample=48000,atrim=0:{END - t_mus + 1:.2f},volume=0.12,afade=t=in:d=2,afade=t=out:st={END - t_mus - 2:.2f}:d=2,adelay={int(t_mus*1000)}|{int(t_mus*1000)}[mus];" \
+     f"[1:a][mus]amix=inputs=2:normalize=0:duration=first,atrim=0:{END:.2f},alimiter=limit=0.95,loudnorm=I=-16:TP=-1.5:LRA=11[a];" \
+     f"[0:v]setpts=N/({FPS})/TB,unsharp=5:5:{SHARP}:5:5:0,tpad=stop_mode=clone:stop_duration={OUT:.2f},fade=t=out:st={END - 1:.2f}:d=1,subtitles=subs_burn.ass:fontsdir={FONTS}" + \
+     ("[vs];[3:v]format=rgba[wm];[vs][wm]overlay=W-w-72:54[v]" if WM else "[v]")   # 10-20 텔레그램 "아래 왼쪽으로 조금 옮겨" (40:28 → 72:54)
+open("fc.txt", "w", encoding="utf-8").write(fc)
+# ★10-21 사용자 「롱폼은 gpu로 바꿔」: 최종 굽기만 라데온 AMF(같은 30초 13.6초→4.5초, 화질 SSIM 0.99), 실패하면 libx264 로 다시.
+#   조각(cuts)은 concat 복사로 이어 붙이므로 CPU 그대로(인코더가 섞이면 이음새가 깨짐). VENC=cpu 면 GPU 안 씀
+def final_cmd(enc):
+    return FF + ["-i", "body.mkv", "-i", "mix.wav", "-i", music] + (["-i", WM] if WM else []) + ["-/filter_complex", "fc.txt", "-map", "[v]", "-map", "[a]",
+                 *enc, "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "final.mp4.tmp.mp4"]
+X264_FINAL = ["-c:v", "libx264", "-preset", "medium", "-crf", "19"]
+AMF_FINAL = ["-c:v", "h264_amf", "-quality", "quality", "-rc", "cqp", "-qp_i", "19", "-qp_p", "21"]
+if os.environ.get("VENC") == "cpu" or subprocess.run(final_cmd(AMF_FINAL)).returncode != 0:
+    print("최종 굽기 CPU(libx264)")
+    subprocess.run(final_cmd(X264_FINAL), check=True)
+os.replace("final.mp4.tmp.mp4", "final.mp4")
+if CFG.get("lean") and os.path.exists("mix.wav"): os.remove("mix.wav")   # 10-21 소리 맞춤 다시 굽기 전에 디스크 확보
+def lufs(p):
+    o = subprocess.run(["ffmpeg", "-i", p, "-af", "ebur128=peak=true", "-f", "null", "-"], capture_output=True, text=True).stderr
+    return float(re.findall(r"I:\s+(-?[\d.]+) LUFS", o)[-1]), max(float(x) for x in re.findall(r"Peak:\s+(-?[\d.]+) dBFS", o)[-2:])
+I, TP = lufs("final.mp4")
+if abs(I + 16) > 0.3 or TP > -1.0:        # ★10-14 README 「소리 맞춤」을 굽기 안으로: loudnorm 한 번으로는 -16.3·정점 +1.8 → 영상 복사 + 소리만(alimiter 는 level=disabled 필수)
+    subprocess.run(FF + ["-i", "final.mp4", "-c:v", "copy", "-af", f"aresample=192000,volume={-16 - I:.2f}dB,alimiter=limit=0.8:level=disabled:attack=1:release=60,aresample=48000",
+                         "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "final_lv.mp4"], check=True)
+    os.replace("final_lv.mp4", "final.mp4"); print("소리 맞춤", I, TP, "→", *lufs("final.mp4"))
+    I2, TP2 = lufs("final.mp4")
+    if TP2 > -1.0:                        # ★10-14 01 헤즈 오브 스테이트: limit 0.8 로도 AAC 뒤 정점 -0.2 → limit 0.7 로 한 번 더(-16.1·-2.3)
+        subprocess.run(FF + ["-i", "final.mp4", "-c:v", "copy", "-af", f"aresample=192000,volume={-16 - I2 + 0.2:.2f}dB,alimiter=limit=0.7:level=disabled:attack=1:release=60,aresample=48000",
+                             "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "final_lv.mp4"], check=True)
+        os.replace("final_lv.mp4", "final.mp4"); print("소리 맞춤 2", I2, TP2, "→", *lufs("final.mp4"))
+print("final", round(dur("final.mp4") / 60, 2), "분 · ", *lufs("final.mp4"), "LUFS·정점")

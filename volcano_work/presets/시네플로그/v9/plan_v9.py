@@ -40,6 +40,21 @@ DTAIL, DTOVER, DFADE = CFG.get("d_tail", 0.6 if NEWSTYLE else 0.0), CFG.get("d_t
 SCPAD, SCJUMP = CFG.get("scene_pad", 0.3 if NEWSTYLE else 0.0), CFG.get("scene_jump", 20.0)
 CPS = 6.5          # 제미나이 Ludo 실측(16 핀치 148조각): 띄어쓰기 뺀 글자 6.51자/초
 DRY = "--dry" in sys.argv
+# ★★★★★11-07 33 콜래트럴 박제(사용자 「너 왜이렇게만들었어?」→「틀린거 다 저장하고 박제해」, README 맨 위):
+#   옛 방식은 나레 밑 조각을 범위(중앙 80초·최대 256초)의 처음·가운데·끝에 고르게 깔아서 마지막 조각이 장면 결말에서 뽑히고
+#   그 뒤에 범위 앞쪽 대사가 붙어 되감겼다(68블록 중 46 「결과 먼저」). 이제 기본은:
+#   ① 나레 구간(문장마다·조각마다)은 n_span(기본 30초) 안 — 넘으면 실패 ② 조각은 구간 앞에서부터 차례로(고르게 깔기 금지)
+#   ③ 나레·소리 장면 그림의 원본 끝은 다음 대사 원본 시작을 넘지 못함(구간을 거기서 자름, 구간 전체가 뒤면 실패 — 「결과 먼저」)
+#   ④ 이어 붙은 조각끼리 원본이 rewind_max(기본 10초) 넘게 되감기면 실패 ⑤ 같은 내용 나레 연달아 경고 ⑥ text_scan.json 글자 조각은 반전 안 함
+#   줄 옵션: {"sent": True} = 세 번째 칸 [(a,b)…] 가 문장마다 구간(조각은 문장이 말해지는 시각으로 나눔) · {"order_ok": "이유"} = ③④ 예외(이유 필수)
+#   {"wide_ok": "이유"} = ① 예외. ep.json "legacy_spread": true 면 옛 방식 그대로(옛 편 재현용).
+LEGACY = bool(CFG.get("legacy_spread"))
+NSPAN, REWIND = CFG.get("n_span", 30.0), CFG.get("rewind_max", 10.0)
+def sent_split(text):
+    """문장 시작 글자 위치들 — . ? ! 뒤(따옴표·괄호 붙어도) 공백에서 끊음"""
+    st = [0]
+    for m in re.finditer(r"[.?!…]+[\"'”’)]*\s+", text): st.append(m.end())
+    return [i for i in st if i < len(text.rstrip())]
 ns = {}; exec(open("script.py", encoding="utf-8").read(), ns); S = ns["S"]
 L = {x["id"]: x for x in json.load(open("lines.json", encoding="utf-8"))}
 cuts = np.array(sorted(float(x) for x in re.findall(r"(?:pts_time:)?(\d+\.\d+)", open(CFG.get("scenes", "scenes.txt")).read())))
@@ -67,11 +82,25 @@ for k, x in enumerate(S):
     it = {"k": k, "kind": x[0], "zone": zone, "opt": opt}
     if x[0] == "N":
         ni += 1; it.update(ni=ni, text=x[1])
-        if isinstance(x[2], (list, tuple)): it.update(parts=[(float(a), float(b)) for a, b in x[2]], a=float(x[2][0][0]), b=float(x[2][-1][1]))
+        if isinstance(x[2], (list, tuple)):
+            if opt.get("sent"):                      # ★11-07 문장마다 구간 — 문장 칸은 (a,b) 또는 [(a,b),(a,b)…](한 문장 속 동작이 여럿이면 조각 차례대로)
+                rs = [[(float(e[0]), float(e[1]))] if not isinstance(e[0], (list, tuple)) else [(float(a), float(b)) for a, b in e] for e in x[2]]
+                ss = sent_split(x[1])
+                if len(ss) != len(rs): problems.append(f"줄{k} 「{x[1][:24]}」 문장 {len(ss)}개인데 sent 구간 {len(rs)}개 — 문장마다 하나씩")
+                it.update(sent_parts=rs, a=min(a for r in rs for a, _ in r), b=max(b for r in rs for _, b in r))
+            else:
+                rs = [(float(a), float(b)) for a, b in x[2]]
+                it.update(parts=rs, a=float(x[2][0][0]), b=float(x[2][-1][1]))
         else: it.update(a=float(x[2]), b=float(x[3]))
         w = f"narr/n{ni:03d}.wav"
         same = os.path.exists(w) and json.load(open(w[:-4] + ".json", encoding="utf-8")).get("text") == x[1]   # --dry 도 글이 같은 녹음은 실제 길이(10-14 줄 바꾼 뒤 번호 다시 매김)
         it["d"] = dur(w) if same or (os.path.exists(w) and not DRY) else len(re.sub(r"\s", "", x[1])) / CPS
+        # 문장 시작 시각(나레 wav 기준 초) — 글자 정렬(narr/nNNN.json chars·st)이 있으면 그것, 없으면 글자 수 비례
+        ss = sent_split(x[1]); al = json.load(open(w[:-4] + ".json", encoding="utf-8")) if same else None
+        if al and len(al.get("chars", [])) == len(x[1]) and al.get("st"): it["sent_t"] = [float(al["st"][i]) for i in ss]
+        else:
+            nz = [len(re.sub(r"\s", "", x[1][:i])) for i in ss]; tot = max(1, len(re.sub(r"\s", "", x[1])))
+            it["sent_t"] = [it["d"] * c / tot for c in nz]
         if not DRY and os.path.exists(w) and not same: problems.append(f"줄{k} 나레 n{ni:03d}.wav 글이 대본과 다름")
         if not DRY and not os.path.exists(w): problems.append(f"줄{k} 나레 n{ni:03d}.wav 없음")
     elif x[0] == "D":
@@ -182,8 +211,14 @@ def free_mask(z, grid, sl):
     ok = np.ones(len(grid), bool)
     for x, y in used[z]: g = gp(x, float(grid[0])); ok &= ~((grid < y + g) & (grid + sl + g > x))
     return ok
+SNAP_FWD = CFG.get("snap_fwd", True)
 def shot_snap(p, sl, lo, hi):
-    """조각 시작이 컷 시작 바로 뒤(0.6초 안)면 그 컷 시작으로 당긴다 — 다음 컷으로 밀면 다른 그림이 된다(10-13 「레이더에 표적이」 밑에 뱃머리)"""
+    """조각 시작이 컷 시작 바로 뒤(0.6초 안)면 그 컷 시작으로 당긴다 — 다음 컷으로 밀면 다른 그림이 된다(10-13 「레이더에 표적이」 밑에 뱃머리)
+    ★11-07 32v2: 조각 첫머리에 앞 컷 꼬리만 잠깐 걸리면(컷이 시작 뒤 0.5초·조각 길이 40% 안) 그 컷 뒤로 민다 — 조각 대부분이 이미 뒤 컷이라 그림은 그대로,
+    줄 첫 프레임에 앞 장면이 번쩍 나오던 것만 없어진다(32 v2 판정 「부분」 59줄 중 약 13줄이 이것). ep.json "snap_fwd": false 면 옛 동작."""
+    if SNAP_FWD:
+        c = cuts[(cuts > p + 0.02) & (cuts <= p + min(0.5, sl * 0.4))]
+        if len(c) and c[-1] + 0.06 + sl <= hi + 1e-6: return float(c[-1]) + 0.06
     c = cuts[(cuts <= p) & (cuts > p - 0.6)]
     if len(c) and c[-1] + 0.06 >= lo: return float(c[-1]) + 0.06
     return p
@@ -198,10 +233,90 @@ def place_parts(it, d, z):
         if not c: problems.append(f"줄{it['k']} 「{it.get('text', '')[:24]}」 조각{j + 1} [{mm(lo)}~{mm(hi)}] 에 {sl:.1f}초 자리 없음"); return None
         g = min(c, key=lambda g: 2.0 * dark(g, g + sl) + abs(g - lo) * 0.05); ps.append(float(g))
     return ps, n, Lw, sl
+# ★11-07 ①③: 나레 구간 폭 검사 · 다음 대사 원본 시작에서 구간 자르기(결과 먼저 금지)
+def _ranges(it):
+    if it.get("sent_parts"): return [r for sub in it["sent_parts"] for r in sub]
+    if it.get("parts"): return it["parts"]
+    return [(it["a"], it["b"])]
+if not LEGACY:
+    for ii, it in enumerate(items):
+        if it["kind"] == "D" or it["zone"] == "outro" or it["opt"].get("cont"): continue
+        if it["kind"] == "N" and not it["opt"].get("wide_ok"):
+            for a, b in _ranges(it):
+                if b - a > NSPAN + 1e-6: problems.append(f"줄{it['k']} 나레 「{it['text'][:24]}」 구간 {mm(a)}~{mm(b)} {b - a:.0f}초 — {NSPAN:g}초 넘음(문장마다 그 장면을 좁게, {{'sent': True}} · 11-07)")
+        nd = next((y for y in items[ii + 1:] if y["kind"] == "D" or y["zone"] != it["zone"]), None)
+        if nd is None or nd["zone"] != it["zone"]: continue
+        why = it["opt"].get("order_ok")
+        if why: continue
+        it["lim"] = nd["s"]
+        for a, b in _ranges(it):
+            if a >= nd["s"] - 0.05:
+                what = f"나레 「{it['text'][:24]}」" if it["kind"] == "N" else f"소리 장면 A {mm(a)}"
+                problems.append(f"줄{it['k']} 결과 먼저: {what} 구간 {mm(a)}~{mm(b)} 이 다음 대사(줄{nd['k']} 원본 {mm(nd['s'])}) 보다 뒤 — 대사 뒤로 옮기거나 구간을 대사 앞으로(11-07)")
+                it["blocked"] = True; break
+def _clip(it, a, b):
+    lim = it.get("lim")
+    return (a, min(b, lim)) if lim is not None else (a, b)
+def place_seq(it, z, pieces):
+    """★11-07 조각을 구간 앞에서부터 차례로 — pieces = [(화면a, 화면b, 원본lo, 원본hi)…]. 앞 조각보다 뒤(이야기 순서)·3초 간격·어두움 피하기"""
+    ps = []; last = None
+    for j, (a, b, lo, hi) in enumerate(pieces):
+        sl = (b - a) * SPD; mine = [(q, q + (pieces[m][1] - pieces[m][0]) * SPD) for m, q in enumerate(ps)]
+        def okg(g): return all(not (g < y + gp(x, g) and g + sl + gp(x, g) > x) for x, y in used[z] + mine)
+        grid = np.arange(lo, hi - sl + 1e-6, ST)
+        c = [g for g in grid if okg(g) and (last is None or g >= last - 1e-6)]
+        if not c: c = [g for g in grid if okg(g)]
+        if not c:
+            problems.append(f"줄{it['k']} 「{it.get('text', '')[:24]}」 조각{j + 1} [{mm(lo)}~{mm(hi)}] 에 {sl:.1f}초 자리 없음" + (f"(다음 대사 {mm(it['lim'])} 앞에서 자름)" if it.get("lim") is not None and hi >= it["lim"] - 1e-6 else ""))
+            return None
+        g = min(c, key=lambda g: 2.0 * dark(g, g + sl) + (g - lo) * 0.05)
+        g2 = shot_snap(g, sl, lo, hi)
+        if okg(g2) and (last is None or g2 >= last - 1e-6): g = g2
+        ps.append(float(g)); last = g + sl + gp(g)
+    return ps
 for ii, it in enumerate(items):
-    if it["kind"] == "D": continue
+    if it["kind"] == "D" or it.get("blocked"): continue
     d = it["T"] - it["t"]; n = max(1, math.ceil(d / MAXC - 1e-6)); Lw = d / n; sl = Lw * SPD
-    lo, hi = it["a"], it["b"]; z = it["zone"]
+    lo, hi = _clip(it, it["a"], it["b"]); z = it["zone"]
+    if it.get("sent_parts") and not it["opt"].get("cont"):     # ★11-07 문장마다 구간: 화면 시간을 문장 시작 시각에서 나누고, 문장 조각은 그 문장 구간에서
+        u = [it["t"]] + [it["t"] + it["lead"] + s for s in it["sent_t"][1:]] + [it["T"]]
+        segs = [[u[q], u[q + 1], q] for q in range(len(u) - 1)]
+        while len(segs) > 1 and any(s[1] - s[0] < 0.6 for s in segs):          # 0.6초 안 되는 문장 몫은 이웃 문장에 붙임(깜빡 조각 금지)
+            q = next(i for i, s in enumerate(segs) if s[1] - s[0] < 0.6)
+            if q > 0: segs[q - 1][1] = segs[q][1]
+            else: segs[1][0] = segs[0][0]
+            segs.pop(q)
+        pieces = []
+        for a0, b0, q in segs:
+            sub = it["sent_parts"][min(q, len(it["sent_parts"]) - 1)]
+            nq = max(1, math.ceil((b0 - a0) / MAXC - 1e-6), min(len(sub), int((b0 - a0) / 0.6))); Lq = (b0 - a0) / nq   # 동작 수만큼은 조각을 나눔(0.6초 안 되게는 안 함)
+            for j in range(nq):
+                rlo, rhi = _clip(it, *sub[min(j, len(sub) - 1)])
+                pieces.append((a0 + Lq * j, a0 + Lq * (j + 1), rlo, rhi))
+        ps = place_seq(it, z, pieces)
+        if ps is None: continue
+        for (a, b, _, _), s in zip(pieces, ps):
+            W.append(dict({"a": round(a, 3), "b": round(b, 3), "s": round(s, 3), "kind": "A", "k": it["k"], "z": z}, **it["opt"])); used[z].append((s, s + (b - a) * SPD))
+        continue
+    if not LEGACY and not it["opt"].get("cont") and it.get("parts"):   # 조각마다 구간(옛 꼴) — 다음 대사에서 자르고 차례로
+        P = [_clip(it, a, b) for a, b in it["parts"]]
+        if len(P) != n: problems.append(f"줄{it['k']} 「{it.get('text', '')[:24]}」 조각 {n}개인데 parts 구간 {len(P)}개 — {{'sent': True}}(문장마다 구간)로 쓸 것"); continue
+        pieces = [(it["t"] + Lw * j, it["t"] + Lw * (j + 1), P[j][0], P[j][1]) for j in range(n)]
+        if Lw > MAXC + 1e-6: problems.append(f"줄{it['k']} 조각 {n}개로는 {Lw:.1f}초씩 — 2.9초 넘음"); continue
+        ps = place_seq(it, z, pieces)
+        if ps is None: continue
+        for (a, b, _, _), s in zip(pieces, ps):
+            W.append(dict({"a": round(a, 3), "b": round(b, 3), "s": round(s, 3), "kind": "A", "k": it["k"], "z": z}, **it["opt"])); used[z].append((s, s + (b - a) * SPD))
+        continue
+    if not LEGACY and not it["opt"].get("cont"):                   # 한 구간: 앞에서부터 차례로(고르게 깔기 금지)
+        if hi - lo < sl: problems.append(f"줄{it['k']} [{mm(lo)}~{mm(hi)}] 이 조각 하나({sl:.1f}초)보다 짧음" + (f" — 다음 대사 {mm(it['lim'])} 앞에서 자름(11-07 결과 먼저 금지)" if it.get("lim") is not None and it["b"] > it["lim"] else "")); continue
+        pieces = [(it["t"] + Lw * j, it["t"] + Lw * (j + 1), lo, hi) for j in range(n)]
+        ps = place_seq(it, z, pieces)
+        if ps is None: continue
+        for (a, b, _, _), s in zip(pieces, ps):
+            W.append(dict({"a": round(a, 3), "b": round(b, 3), "s": round(s, 3), "kind": "A", "k": it["k"], "z": z}, **it["opt"])); used[z].append((s, s + sl))
+            if dark(s, s + sl) >= 0.75: problems.append(f"줄{it['k']} 조각 {mm(a)} 원본 {mm(s)} 까만 화면 {dark(s, s + sl):.1f}초")
+        continue
     if it["opt"].get("cont"):                # ★11-03 핵심 장면 이어 가기(위 설명)
         pv = items[ii - 1] if ii else None; nx = items[ii + 1] if ii + 1 < len(items) else None
         if pv is None or pv["kind"] != "D":
@@ -267,6 +382,36 @@ for ii, it in enumerate(items):
         W.append(dict({"a": round(a, 3), "b": round(b, 3), "s": round(ps[j], 3), "kind": "A", "k": it["k"], "z": z}, **it["opt"])); used[z].append((ps[j], ps[j] + sl))
         if dark(ps[j], ps[j] + sl) >= 0.75: problems.append(f"줄{it['k']} 조각 {mm(a)} 원본 {mm(ps[j])} 까만 화면 {dark(ps[j], ps[j] + sl):.1f}초")
 W.sort(key=lambda w: w["a"])
+# ★11-07 ⑥ 글자 조각은 반전 안 함 — text_scan.json(prep/textflip.py · 사람이 본 것) 의 원본 구간과 겹치는 조각
+TS = json.load(open(CFG.get("text_scan", "text_scan.json"), encoding="utf-8")) if os.path.exists(CFG.get("text_scan", "text_scan.json")) else {}
+TXT = [(float(a), float(b)) for a, b, *_ in TS.get("text", [])]; ntx = 0
+def _sl(w): return (w["b"] - w["a"]) * w.get("rate", SPD if w["kind"] == "A" else 1.0)
+for w in W:
+    if not w.get("noflip") and any(w["s"] < b and w["s"] + _sl(w) > a for a, b in TXT): w["noflip"] = True; w["noflip_text"] = True; ntx += 1
+# ★11-07 ④ 되감기 · 결과 먼저(나레 블록 그림보다 10초+ 앞선 대사가 뒤에 나옴 — sync_check ① 와 같은 잣대)
+KOPT = {it["k"]: it["opt"] for it in items}
+if not LEGACY:
+    def _se(w): return w["s"] + _sl(w)
+    for x, y in zip(W, W[1:]):
+        if x["z"] != "main" or y["z"] != "main" or KOPT.get(y["k"], {}).get("order_ok") or KOPT.get(x["k"], {}).get("order_ok"): continue
+        if y["s"] < _se(x) - REWIND: problems.append(f"되감기: 화면 {mm(y['a'])} 줄{y['k']} 원본 {mm(y['s'])} 가 앞 조각(줄{x['k']}) 원본 끝 {mm(_se(x))} 보다 {_se(x) - y['s']:.0f}초 앞 — 줄 순서를 원본 순서로(11-07)")
+    NB = [it for it in items if it["kind"] == "N" and it["zone"] != "outro"]
+    for i, it in enumerate(NB):
+        As = [w for w in W if w["k"] == it["k"] and w["kind"] == "A"]
+        if not As or it["opt"].get("order_ok"): continue
+        mx = max(w["s"] for w in As); nxt = NB[i + 1]["t"] if i + 1 < len(NB) else 1e9
+        for w in W:
+            if w["kind"] == "D" and it["T"] - 0.05 <= w["a"] < nxt and w["s"] < mx - 10:
+                problems.append(f"결과 먼저: 줄{it['k']} 나레 「{it['text'][:24]}」 그림(원본 {mm(mx)})이 뒤 대사 줄{w['k']}(원본 {mm(w['s'])}) 보다 {mx - w['s']:.0f}초 뒤 장면"); break
+# ★11-07 ⑤ 같은 내용 나레 연달아(경고) — 글자 두 개씩 겹침
+def _bg(s): s = re.sub(r"[\s.,!?…'\"“”‘’]", "", s); return {s[i:i + 2] for i in range(len(s) - 1)}
+WARN = []
+NN = [it for it in items if it["kind"] == "N"]
+for i, x in enumerate(NN):
+    for y in NN[i + 1:i + 3]:
+        A_, B_ = _bg(x["text"]), _bg(y["text"])
+        j = len(A_ & B_) / max(1, min(len(A_), len(B_)))
+        if j >= 0.45: WARN.append(f"같은 내용 나레 연달아? 줄{x['k']} 「{x['text'][:28]}」 ↔ 줄{y['k']} 「{y['text'][:28]}」 (겹침 {j:.2f})")
 
 # ── 4. 검사 (계획 단계에서 보장해야 할 것)
 for i in range(len(W) - 1):
@@ -285,9 +430,13 @@ rep = [f"화면 {mm(BODY)} ({BODY:.0f}초) · 원본 {SRCLEN / 60:.0f}분의 {10
        f"가장 긴 조각 {max(w['b'] - w['a'] for w in W):.2f}초 · 대사 창 최장 {max([it['d'] for it in items if it['kind'] == 'D'] or [0]):.2f}초"]
 _tl = [it["tail"] / DSPD for it in items if it.get("tail")]
 if DTAIL > 0 or SCPAD > 0: rep.append(f"대사 여운 {len(_tl)}곳(평균 {sum(_tl) / max(1, len(_tl)):.2f}초) · 장면 바뀜 숨 {sum(1 for it in items if it.get('scene_end'))}곳")
+rep.append(("옛 방식(legacy_spread)" if LEGACY else f"11-07 규칙: 나레 구간 {NSPAN:g}초 안 · 다음 대사에서 자름 · 되감기 {REWIND:g}초") + f" · 글자 조각 반전 안 함 {ntx}" + ("" if TS else " (text_scan.json 없음 — prep/textflip.py)"))
+rep += [f"△ {x}" for x in WARN]
 rep += [f"✗ {p}" for p in problems]
 open("plan_report.txt", "w", encoding="utf-8").write("\n".join(rep) + "\n")
-print("\n".join(rep[:2])); print(f"문제 {len(problems)}")
+print("\n".join(rep[:3]))
+for x in WARN: print("  △", x)
+print(f"문제 {len(problems)}")
 for p in problems[:60]: print("  ✗", p)
 if not DRY:
     json.dump(W, open("windows.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)

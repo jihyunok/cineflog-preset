@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """무비세상 B판 마무리(make_b.py init·rewrite·emph 뒤): 녹음 → 계획(자리 없는 소리 장면 A 뺌) → narr_pic → 관문 pre → 자르기·굽기 → finalcheck → 완성본/무비세상.
-관문 ⑨(나레↔그림)는 A판에서 눈으로 보고 허용한 나레 줄이면 같은 이유로 허용, 새로 걸린 줄이 있으면 b_new9.txt 에 적고 멈춘다(exit 3 — 보고 나서 gate_allow 에 넣고 다시).
+관문 ⑨(나레↔그림)는 ★11-07부터 A판 허용 중 같은 원본 조각·같은 나레 글의 「본 것(seen)」만 옮기고, 나머지는 b_new9.txt 에 적고 멈춘다(exit 3 — npsheet 시트를 보고 조각마다 seen 을 gate_allow 에 넣고 다시). ⑯ 훅·⑰ 글자 검사도 관문에 있다(prep/hookcheck.py·textflip.py).
 사용: python finish_b.py <B판 폴더> [--from plan|gate|build|deliver]"""
 import json, os, re, shutil, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); V9 = os.path.join(HERE, "..", "v9")
@@ -86,16 +86,30 @@ if on("gate"):
     if '"event"' not in open(os.path.join(A, "script.py"), encoding="utf-8").read():   # 앞 3분 규칙(10-20) 전에 만든 옛 편 — A판 구조 그대로
         G.setdefault("⑭ 첫 사건 표시 없음", "10-31 B판 — A판이 앞 3분 규칙(10-20) 전 편, 구조 그대로")
         G.setdefault("⑮ 앞 5분", "10-31 B판 — A판이 앞 5분 규칙(10-20) 전 편, 대사 흐름 그대로")
-    An = {mm.group(0)[:4] for k in GA for mm in [re.search(r"n\d{3}_", k)] if mm}   # 키가 "n001_w0_0.0" 꼴이든 "⑨ … n002_w4_" 꼴이든
-    An |= {mm.group(0)[:4] for k in G if not str(G[k]).startswith("A판") for mm in [re.search(r"n\d{3}_", k)] if mm}   # B판에서 이미 본 나레 줄(제브 판정이 돌 때마다 흔들림)
+    # ★11-07 33 콜래트럴 박제: 옛 판은 A판에서 허용한 나레 「줄」이면 ⑨ 를 같은 문구 하나로 몰아 허용했다(보지 않은 일괄 허용 — 관문이 이제 거절).
+    #   이제는 A판 허용 가운데 {"seen": …}(그 조각에서 본 것)이 있고, B판 조각이 **같은 원본 조각**(원본 초 ±0.05)·**같은 나레 글**일 때만 그 한 건을 옮긴다.
+    #   나머지는 b_new9.txt 에 적고 멈춘다 → B판 npsheet.py 시트를 보고 조각마다 seen 을 적는다.
+    def _pieces(folder):
+        Wf = json.load(open(os.path.join(folder, "windows.json"), encoding="utf-8"))
+        INf = {json.loads(l)["id"]: json.loads(l) for l in open(os.path.join(folder, "jev_np_in.jsonl"), encoding="utf-8")} if os.path.exists(os.path.join(folder, "jev_np_in.jsonl")) else {}
+        def key(i):
+            m = re.match(r"n(\d{3})_w(\d+)_", i)
+            if not m or int(m.group(2)) >= len(Wf): return None
+            return (round(Wf[int(m.group(2))]["s"], 1), (INf.get(i) or {}).get("narration"))
+        return key
+    akey = _pieces(A)
+    AS = {akey(k): v for k, v in GA.items() if isinstance(v, dict) and v.get("seen") and akey(k)}
     json.dump(G, open("gate_allow.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)   # ⑭⑮ 허용을 관문 전에 써 둠
+    run(os.path.join(V9, "prep", "npsheet.py"), log="_npsheet.log")
     r = run(os.path.join(V9, "gate.py"), "pre", log="_gate_pre.log")
     fails = re.findall(r"✗ ⑨ 나레↔그림 어긋남 (n\d{3}_w\d+_[\d.]+)", r.stdout)
     other = [l for l in r.stdout.splitlines() if "✗" in l and "⑨" not in l]
+    bkey = _pieces("."); moved = []
     for f in fails:
-        if f[:4] in An: G[f] = "10-31 B판 — A판에서 눈으로 보고 허용한 같은 나레 줄·같은 원본 구간"
+        v = AS.get(bkey(f))
+        if v and f not in G: G[f] = dict(v, why="A판 같은 원본 조각·같은 나레 글의 본 것 그대로(11-07)"); moved.append(f)
     json.dump(G, open("gate_allow.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    new = [f for f in fails if f[:4] not in An]
+    new = [f for f in fails if f not in moved]
     if new or other:
         IN = {json.loads(l)["id"]: json.loads(l) for l in open("jev_np_in.jsonl", encoding="utf-8")}
         open("b_new9.txt", "w", encoding="utf-8").write("\n".join([f"{f}\t{IN.get(f, {}).get('narration')}\t{IN.get(f, {}).get('shot')}" for f in new] + other))

@@ -62,7 +62,11 @@ def burn(s0, L):
             out.append((i / FPS8, j / FPS8, min(top(a[x]) for x in range(i, j)))); i = j
         else: i += 1
     return out
-def key(w, k): return f"{w['kind']}_{w['s']:.3f}_{w['b'] - w['a']:.3f}_{int(bool(w.get('noflip')))}_{w.get('rate', 0):.4f}_{w.get('pre', 0):.3f}" + (f"_fx{k % 2}_{MOVE}_{GRAIN}" if FX else "")
+def key(w, k):
+    # ★11-07 32v2: 프레임 수(n)를 이름에 — 같은 원본·같은 길이라도 화면 위치(a)에 따라 n 이 ±1 프레임 달라진다(전체 격자에 맞춤).
+    #   n 없이 옛 판 clips 캐시를 다시 쓰면 632조각 중 93개가 ±1프레임 → 그림이 나레보다 최대 0.4초 밀렸다(줄 첫 프레임에 앞 장면 — 판정 「부분」).
+    n = max(1, round(w["b"] * FPS) - round(w["a"] * FPS))
+    return f"{w['kind']}_{w['s']:.3f}_{w['b'] - w['a']:.3f}_{int(bool(w.get('noflip')))}_{w.get('rate', 0):.4f}_{w.get('pre', 0):.3f}_n{n}" + (f"_fx{k % 2}_{MOVE}_{GRAIN}" if FX else "")
 def cut(k):
     w = WN[k]; p = f"{CLIPS}/{key(w, k)}.mkv"
     if os.path.exists(p): return p
@@ -86,7 +90,10 @@ if MODE == "cut":
     gate("pre")
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(int(os.environ.get("CUT_JOBS", 6))) as ex: ps = list(ex.map(cut, range(len(WN))))   # 10-20 메모리 부족(13.9GB PC)으로 멈춤 → CUT_JOBS=3
-    open("all.txt", "w", encoding="utf-8").write("".join(f"file '{p}'\n" for p in ps))
+    # ★11-11 32v2: 이어 붙이기가 조각마다 mkv 길이(ms 올림 — 1.3347→1.335초)만큼 다음 조각을 밀어, 628조각이면 그림이 끝에서 0.2초 늦었다
+    #   (소리·나레·자막은 계획대로 → 줄 첫 프레임에 앞 장면 꼬리·입 모양 어긋남). 조각마다 실제 길이(프레임 수 × 1001/24000)를 duration 으로 적는다.
+    def _n(k): w = WN[k]; return max(1, round(w["b"] * FPS) - round(w["a"] * FPS))
+    open("all.txt", "w", encoding="utf-8").write("".join(f"file '{p}'\nduration {_n(k) * 1001 / 24000:.6f}\n" for k, p in enumerate(ps)))
     subprocess.run(FF + ["-f", "concat", "-safe", "0", "-i", "all.txt", "-c", "copy", "body.mkv"], check=True)
     print("조각", len(ps), "· 몸통", round(dur("body.mkv"), 2), "초 (계획", round(WN[-1]["b"], 2), ")"); sys.exit()
 
@@ -344,16 +351,62 @@ org *= env[:, None]; save("org.wav", org)
 nar = np.zeros((N, 2), np.float32)
 for i, t, d, w in narr:
     x = load(w); k = int(t * SR); nar[k:k + len(x)] += x[:N - k]
-save("narr_track.wav", nar); save("mix.wav", org + nar)
-gate("final", "subs.ass", "narr_track.wav")
 t_mus = narr[-1][1] - 1.0
-music = os.path.expanduser(CFG.get("music", r"~/volcano_work/달빛롱폼/bgm/Healing.mp3"))
-fc = f"[2:a]aresample=48000,atrim=0:{END - t_mus + 1:.2f},volume=0.12,afade=t=in:d=2,afade=t=out:st={END - t_mus - 2:.2f}:d=2,adelay={int(t_mus*1000)}|{int(t_mus*1000)}[mus];" \
-     f"[1:a][mus]amix=inputs=2:normalize=0:duration=first,atrim=0:{END:.2f},alimiter=limit=0.95,loudnorm=I=-16:TP=-1.5:LRA=11[a];" \
+music = os.path.expanduser(CFG.get("music") or "")   # ★11-12 사용자 「배경음은 넣지마」 — 기본 음악 없음(옛 기본 Healing.mp3). ep.json "music" 을 적을 때만
+# ★11-07 33 콜래트럴 박제: 나레가 대사보다 6.7 LU 컸다(분석 — 순간음량 중앙 나레 −14.9 / 대사 −21.6) → 「나레는 대사보다 2~3 LU 크게 → 최종 −16 LUFS」
+#   나레 줄 동안 나레 순간음량 중앙값을 대사 창 동안 원본 순간음량 중앙값 + narr_over_lu(기본 2.5)로 맞추고,
+#   끝 음원까지 섞은 뒤 통합 음량을 재서 고정 이득으로 −16(옛 한 번짜리 loudnorm 은 시간에 따라 이득이 바뀌어 균형을 흐림). ep.json "legacy_loud": true 면 옛 방식.
+LEG_LOUD = bool(CFG.get("legacy_loud"))
+def m_med(x, ivs):
+    """순간음량(400ms, ebur128) 중앙값 — ivs 구간 안(가장자리 0.2초 뺌)"""
+    save("_lm.wav", x)
+    o = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-v", "verbose", "-i", "_lm.wav", "-af", "ebur128=framelog=verbose", "-f", "null", "-"], capture_output=True, text=True, encoding="utf-8", errors="replace").stderr
+    M = np.array([float(m.group(1)) if m.group(1) not in ("-inf", "nan") else -120 for m in re.finditer(r"t:\s*[\d.]+\s+TARGET.*?M:\s*(-?[\d.]+|-?inf|nan)\s+S:", o)])
+    I_ = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", o)[-1]); os.remove("_lm.wav")
+    tc = (np.arange(len(M)) + 1) / 10 - 0.2; m = np.zeros(len(M), bool)
+    for a, b in ivs: m |= (tc >= a + 0.2) & (tc <= b - 0.2)
+    v = M[m]; v = v[v > -70]
+    return (float(np.median(v)) if len(v) else None), I_
+mus = np.zeros((N, 2), np.float32)
+if os.path.exists(music):
+    mz = load(music); L_ = int((END - t_mus + 1) * SR); mz = mz[:L_] * 0.12; k0 = int(t_mus * SR); n_ = min(len(mz), N - k0)
+    if n_ > 0:
+        fi = min(n_, 2 * SR); mz[:fi] *= np.linspace(0, 1, fi)[:, None]
+        fo0 = max(0, int((END - t_mus - 2) * SR)); fo1 = min(n_, fo0 + 2 * SR)
+        if fo1 > fo0: mz[fo0:fo1] *= np.linspace(1, 0, fo1 - fo0)[:, None]
+        mz[fo1:n_] = 0; mus[k0:k0 + n_] = mz[:n_]
+if not LEG_LOUD:
+    DIV = [(w["a"], w["b"]) for w in WN if w["kind"] == "D"]
+    dm, _ = m_med(org, DIV); nm, _ = m_med(nar, [(t, t + d) for _, t, d, _ in narr])
+    over = CFG.get("narr_over_lu", 2.5)
+    dlt = (dm + over) - nm if dm is not None and nm is not None else 0.0
+    gd = max(0.0, min(4.0, -dlt / 2))            # 나레가 너무 크면 절반은 대사 창을 올리고(최대 4dB, 액션 소리는 그대로) 나머지는 나레를 내림 — 뒤 고정 이득이 커져 큰 소리가 눌리지 않게
+    gn = max(-10.0, min(4.0, dlt + gd))
+    if gd > 0:
+        gw = np.ones(N, np.float32); R2 = int(0.05 * SR)
+        for w in WN:
+            if w["kind"] != "D": continue
+            ia, ib = max(0, int(w["a"] * SR)), min(N, int(w["b"] * SR)); gw[ia:ib] = 10 ** (gd / 20)
+        c_ = np.concatenate([[0.0], np.cumsum(gw, dtype=np.float64)]); sm_ = ((c_[R2:] - c_[:-R2]) / R2).astype(np.float32)   # 경계 0.05초 부드럽게(이동 평균)
+        gw = np.concatenate([sm_, np.full(R2 - 1, sm_[-1], np.float32)])[:N]
+        org *= gw[:, None]
+    nar *= 10 ** (gn / 20)
+    print(f"나레·대사 균형: 대사 창 원본 {dm:.1f} · 나레 {nm:.1f} LUFS(순간 중앙) → 대사 창 {gd:+.1f}dB · 나레 {gn:+.1f}dB (나레 = 대사 + {over} LU)")
+    save("org.wav", org)
+save("narr_track.wav", nar); save("mix.wav", org + nar + (mus if not LEG_LOUD else 0))
+gate("final", "subs.ass", "narr_track.wav")
+if not LEG_LOUD:
+    _, Imix = m_med(org + nar + mus, [])
+    gF = -16.0 - Imix; print(f"섞은 소리 {Imix:.1f} LUFS → 고정 이득 {gF:+.1f}dB")
+    afc = f"[1:a]atrim=0:{END:.2f},volume={gF:.2f}dB,alimiter=limit=0.89:level=disabled:attack=1:release=60[a];"
+else:
+    afc = f"[2:a]aresample=48000,atrim=0:{END - t_mus + 1:.2f},volume=0.12,afade=t=in:d=2,afade=t=out:st={END - t_mus - 2:.2f}:d=2,adelay={int(t_mus*1000)}|{int(t_mus*1000)}[mus];" \
+          f"[1:a][mus]amix=inputs=2:normalize=0:duration=first,atrim=0:{END:.2f},alimiter=limit=0.95,loudnorm=I=-16:TP=-1.5:LRA=11[a];"
+fc = afc + \
      f"[0:v]unsharp=5:5:{SHARP}:5:5:0,tpad=stop_mode=clone:stop_duration={OUT:.2f},fade=t=out:st={END - 1:.2f}:d=1,subtitles=subs_burn.ass:fontsdir={FONTS}" + \
      ("[vs];[3:v]format=rgba[wm];[vs][wm]overlay=W-w-72:54[v]" if WM else "[v]")   # 10-20 텔레그램 "아래 왼쪽으로 조금 옮겨" (40:28 → 72:54)
 open("fc.txt", "w", encoding="utf-8").write(fc)
-subprocess.run(FF + ["-i", "body.mkv", "-i", "mix.wav", "-i", music] + (["-i", WM] if WM else []) + ["-/filter_complex", "fc.txt", "-map", "[v]", "-map", "[a]",
+subprocess.run(FF + ["-i", "body.mkv", "-i", "mix.wav"] + (["-i", music] if os.path.exists(music) else ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo"]) + (["-i", WM] if WM else []) + ["-/filter_complex", "fc.txt", "-map", "[v]", "-map", "[a]",
                      "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "final.mp4.tmp.mp4"], check=True)
 os.replace("final.mp4.tmp.mp4", "final.mp4")
 def lufs(p):

@@ -30,7 +30,11 @@ def place(t):
         return next((g[0].lower() for g in SAME if b in [q.lower() for q in g]), b)
     return head.strip()
 def src0(x):
-    if x[0] == "N": return (x[2][0][0] if isinstance(x[2], list) else x[2])
+    if x[0] == "N":
+        if not isinstance(x[2], (list, tuple)): return x[2]
+        f = x[2][0]                                    # ★11-07 문장 구간(sent) 꼴: 문장 칸이 (a,b) 또는 [(a,b),…] — 첫 구간 시작
+        while isinstance(f, (list, tuple)) and isinstance(f[0], (list, tuple)): f = f[0]
+        return f[0]
     if x[0] == "D": ids = x[1] if isinstance(x[1], list) else [x[1]]; return L[ids[0]]["ws"]
     if x[0] == "A": return x[1]
 def mm(t): return f"{int(t // 60)}:{t % 60:04.1f}"
